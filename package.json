@@ -1,0 +1,14 @@
+{
+  "name": "kanjialive-api",
+  "version": "0.0.1",
+  "description": "Kanji Alive App",
+  "main": "index.js",
+  "author": "dayj",
+  "dependencies": {
+    "express": "3.x",
+    "mongodb": "^1.4.39"
+  },
+  "engines": {
+    "node": "0.12.x"
+  }
+}

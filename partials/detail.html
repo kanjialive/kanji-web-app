@@ -1,0 +1,230 @@
+<div class="row nav">
+  <!--<div class="mobile-branding col-xs-12">
+     <a href="http://kanjialive.com" target="_blank">Kanji alive</a>
+  </div>-->
+  <div class="col-xs-3 nav-section-1">
+    <p><span><a ng-href="{{lastSearch}}">{{query}}</a></span></p>
+  </div>
+  <div class="col-xs-3 nav-section-2">
+    <div class="control-wrapper">
+      <a class="icon icon-left" ng-click="prevKanji(false)">〈</a>
+      <a><span>{{currentIndex + 1}} of {{results.length}}</span></a>
+      <a class="icon icon-right" ng-click="nextKanji(false)">〉</a>
+    </div>
+  </div>
+  <div class="col-xs-3 nav-section-3">
+    <img src="http://kanjialive.com/wp-content/uploads/2013/10/fan_logo_104.png"/>
+    <a ng-click="showHelpModal('lg')"><span>Info</span></a>
+  </div>
+  <div class="desktop-branding col-xs-3 nav-section-4">
+    <a href="http://kanjialive.com" target="_blank"><span>Kanji alive</span></a>
+    <img src="http://kanjialive.com/wp-content/uploads/2013/10/fan_logo_104.png"/>
+  </div>
+  <div class="border">
+    <div class="border-inner"></div>
+  </div>
+</div>
+
+<div class="row detail-body" vg-player>
+  <div class="col-xs-6">
+    <div class="row">
+      <div class="col-xs-6">
+        <h3>Kanji</h3>
+        <div ng-switch="detailMode">
+          <div class="video-container" ng-switch-default>
+            <div class="video">
+              <video ng-click="setDetailMode('typeface')" ng-attr-poster='{{doc.poster_video_source}}' preload='auto' vg-src="sources" preload='metadata' vg-video>
+              </video>
+            </div>
+            <div class="row animation-controls">
+              <div class="col-xs-2 col-xs-offset-3">
+                <a aria-hidden="true" id="ka-anim-step-back" class="icon-step-left ka-icon-gray pointer gray-out" ng-click="stepBackward()"></a>
+              </div>
+              <div class="col-xs-2">
+                <a aria-hidden="true" id="ka-anim-play" ng-class="playPauseIcon" class="ka-icon-gray pointer gray-out" ng-click="togglePlayPause()"></a>
+              </div>
+              <div class="col-xs-2">
+                <a aria-hidden="true" id="ka-anim-step-forward" class="icon-step-right ka-icon-gray pointer gray-out" ng-click="stepForward()"></a>
+              </div>
+            </div>
+          </div>
+          <div id="ka-typeface-container" ng-switch-when="typeface">
+            <div ng-click="setDetailMode('video')" class="ka-typefaces" ng-switch="typeface">
+              <img ng-switch-when="shino" ng-src="{{doc.shino_source}}">
+              <img ng-switch-when="tensho" ng-src="{{doc.tensho_source}}">
+              <img ng-switch-when="kyokasho" ng-src="{{doc.kyokasho_source}}">
+              <img ng-switch-when="maru" ng-src="{{doc.maru_source}}">
+              <img ng-switch-when="mincho" ng-src="{{doc.mincho_source}}">
+              <img ng-switch-when="gothic" ng-src="{{doc.gothic_source}}">
+              <img ng-switch-when="hiragino" ng-src="{{doc.hiragino_source}}">
+              <img ng-switch-when="kanteiryu" ng-src="{{doc.kanteiryu_source}}">
+              <img ng-switch-when="suzumushi" ng-src="{{doc.suzumushi_source}}">
+            </div>
+            <div class="row animation-controls">
+              <div class="col-xs-2 col-xs-offset-2">
+              <a ng-click="previousTypeface()" class="ka-typeface-left pointer gray-out">〈</a>
+              </div>
+              <div class="col-xs-4">
+              <span class="typeface-name" ng-bind-html="renderHtml(typefaceDisplay)"></span>
+              </div>
+              <div class="col-xs-2">
+              <a ng-click="nextTypeface()" class="ka-typeface-right pointer gray-out">〉</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-xs-6">
+        <div class="meaning">
+          <h3>Meaning</h3>
+          <p>{{doc.meaning}}</p>
+        </div>
+
+        <div class="onyomi">
+          <h3>Onyomi</h3>
+          <p>{{doc.onyomi_ja}}</p>
+        </div>
+
+        <div class="kunyomi">
+          <h3>Kunyomi</h3>
+          <p>{{doc.kunyomi_ka_display}}</p>
+        </div>
+
+        <div class="border-no-padding">
+          <div class="border-inner"></div>
+        </div>
+
+        <div class="radical">
+          <h3>Radical</h3>
+          <div class="row">
+            <div class="col-xs-3" class="radical-character-container">
+              <img class="radical-character" ng-src="{{doc.rad_char_source}}">
+              <img class="radical-position" ng-show="doc.rad_position" class="radical-position" ng-src="{{doc.rad_position_file}}">
+            </div>
+            <div class="col-xs-6">
+              <div>{{doc.rad_name_ja}}</div>
+              <div>{{doc.rad_meaning}}</div>
+              <div>{{doc.rad_stroke}}</div>
+            </div>
+            <div class="col-xs-3">
+              <div class="ka-rad-anim" class="pointer" ng-click="startRadicalAnimation()">
+                <img ng-class="{'opaque':radicalFrame === 0}" ng-src="{{doc.rad_anim_frame_0}}">
+                <img ng-class="{'opaque':radicalFrame === 1}" ng-src="{{doc.rad_anim_frame_1}}">
+                <img ng-class="{'opaque':radicalFrame === 2}" ng-src="{{doc.rad_anim_frame_2}}">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-xs-12">
+
+        <div class="border-no-padding hidden-xs">
+          <div class="border-inner"></div>
+        </div>
+
+        <div class="stroke-breakdown">
+          <img ng-repeat="stroke in doc.strokes" class="ka-breakdown" ng-src="{{stroke}}" ng-mouseover="seek(doc.stroketimes[$index + 1])">
+        </div>
+
+      </div>
+    </div>
+  </div>
+  <div class="col-xs-6">
+    <div class="row">
+      <div class="col-xs-6">
+
+        <div class="row strokes-grade">
+          <div class="col-xs-6">
+            <h3>Strokes</h3>
+            <p>{{doc.kstroke}}</p>
+          </div>
+
+          <div class="col-xs-6">
+            <h3>Grade</h3>
+            <p>{{doc.grade}}</p>
+          </div>
+        </div>
+        <div class="row kodansha-nelson">
+          <div class="col-xs-12">
+            <div class="border-no-padding">
+              <div class="border-inner"></div>
+            </div>
+          </div>
+          <div class="col-xs-6">
+            <h3>Kodansha</h3>
+            <p>{{doc.dick}}</p>
+          </div>
+          <div class="col-xs-6">
+            <h3>Classic Nelson</h3>
+            <p>{{doc.dicn}}</p>
+          </div>
+        </div>
+        <div class="row luminous-hint">
+          <div class="col-xs-12">
+            <div class="luminous">
+              <h3>Luminous</h3>
+              <p ng-switch="doc.luminous">
+                <span ng-switch-when="n/a">{{doc.luminous}}</span>
+                <a ng-switch-default target="_blank" href="{{doc.luminous}}">Example sentences using {{doc.ka_utf}}</a>
+              </p>
+            </div>
+            <div class="border-no-padding">
+              <div class="border-inner"></div>
+            </div>
+
+            <div class="hint">
+              <h3>Hint</h3>
+              <div id="ka-hint" ng-bind-html="renderHtml(doc.hint)"></div>
+            </div>
+
+            <div class="border-no-padding">
+              <div class="border-inner"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-xs-6 examples">
+
+        <div class="border-no-padding visible-xs">
+          <div class="border-inner"></div>
+        </div>
+
+        <h3>Examples</h3>
+        <div class="row example" ng-repeat="example in doc.examples" >
+          <div ng-mouseenter="showTranslation($index)" ng-mouseleave="hideTranslation($index)">
+            <div ng-hide="translations[$index]" class="col-xs-10 example-ja" ng-bind-html="renderHtml(example.japanese)"></div>
+            <div ng-show="translations[$index]" class="col-xs-10 example-ja" ng-bind-html="renderHtml(example.english)"></div>
+          </div>
+          <div class="col-xs-1 example-audio">
+            <ka-audio>
+              <audio class="icon-play audio-play ka-icon-gray pointer gray-out">
+                <source ng-src="{{example.opus}}" type="audio/opus">
+                <source ng-src="{{example.aac}}" type="audio/aac">
+                <source ng-src="{{example.ogg}}" type="audio/ogg">
+                <source ng-src="{{example.mp3}}" type="audio/mp3">
+              </audio>
+              <a aria-hidden="true" class="icon-play audio-play ka-icon-gray pointer gray-out"></a>
+            </ka-audio>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="row">
+  <div class="col-xs-12">
+    <div class="border-no-padding">
+      <div class="border-inner"></div>
+    </div>
+    <div class="row footer">
+      <div class="col-xs-12">
+        <p>v2.0.0</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+

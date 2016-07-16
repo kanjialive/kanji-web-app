@@ -1,0 +1,142 @@
+<div class="row nav">
+    <div class="col-xs-3 nav-section-1">
+        <p>
+        <form class="search-form" ng-submit="search()">
+            <input ng-model="query" id="search-kid" class="search-bar" type="text" spellcheck="false" autocapitalize="off" autocorrect="off">
+            <a class="search-button" ng-click="search()"></a>
+            <input type="submit" class="hidden"/>
+        </form>
+        </p>
+    </div>
+    <div class="col-xs-3 nav-section-2">
+        <div class="control-wrapper">
+            <a ng-click="scrollBackward()" class="icon icon-left">〈</a>
+            <a ng-click="sort(1)"><span>Sort</span></a>
+            <a ng-click="scrollForward()" class="icon icon-right">〉</a>
+        </div>
+    </div>
+    <div class="col-xs-3 nav-section-3">
+        <img src="http://kanjialive.com/wp-content/uploads/2013/10/fan_logo_104.png"/>
+        <a ng-click="showHelpModal('lg')"><span>Info</span></a>
+    </div>
+    <div class="desktop-branding col-xs-3 nav-section-4">
+        <a href="http://kanjialive.com" target="_blank"><span>Kanji alive</span></a>
+        <img src="http://kanjialive.com/wp-content/uploads/2013/10/fan_logo_104.png"/>
+    </div>
+    <div class="border">
+        <div class="border-inner"></div>
+    </div>
+</div>
+
+
+<div class="detail-body" ng-switch="mode">
+    <div class="scrollbar-wrapper" ng-switch-when="kanji">
+    <perfect-scrollbar class="scroller row search-results-container" wheel-propagation="true" wheel-speed="50" ka-scrollable>
+        <div ng-style="kanjiResultsStyle" class="col-xs-12 search-results" >
+            <div id="kanji-count" class="ka-results-h1">{{results.length}}</div>
+            <div class="ka-results-h3">Kanji</div>
+            <div class="ka-border-bottom">
+                <div class="border-inner"></div>
+            </div>
+            <p class="kanji">
+                <a ng-repeat="kanji in results track by $index" ng-click="setCurrent($index)" id="{{kanji.ka_id}}"
+                   class="ka" href="/{{kanji.ka_utf}}">{{kanji.ka_utf}}</a>
+
+            <p class="no-results" ng-hide="results.length">No kanji were found matching this search.</p>
+            </p>
+        </div>
+    </perfect-scrollbar>
+    </div>
+    <div class="scrollbar-wrapper" ng-switch-when="rsort">
+
+    <perfect-scrollbar class="scroller row search-results-container" wheel-propagation="true" wheel-speed="50" ka-group-scrollable>
+        <div class="col-xs-12 search-results">
+            <ul class="list-inline">
+                <li class="results-group" ng-repeat="group in radicalStrokeGroups">
+                    <div class="ka-results-h1">{{group.stroke}}</div>
+                    <div class="ka-results-h3">Radical Stroke<span ng-hide="group.stroke == 1">s</span></div>
+                    <div class="ka-border-bottom">
+                        <div class="border-inner"></div>
+                    </div>
+                    <div class="grouped-results">
+                        <div class="grouped-column inline" ng-repeat="column in group.columns">
+                            <div ng-repeat="radical in column">
+                                <div class="ka-radical inline">{{radical.radical}}</div>
+                                <div class="grouped-row-container inline">
+                                    <div class="grouped-row" ng-repeat="row in radical.rows">
+                                        <a ng-repeat="kanji in row" id="{{kanji.ka_id}}" class="ka" href="/{{kanji.ka_utf}}"
+                                           ng-click="setCurrent(kanji.sortedIndex)">{{kanji.ka_utf}}</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </perfect-scrollbar>
+        </div>
+    <div class="scrollbar-wrapper" ng-switch-when="ksort">
+
+    <perfect-scrollbar class="scroller row search-results-container" wheel-propagation="true" wheel-speed="50" ka-group-scrollable>
+        <div class="col-xs-12 search-results">
+            <ul class="list-inline">
+                <li class="results-group" ng-repeat="group in kanjiStrokeGroups">
+                    <div class="ka-results-h1">{{group.stroke}}</div>
+                    <div class="ka-results-h3">Kanji Stroke<span ng-hide="group.stroke == 1">s</span></div>
+                    <div class="ka-border-bottom">
+                        <div class="border-inner"></div>
+                    </div>
+                    <div class="grouped-results">
+                        <div class="grouped-column inline" ng-repeat="column in group.columns">
+                            <div ng-repeat="radical in column">
+                                <div class="ka-radical inline">{{radical.radical}}</div>
+                                <div class="grouped-row-container inline">
+                                    <div class="grouped-row" ng-repeat="row in radical.rows">
+                                        <a ng-repeat="kanji in row" id="{{kanji.ka_id}}" class="ka" href="/{{kanji.ka_utf}}"
+                                           ng-click="setCurrent(kanji.sortedIndex)">{{kanji.ka_utf}}</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </perfect-scrollbar>
+        </div>
+        <div class="col-xs-6 search-results" ng-switch-when="help">
+            <div class="ka-welcome-header">Welcome to <span class="ka-welcome-italic">Kanji alive</span></div>
+            <p class="ka-welcome-p">Start out with <span class="ka-welcome-italic">Quick Search</span> by entering either a
+                kanji itself, its Onyomi in katakana, Kunyomi in hiragana or its English meaning into the search field. If
+                your search produced many results, click on the “Sort” icon to view these kanji grouped in different ways.
+            </p>
+
+            <p class="ka-welcome-p">Next, learn how to use the flexible <span
+                    class="ka-welcome-italic">Advanced Search</span> syntax. This allows you to search for kanji in romaji
+                or Japanese using all available categories including radical, stroke, grade and textbook (e.g. by entering
+                <code>on:shin</code> to find all kanji with the onyomi “shin” or <code>grade:2</code> to find all Grade 2
+                kanji).</p>
+
+            <p class="ka-welcome-p">Please read our <a href="http://kanjialive.com/user-guide" target="_blank">User
+                Guide</a> to learn more, watch a <a href="http://www.youtube.com/kanjialive/" target="_blank">demo video</a>
+                or click on the “Info” icon in the navigation bar to review the context sensitive Quick Reference.
+            </p>
+        </div>
+        <div class="col-xs-6 search-results" ng-switch-default></div>
+</div>
+
+<div class="row">
+    <div class="col-xs-12">
+        <div class="border-no-padding">
+            <div class="border-inner"></div>
+        </div>
+        <div class="row footer">
+            <div class="col-xs-12">
+                <p>v2.0.0</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+

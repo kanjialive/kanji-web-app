@@ -1,0 +1,642 @@
+@font-face {
+  font-family: 'mplus-1m-light';
+  src: url('/static/css/fonts/mplus-1m-light-webfont.eot');
+  src: url('/static/css/fonts/mplus-1m-light-webfont.eot?#iefix') format('embedded-opentype'),
+       url('/static/css/fonts/mplus-1m-light-webfont.woff') format('woff'),
+       url('/static/css/fonts/mplus-1m-light-webfont.ttf') format('truetype');
+  font-style: normal;
+  font-weight: normal;
+  font-variant: normal;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+@font-face {
+  font-family: 'SourceSansPro-Regular';
+  src: local('SourceSansPro-Regular');
+  src: url('/static/css/fonts/sourcesanspro-regular-webfont.eot');
+  src: url('/static/css/fonts/sourcesanspro-regular-webfont.eot?#iefix') format('embedded-opentype'),
+       url('/static/css/fonts/sourcesanspro-regular-webfont.woff') format('woff'),
+       url('/static/css/fonts/sourcesanspro-regular-webfont.ttf') format('truetype');
+  unicode-range: U+0000-007F; 
+  font-style: normal;
+  font-weight: normal;
+  font-variant: normal;
+}
+
+@font-face {
+  font-family: 'SourceSansPro-It';
+  src: local('SourceSansPro-It');
+  src: url('/static/css/fonts/sourcesanspro-italic-webfont.eot');
+  src: url('/static/css/fonts/sourcesanspro-italic-webfont.eot?#iefix') format('embedded-opentype'),
+       url('/static/css/fonts/sourcesanspro-italic-webfont.woff') format('woff'),
+       url('/static/css/fonts/sourcesanspro-italic-webfont.ttf')  format('truetype');
+  font-style: italic;
+  font-weight: normal;
+  font-variant: normal;
+}
+
+@font-face {
+  font-family: 'JapaneseRadicals-Regular';
+  src: local('JapaneseRadicals-Regular');
+  src: url('/static/css/fonts/JapaneseRadicals-Regular.eot');
+  src: url('/static/css/fonts/JapaneseRadicals-Regular.eot?#iefix') format('embedded-opentype'),
+       url('/static/css/fonts/JapaneseRadicals-Regular.woff') format('woff'),
+       url('/static/css/fonts/JapaneseRadicals-Regular.ttf')  format('truetype');
+  font-weight: normal;
+  font-variant: normal;
+}
+
+@font-face {
+  font-family: 'mplus-1m-icons';
+  src: url('/static/css/fonts/mplus-1m-icons.eot');
+  src: url('/static/css/fonts/mplus-1m-icons.eot?#iefix') format('embedded-opentype'),
+       url('/static/css/fonts/mplus-1m-icons.woff') format('woff'),
+       url('/static/css/fonts/mplus-1m-icons.ttf')  format('truetype');
+  font-style: normal;
+  font-weight: normal;
+  font-variant: normal;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  background-color: #D0D0D0;
+}
+
+
+.desktop-branding {
+  display:none;
+}
+.desktop-branding img {
+  max-width:54px;
+  padding-bottom:8px;
+}
+/*.mobile-branding a {
+  margin-top:20px;
+}*/
+.mobile-branding img {
+  max-width:50px;
+}
+
+.mobile-branding, .desktop-branding a {
+  font-family: 'SourceSansPro-It','SourceSansPro-Regular',sans-serif;
+  /*workaround for FireFox*/  
+  font-style: italic;
+}
+
+.nav a, .nav {
+    font-family:'SourceSansPro-Regular','ヒラギノ角ゴ Pro W3','Hiragino Kaku Gothic Pro','メイリオ',Meiryo,'ＭＳ Ｐゴシック',MS-Gothic,sans-serif; 
+    font-size:17px; 
+    color:#B64630;
+    font-weight:normal; 
+    -webkit-touch-callout: none; 
+    -webkit-user-select: none; 
+    -khtml-user-select:none; 
+    -moz-user-select:none; 
+    -ms-user-select: none; 
+  }
+a:hover {
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.search-form {
+  width:259px;
+  background: #F6F6F6;
+}
+
+.search-button {
+  background: url('/static/img/search-icon.png');
+  background-size:22px 22px;
+  width: 22px;
+  height:22px;
+  position:absolute;
+  top:0;
+  left:240px;
+}
+
+
+.search-bar {
+  border:0; 
+  outline:none; 
+  background-color:#F6F6F6;
+  box-shadow:none;
+  color:#B64630;
+  padding: 4px 0 1px 10px;
+  height:29px;
+  font-family:'SourceSansPro-Regular','ヒラギノ角ゴ Pro W3','Hiragino Kaku Gothic Pro','メイリオ',Meiryo,'ＭＳ Ｐゴシック',MS-Gothic,sans-serif; 
+}
+
+.nav a.icon {
+  font-family:'mplus-1m-icons' !important; 
+  font-size:20px;
+}
+
+.video-container .video {
+  width:254px;
+  height:254px;
+}
+
+video[poster] {
+  width:254px;
+  height:254px;
+}
+
+video {
+  width:254px;
+  height:254px;
+}
+
+.nav-section-1 a {
+  margin-right:15px;
+}
+
+.nav-section-2 {
+  text-align: center;
+}
+
+.nav-section-3 {
+  margin-top:5px;
+}
+
+.nav-section-2 .icon-left {
+  margin-right:15px;
+}
+
+.nav-section-2 .icon-right {
+  margin-left:15px;
+}
+h3.nav-header {
+    color:#B64630;
+    margin-top:22px;
+}
+
+.nav-section-3 span {
+  float:right;
+  display:none;
+}
+
+.nav-section-1, .nav-section-2, .nav-section-3 {
+  margin-top:15px;
+  margin-bottom:3px;
+}
+
+.nav-section-1 p, .nav-section-2 p, .nav-section-3 p{
+  display:inline;
+}
+
+.animation-controls {
+  padding-top:30px; 
+}
+
+.search-results {
+  height:529px;
+  /*padding-left:0px;*/
+  /*padding-right:0px;*/
+  /*margin-left:15px;*/
+  /*margin-right:15px;*/
+}
+
+
+.docs-container {
+    padding-top:30px;
+}
+
+
+.mobile-branding {
+  margin-bottom:10px;
+}
+
+.nav-section-3 img {
+  width:25px;
+  padding-top:2px;
+  float:right;
+}
+
+video {width:100%;}
+
+h3 {
+    font-family: "SourceSansPro-Regular", sans-serif;
+    font-size:17px;
+    color:#607F3A;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    margin-top:15px;
+}
+
+h4 {
+    font-family: "SourceSansPro-Regular", sans-serif;
+    font-size:16px;
+    color:#B64630;
+    -webkit-user-select: text;
+    -khtml-user-select:text;
+    -moz-user-select:text;
+    -ms-user-select: text;
+
+}
+
+label {
+    font-family: "SourceSansPro-Regular", sans-serif;
+    font-size:13px;
+    color:#607F3A;
+    font-weight: 300;
+}
+
+.example { min-height:41px; }
+.detail-body {min-height:536px; !important }
+
+.submit { margin-top:20px; }
+
+textarea { resize: none; }
+
+
+.radical img {max-width:50px; max-height:50px;}
+.hint img {
+  max-width:12px;
+  max-height:12px;
+}
+img.ka-breakdown {
+    height:48px;
+    width:48px;
+    padding-bottom:10px;
+}
+
+.stroke-breakdown {
+    width:530px;
+    height:130px;
+    margin:0;
+    padding-top:15px;
+}
+
+
+
+.luminous-hint .border-no-padding {
+  margin-top:15px;
+  margin-bottom:15px;
+}
+
+.luminous a {
+  color:black;
+}
+
+.border {
+  float:left;
+  height:auto;
+  width:100%;
+  display:block;
+  padding-left:15px;
+  padding-right:15px;
+}
+.border-no-padding{
+  float:left;
+  height:auto;
+  width:100%;
+  display:block;
+}
+.border-inner {
+  height:1px;
+  background-color: #CBCCD0;
+}
+
+.border-right {
+    border-right:1px solid #CBCCD0;
+}
+
+.footer {
+  padding-top:15px;
+  padding-bottom:5px;
+  color:#999;
+}
+
+
+/*@media (min-width: 768px) {*/
+  .nav {
+    height:62px;
+  }
+  .nav span {
+    float:left;
+    display:block;
+    margin-top:4px;
+  }
+  .nav-section-1, .nav-section-2, .nav-section-3 {
+    margin-top:15px;
+  }
+  .nav-section-2 a {
+    margin-left:-10px;
+  }
+  .nav-section-3 span {
+  display:block;
+  }
+  .nav-section-3 img {
+    display:none;
+  }
+  .mobile-branding img {
+    display:none;
+  }
+  .nav-section-4 a {
+    display:block;
+    margin-top:15px;
+    float:left;
+  }
+  .nav .icon {
+    float:left;
+  }
+  .nav .icon-left {
+    margin-right:12%;
+  }
+  .nav .icon-right {
+    margin-left:12%;
+  }
+  .container {
+    width:1220px !important;
+    min-height: 660px !important;
+    margin-left:auto; 
+    margin-right:auto; 
+    margin-top:55px;
+    -moz-box-shadow:    0 3px 6px rgba(100, 100, 100, 0.3);
+    -webkit-box-shadow: 0 3px 6px rgba(100, 100, 100, 0.3);
+    box-shadow:         0 3px 6px rgba(100, 100, 100, 0.3);
+    padding-top:29px;
+    padding-left:48px;
+    padding-right:48px;
+    background-color:white;
+
+  }
+  .mobile-branding {
+    display:none;
+  }
+  .luminous-hint .border-no-padding {
+    margin-top:0;
+    margin-bottom:0;
+  }
+  .desktop-branding {display:block;}
+  .desktop-branding img {float:right;}
+  .meaning {height:70px; }
+  .onyomi {height:58px;}
+  .radical {height:115px;}
+  .kunyomi {height:89px;}
+  .strokes-grade {height:84px;}
+  .kodansha-nelson {height:74px;}
+  .luminous {height:89px;}
+  .hint {height:115px;}
+/*}*/
+
+@font-face {
+  font-family: 'ka-multimedia';
+  src:url('/static/css/fonts/ka-multimedia.eot');
+  src:url('/static/css/fonts/ka-multimedia.eot?#iefix') format('embedded-opentype'),
+    url('/static/css/fonts/ka-multimedia.woff') format('woff'),
+    url('/static/css/fonts/ka-multimedia.ttf') format('truetype'),
+    url('/static/css/fonts/ka-multimedia.svg#ka-multimedia') format('svg');
+  font-weight: normal;
+  font-style: normal;
+}
+
+/* Use the following CSS code if you want to have a class per icon */
+/*
+Instead of a list of all class selectors,
+you can use the generic selector below, but it's slower:
+[class*="icon-"] {
+*/
+.icon-step-left, .icon-play, .icon-pause, .icon-step-right, .icon-pause-down, .icon-step-right-down, .icon-step-left-down, .icon-play-down {
+  font-family: 'ka-multimedia';
+  speak: none;
+  font-style: normal;
+  font-weight: normal;
+  font-variant: normal;
+  text-transform: none;
+  line-height: normal;
+  font-size:20px; 
+  color:black; 
+}
+.icon-step-left:before { content: "\e008"; }
+.icon-play:before { content: "\e007"; }
+.icon-pause:before { content: "\e006"; }
+.icon-step-right:before { content: "\e005"; }
+.icon-pause-down:before { content: "\e002"; }
+.icon-step-right-down:before { content: "\e001"; }
+.icon-step-left-down:before { content: "\e000"; }
+.icon-play-down:before { content: "\e003"; }
+
+.audio-play {
+  font-size:15px; 
+}
+
+.ka-rad-anim img {
+  cursor: pointer;
+  width:54px; 
+  height:54px; 
+  position:absolute;
+  left:0;
+  -webkit-transition: opacity 1s ease-in-out;
+  -moz-transition: opacity 1s ease-in-out;
+  -o-transition: opacity 1s ease-in-out;
+  transition: opacity 1s ease-in-out;
+  opacity:0;
+  -ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";
+  filter: alpha(opacity=0);
+}
+
+.ka-rad-anim img.opaque {
+  opacity:1;
+  -ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=100)";
+  filter: alpha(opacity=1);
+}
+
+.ka-typefaces img {
+  height:226px;
+  width:226px;
+}
+
+.ka-typeface-left, .ka-typeface-right{
+  color:#000000;
+  font-size:20px; 
+  font-family:'mplus-1m-icons';
+  -webkit-user-select: none;
+  -khtml-user-select:none;
+  -moz-user-select:none;
+  -ms-user-select: none;
+}
+
+.typeface-name {
+
+  text-align:center;
+  font-size:15px;
+
+  position:absolute;
+  width:100px;
+  left:0;
+  top:3px;
+}
+		
+.ka-welcome-header {
+  font-family: "SourceSansPro-Regular", sans-serif;
+  font-size:22px;
+  padding-top:30px; 
+  padding-bottom:24px; 
+  color:#607F3A; 
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.ka-welcome-italic {
+  font-family: 'SourceSansPro-It','SourceSansPro-Regular',sans-serif;
+/* workaround for FireFox */  
+  font-style: italic;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.ka-welcome-p {
+  font-size: 18px;
+  font-family: "SourceSansPro-Regular", sans-serif;
+  line-height: 136%;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  white-space: normal;
+}
+
+.ka-results-h1 {
+  font-family: "SourceSansPro-Regular", sans-serif;
+  font-size:17px; 
+  color:#607F3A;  
+  height:39px;
+  padding:10px 0px 0px 0px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.ka-results-h3 {
+  font-family: "SourceSansPro-Regular", sans-serif;
+  font-size:17px; 
+  color:#607F3A; 
+  height:17px; 
+  padding-top:12px;
+  padding-bottom:28px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+
+.ka-bottom-bar {
+  height: 18px;
+  margin-top:-4px; 
+  border-top:1px solid #CBCCD0; 
+}
+
+.ka-radical {
+  font-family:"JapaneseRadicals-Regular", sans-serif;
+  font-size:22px; 
+  color:#CBCCD0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.kanji {
+  font-family:"mplus-1m-light", sans-serif;
+  font-size:25px;
+  -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+.kanji > a {
+  padding:0;
+  margin:0 0 0 12px;
+}
+p.kanji {
+  line-height: 46px;
+  margin-left:-12px;
+  margin-bottom:33px; 
+  margin-right:0; 
+  word-wrap: break-word;
+  white-space:normal;
+
+}
+
+
+a:hover {
+  text-decoration:none; 
+}
+
+a.ka {
+  font-family:"mplus-1m-light", sans-serif;
+  font-size:25px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.grouped-row > a.ka {
+  padding-left:12px;
+}
+
+a.ka, a.ka:visited {
+  color:black; 
+  text-decoration:none; 
+}
+a.ka:hover {
+  cursor:pointer; 
+}
+a.ka:hover, a.ka:active {
+  color:#B64630;
+  text-decoration:none; 
+}
+
+/*@media (min-width:1200px){*/
+/*.container {*/
+    /*margin-top: 55px;*/
+ /*}*/
+/*}*/
+
+.radical-character {
+  width:100%;
+  height:37px
+}
+.radical-position {
+  margin:7px;
+  height:12px; 
+  width:12px;
+}
+
+.inline {
+  display:inline-table;
+}
+
+.results-group {
+  min-width: 259px;
+  margin-right:29px;
+}
+
+
+
+.grouped-results .grouped-column:not(:first-child) {
+  padding-left:29px;
+}
+
+.scroller {
+  white-space: nowrap;
+  height: 529px;
+  overflow-y: hidden;
+  overflow:hidden;
+  position: relative;
+}
+
+.scrollbar-wrapper{
+  width:1124px;
+  height:auto;
+  overflow: hidden;
+  float:left;
+}
+
+::-ms-clear { width : 0; height: 0; }
+
+.list-inline>li {
+  padding-left:0;
+  padding-right:0;
+}
+
+.list-inline>li:first-child {
+  margin-left:5px;
+}
+
+
+

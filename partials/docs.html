@@ -1,0 +1,248 @@
+<div class="row nav">
+    <div class="desktop-branding col-xs-3 nav-section-4">
+        <h3 class="nav-header"><em>Kanji Alive</em> API Documentation</h3>
+    </div>
+    <div class="desktop-branding col-xs-3 nav-section-4">
+    </div>
+    <div class="desktop-branding col-xs-3 nav-section-4">
+        <a href="http://kanjialive.com" target="_blank"><span><em>Kanji alive</em></span></a>
+        <img src="http://kanjialive.com/wp-content/uploads/2013/10/fan_logo_104.png"/>
+    </div>
+    <div class="border">
+        <div class="border-inner"></div>
+    </div>
+</div>
+
+<div class="row docs-container">
+    <div class="col-xs-6 border-right docs-detail">
+        <h3>Introduction</h3>
+        <p>Almost all of the functionality of the <em>Kanji Alive</em> web application (<a href="http://app.kanjialive.com">http://app.kanjialive.com</a>) can be accessed using the <a href="https://www.mashape.com/kanjialive/learn-to-read-and-write-japanese-kanji" target="_blank">public developer API</a> hosted and documented on <a href="https://www.mashape.com/kanjialive/learn-to-read-and-write-japanese-kanji" target="_blank">Mashape</a>. The only exceptions are searching for kanji by textbook and viewing the mnemonic hints for individual kanji. Due to licensing restrictions these features are not available in the public API.</p>
+        
+        <p>All of the <em>Kanji alive</em> data and media accessible through the API is freely available for private and commercial use under a <a href="http://creativecommons.org/licenses/by/4.0/" target="_blank">Creative Commons Attribution (CC-BY)</a> license. We encourage developers to download our language data, media and <a href="https://github.com/kanjialive/media">custom Japanese Radicals font</a> from our <a href="https://github.com/kanjialive/media">GitHub repository</a> for offline use.</p>
+        <p>The documentation on this page is intended to supplement the <a href="https://www.mashape.com/kanjialive/learn-to-read-and-write-japanese-kanji" target="_blank">API documented on Mashape</a>. If necessary, please review the <em>Kanji alive</em> <a href="https://kanjialive.com/user-guide/" target="_blank">User Guide</a> for  further details on individual fields and components.</p>
+        <h3>Basic Search</h3>
+        <p>Valid search strings for the basic search endpoint <code>:search</code> are a single kanji character, an Onyomi reading in katakana, a Kunyomi reading in hiragana, or a kanji's simplified English meaning.</p>
+        <pre>https://kanjialive-api.p.mashape.com/api/public/search/</pre>
+        <h3>Advanced Search</h3>
+        <p>Advanced search mirrors the advanced search options in the <em>Kanji Alive</em> app with one exception. Due to licensing restrictions you cannot search for kanji by textbook (chapter).</p> 
+<p>You can construct an advanced search with any combination of the following key/value pairs as URL parameters. The base endpoint will always be:<pre>https://app.kanjialive.com/api/public/search/advanced</pre></p>
+        <table class="table table-bordered table-condensed">
+            <tbody><tr>
+                <td><code>on</code></td>
+                <td>Onyomi reading, R/J (Katakana)</td>
+                <td><code>on=shin</code> or <code>on=シン</code></td>
+            </tr>
+            <tr>
+                <td><code>kun</code></td>
+                <td>Kunyomi reading, R/J (Hiragana)</td>
+                <td><code>kun=oya</code> or <code>kun=おや</code></td>
+            </tr>
+            <tr>
+                <td><code>kem</code></td>
+                <td>Kanji English meaning, E</td>
+                <td><code>kem=parent</code></td>
+            </tr>
+            <tr>
+                <td><code>ks</code></td>
+                <td>Kanji stroke number, #</td>
+                <td><code>ks=16</code></td>
+            </tr>
+                <td><code>kanji</code></td>
+                <td>Kanji character, J</td>
+                <td><code>kanji=親</code></td>
+            </tr>
+            <tr>
+                <td><code>rjn</code></td>
+                <td>Radical Japanese name, R/J (Hiragana)</td>
+                <td><code>rjn=miru</code> or <code>rjn=みる</code></td>
+            </tr>
+            <tr>
+                <td><code>rem</code></td>
+                <td>Radical English meaning, E</td>
+                <td><code>rem=see</code></td>
+            </tr>
+            <tr>
+                <td><code>rs</code></td>
+                <td>Radical stroke number, #</td>
+                <td><code>rs=7</code></td>
+            </tr>
+             <tr>
+                <td><code>rpos</code></td>
+                <td>Radical position, R/J (Hiragana)</td>
+                <td><code>rpos:hen</code> or <code>rpos:へん</code></td>
+            </tr>
+            <tr>
+            <tr>
+                <td><code>grade</code></td>
+                <td>Grade level, #</td>
+                <td><code>grade=2</code></td>
+            </tr>
+            <tr>
+                <td><code>list</code></td>
+                <td>Study List</td>
+                <td>see below for details</td>
+            </tr>
+            </tbody>
+        </table>
+        <p>Here is an example of an advanced search matching the radical Japanese name みる with all 7 stroke kanji. The advanced search endpoint accepts an arbitrary number of parameters separated by an ampersand:</p>
+    <pre>https://kanjialive-api.p.mashape.com/api/public/search/advanced?rjn=みる&ks=7</pre>
+        <h3>Advanced Search on Study Lists)</h3>
+        <p>Advanced searches on study lists are a slightly idiosyncratic. The aforementioned URL parameter still exists, with the key <code>list</code>, but the value can be constructed using either one or two values in succession.</p>
+        <p>The leftmost column shows what the search parameter would look like for all kanji in a specific list. The rightmost column shows a chapter specific search.</p>
+        <table class="table table-bordered table-condensed">
+            <tbody>
+                    <tr>
+                <td><code>list=ap</code></td>
+                <td>Advanced Placement Exam</td>
+                <td><code>list=ap:c3</code></td>
+            </tr>
+            <tr>
+                <td><code>list=mac</code></td>
+                <td>Macquarie University</td>
+                <td><code>list=mac:c12</code></td>
+            </tr>
+            </tbody>
+        </table>
+        <h3>Response</h3>
+        <p>All basic and advanced searches return a JSON array containing individual objects for each kanji that matches the search. You can use the kanji <code>character</code> value that is returned for a kanji with the detail endpoint to get all of the available information regarding a specific kanji. The radical <code>order</code> value indicates the index number of the radical in the <a href="http://kanjialive.com/214-traditional-kanji-radicals/">canonical order of the 214 traditional kanji radicals</a>.</p>
+        <p>Example: <code>https://kanjialive-api.p.mashape.com/api/public/search/坊</code>
+        <pre>
+[
+  {
+    "kanji": {
+      "character": "坊",
+      "stroke": 7
+    },
+    "radical": {
+      "character": "",
+      "stroke": 3,
+      "order": 38
+    }
+  }
+]
+]</pre>
+        <p>If your search does not yield any results, an empty JSON Array will be returned</p>
+<p><strong>Please Note:</strong> As illustrated above some of the radical characters supported by <em>Kanji alive</em> are not defined in Unicode and had to be assigned PUA (Private Use Area) encodings in the range U+E700..U+E759. To view these characters correctly, your users will first have to install our custom <a href="https://github.com/kintopp/Kanji-alive/tree/master/radicals-font">Japanese Radicals font</a> (freely available in .ttf, .otf, .woff, and .woff2 formats). 
+    </div>
+    <div class="col-xs-6 docs-detail">
+        <h3>Kanji Details</h3>
+        <p>If you know the kanji that you want more detail for, you can use the detail endpoint to get all of the information <em>Kanji Alive</em> has to offer. The information offered through the API is largely the same as found in the web app's detail view, with the following two differences:
+        <ol>
+        <li>The API offers romaji versions of a kanji's Onyomi and Kunyomi readings and access to the timing information for each kanji stroke</li>
+        <li> The API does not offer data on an individual kanji's mnemonic hints</li>
+        </ol></p>
+        <p>The detail endpoint has one parameter, and that is the <code>:character</code> itself.</p>
+        <pre>https://app.kanjialive.com/api/public/kanji/:character</pre>
+        <p>Here is an example of how to use the detail endpoint</p>
+        <pre>https://kanjialive-api.p.mashape.com/api/public/kanji/訪</pre>
+        <h3>Response</h3>
+        <p>The JSON response will be a single JSON Object for the kanji that you have appended to the detail endpoint. All asset URLs that you might be interested will always be fully qualified.</p>
+        <pre>
+ {
+  "kanji": {
+    "character": "訪",
+    "meaning": {
+      "english": "visit"
+    },
+    "strokes": 11,
+    "onyomi": {
+      "romaji": "hou",
+      "katakana": "ホウ"
+    },
+    "kunyomi": {
+      "romaji": "otozureru, tazuneru, otozu, tazu",
+      "hiragana": "おとずれる、たずねる、おとず、たず"
+    },
+    "video": {
+      "poster": "https://media.kanjialive.com/kanji_strokes/otozu(reru)_11.svg",
+      "mp4": "https://media.kanjialive.com/kanji_animations/kanji_mp4/otozu(reru)_00.mp4",
+      "webm": "https://media.kanjialive.com/kanji_animations/kanji_webm/otozu(reru)_00.webm"
+    }
+  },
+  "radical": {
+    "character": "",
+    "strokes": 7,
+    "image": "https://media.kanjialive.com/radical_character/gonben.svg",
+    "position": {
+      "hiragana": "へん",
+      "romaji": "hen",
+      "icon": "https://media.kanjialive.com/rad_positions/hen.svg"
+    },
+    "name": {
+      "hiragana": "ごんべん",
+      "romaji": "gonben"
+    },
+    "meaning": {
+      "english": "words, to speak, say"
+    },
+    "animation": [
+      "https://media.kanjialive.com/rad_frames/gonben0.svg",
+      "https://media.kanjialive.com/rad_frames/gonben1.svg",
+      "https://media.kanjialive.com/rad_frames/gonben2.svg"
+    ]
+  },
+  "references": {
+    "grade": 6,
+    "kodansha": "985",
+    "classic_nelson": "4326"
+  },
+  "examples": [
+    {
+      "japanese": "歴訪する（れきほうする）",
+      "meaning": {
+        "english": "make a tour of"
+      },
+      "audio": {
+        "opus": "https://media.kanjialive.com/examples_audio/audio-opus/otozu(reru)_06_a.opus",
+        "aac": "https://media.kanjialive.com/examples_audio/audio-aac/otozu(reru)_06_a.aac",
+        "ogg": "https://media.kanjialive.com/examples_audio/audio-ogg/otozu(reru)_06_a.ogg",
+        "mp3": "https://media.kanjialive.com/examples_audio/audio-mp3/otozu(reru)_06_a.mp3"
+      }
+    },
+    {
+      "japanese": "訪問する（ほうもんする）",
+      "meaning": {
+        "english": "visit [v.t.]"
+      },
+      "audio": {
+        "opus": "https://media.kanjialive.com/examples_audio/audio-opus/otozu(reru)_06_b.opus",
+        "aac": "https://media.kanjialive.com/examples_audio/audio-aac/otozu(reru)_06_b.aac",
+        "ogg": "https://media.kanjialive.com/examples_audio/audio-ogg/otozu(reru)_06_b.ogg",
+        "mp3": "https://media.kanjialive.com/examples_audio/audio-mp3/otozu(reru)_06_b.mp3"
+      }
+    },
+    {
+      "japanese": "訪れる（おとずれる）",
+      "meaning": {
+        "english": "visit [v.i., v.t.]"
+      },
+      "audio": {
+        "opus": "https://media.kanjialive.com/examples_audio/audio-opus/otozu(reru)_06_c.opus",
+        "aac": "https://media.kanjialive.com/examples_audio/audio-aac/otozu(reru)_06_c.aac",
+        "ogg": "https://media.kanjialive.com/examples_audio/audio-ogg/otozu(reru)_06_c.ogg",
+        "mp3": "https://media.kanjialive.com/examples_audio/audio-mp3/otozu(reru)_06_c.mp3"
+      }
+    },
+    {
+      "japanese": "訪ねる（たずねる）",
+      "meaning": {
+        "english": "visit [v.t.]"
+      },
+      "audio": {
+        "opus": "https://media.kanjialive.com/examples_audio/audio-opus/otozu(reru)_06_d.opus",
+        "aac": "https://media.kanjialive.com/examples_audio/audio-aac/otozu(reru)_06_d.aac",
+        "ogg": "https://media.kanjialive.com/examples_audio/audio-ogg/otozu(reru)_06_d.ogg",
+        "mp3": "https://media.kanjialive.com/examples_audio/audio-mp3/otozu(reru)_06_d.mp3"
+      }
+    }
+  ]
+}
+        </pre>
+        <p>If you ask for a kanji character that Kanji Alive does not have any data for you will get an error response that looks like this:</p>
+        <pre>
+{
+  "error": "no kanji found."
+}</pre>
+
+    </div>
+</div>
