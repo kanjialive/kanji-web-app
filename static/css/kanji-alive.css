@@ -474,7 +474,7 @@ you can use the generic selector below, but it's slower:
 }
 
 
-<!-- added TGJ 26/7/16 css for placeholder for kanji on welcome page -->
+<!-- added TGJ 26/7/16 css for kanji div on welcome page -->
 .ka-welcome-col1{
   position:absolute;
   width:550px;
@@ -485,9 +485,9 @@ you can use the generic selector below, but it's slower:
 
 .ka-welcome-col2{
   position:absolute;
-  width:550px;
-  left:575px;
-  top:0px;
+  width:475px;
+  left:650px;
+  top:40px;
   height:100%;
   
 }
@@ -666,4 +666,25 @@ a.ka:hover, a.ka:active {
   width:254px;
   height:254px;
 
+}
+
+/* added TGJ 26/7/16 css for kanji div on welcome page */
+.TypeSquare {
+	font-family: font-family: "学参 常改教科書ICA L" または "GJ Kyoukasho ICA Light";
+	font-family: "GJ Kyoukasho ICA Light";
+	font-size: 24px;
+	text-rendering: optimizelegibility;
+	ms-writing-mode: tb-rl;
+	-webkit-writing-mode: vertical-rl;
+	-moz-writing-mode: vertical-rl;
+	-ms-writing-mode: vertical-rl;
+	writing-mode: vertical-rl;
+	-webkit-text-orientation: upright;
+	-moz-text-orientation: upright;
+	-ms-text-orientation: upright;
+	text-orientation: upright;
+	-moz-font-feature-settings: "vkrn", "vpal", "vert”, "vkna";
+	-ms-font-feature-settings: "vkrn", "vert”, "vpal", "vkna";
+	-webkit-font-feature-settings: "vkrn", "vert”, "vpal", "vkna";
+	font-feature-settings: "vkrn", "vert”, "vpal", "vkna";
 }
