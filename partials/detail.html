@@ -2,9 +2,18 @@
   <!--<div class="mobile-branding col-xs-12">
      <a href="http://kanjialive.com" target="_blank">Kanji alive</a>
   </div>-->
+  
+  <!-- search function added by TGJ 26/07/16  -->
   <div class="col-xs-3 nav-section-1">
-    <p><span><a ng-href="{{lastSearch}}">{{query}}</a></span></p>
-  </div>
+        <p>
+        <form class="search-form" ng-submit="search()">
+            <input ng-model="query" id="search-kid" class="search-bar" type="text" spellcheck="false" autocapitalize="off" autocorrect="off">
+            <a class="search-button" ng-click="search()"></a>
+            <input type="submit" class="hidden"/>
+        </form>
+        </p>
+    </div>
+  
   <div class="col-xs-3 nav-section-2">
     <div class="control-wrapper">
       <a class="icon icon-left" ng-click="prevKanji(false)">〈</a>
