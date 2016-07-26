@@ -240,4 +240,68 @@ app.controller(
         });
 
 
+    
+    
+    /*  added by TGJ 26/07/16 to support addition of search form in detail view */
+    
+    /* called when hidden submit button is triggered on enter key pressed */
+    $scope.search = function() { parseQuery($scope.query); };
+
+    var parseQuery = function(query) {
+
+      searchService.query = query;
+
+      var searchObj = {};
+      if (query !== undefined && query.length > 0){
+        var components = query.split(':');
+        if (components.length >= 2){
+
+          var searchingForKey = true;
+          var lastSpaceIndex = - 1;
+          var lastColonIndex = -1;
+          var key = null;
+
+          for (var i=0; i < query.length; i++){
+            if (searchingForKey){
+              if (query.charAt(i) === ':'){
+                if (lastColonIndex !== -1 && key !== null){
+                  searchObj[key] = query.substring(lastColonIndex+1, lastSpaceIndex);
+                }
+                key = query.substring(lastSpaceIndex + 1, i).toLowerCase();;
+                searchingForKey = false;
+                lastColonIndex = i;
+
+              } else if (query.charAt(i) === ' '){
+                lastSpaceIndex = i;
+              }
+            } else {
+              if (query.charAt(i) === ' '){
+                lastSpaceIndex = i;
+                searchingForKey = true;
+              }
+            }
+          }
+
+          if (lastColonIndex !== -1){
+            searchObj[key] = query.substring(lastColonIndex+1);
+          }
+
+          $location.path('/search/advanced').search(searchObj);
+
+        } else {
+
+          $location.path('/search/' + query).search({});
+
+        }
+
+        searchService.lastSearch = $location.url();
+
+      }
+    };
+
+    
+    
+    
+   
+    
   }]);
