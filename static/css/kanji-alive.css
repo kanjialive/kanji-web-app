@@ -188,6 +188,8 @@ h3.nav-header {
 
 .animation-controls {
   padding-top:30px; 
+/* added by TGJ 26/07/16 align navigation bar */
+  vertical-align:bottom !important;
 }
 
 .search-results {
@@ -445,8 +447,9 @@ you can use the generic selector below, but it's slower:
 }
 
 .ka-typefaces img {
-  height:226px;
-  width:226px;
+/* modified by TGJ 26/07/16 align kanji animation in detail view */
+  height:254px;
+  width:254px;
 }
 
 .ka-typeface-left, .ka-typeface-right{
@@ -639,4 +642,9 @@ a.ka:hover, a.ka:active {
 }
 
 
+/* added by TGJ 26/07/16 align kanji in detail view */
+.typeface-container  {
+  width:254px;
+  height:254px;
 
+}
