@@ -472,7 +472,26 @@ you can use the generic selector below, but it's slower:
   left:0;
   top:3px;
 }
-		
+
+
+<!-- added TGJ 26/7/16 css for placeholder for kanji on welcome page -->
+.ka-welcome-col1{
+  position:absolute;
+  width:550px;
+  left:0;
+  top:0px;
+ height:529px;
+}
+
+.ka-welcome-col2{
+  position:absolute;
+  width:550px;
+  left:575px;
+  top:0px;
+  height:100%;
+  
+}
+
 .ka-welcome-header {
   font-family: "SourceSansPro-Regular", sans-serif;
   font-size:22px;
