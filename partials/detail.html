@@ -13,11 +13,11 @@
         </form>
         </p>
     </div>
-  
-  <div class="col-xs-3 nav-section-2">
+<div class="col-xs-3 nav-section-2">
     <div class="control-wrapper">
       <a class="icon icon-left" ng-click="prevKanji(false)">〈</a>
-      <a><span>{{currentIndex + 1}} of {{results.length}}</span></a>
+      <!-- updated by TGJ 26/07/16 to link back to last search -->
+      <a ng-href="{{lastSearch}}"><span>{{currentIndex + 1}} of {{results.length}}</span></a>
       <a class="icon icon-right" ng-click="nextKanji(false)">〉</a>
     </div>
   </div>
