@@ -15,10 +15,16 @@
     </div>
 <div class="col-xs-3 nav-section-2">
     <div class="control-wrapper">
+    <div class="col-xs-2">
       <a class="icon icon-left" ng-click="prevKanji(false)">〈</a>
       <!-- updated by TGJ 26/07/16 to link back to last search -->
+     </div>
+     <div class="col-xs-4">
       <a ng-href="{{lastSearch}}"><span>{{currentIndex + 1}} of {{results.length}}</span></a>
+   </div>
+   <div class="col-xs-2 ">
       <a class="icon icon-right" ng-click="nextKanji(false)">〉</a>
+      </div>
     </div>
   </div>
   <div class="col-xs-3 nav-section-3">
@@ -45,19 +51,24 @@
               <video ng-click="setDetailMode('typeface')" ng-attr-poster='{{doc.poster_video_source}}' preload='auto' vg-src="sources" preload='metadata' vg-video>
               </video>
             </div>
-            <div class="row animation-controls">
-              <div class="col-xs-2 col-xs-offset-3">
+      
+     <div class="row animation-controls">
+              <div class="col-xs-2 col-xs-offset-2" >
                 <a aria-hidden="true" id="ka-anim-step-back" class="icon-step-left ka-icon-gray pointer gray-out" ng-click="stepBackward()"></a>
               </div>
-              <div class="col-xs-2">
-                <a aria-hidden="true" id="ka-anim-play" ng-class="playPauseIcon" class="ka-icon-gray pointer gray-out" ng-click="togglePlayPause()"></a>
+               <div class="col-xs-4">
+              <div class="col-xs-1 col-xs-offset-2">
+                <a  aria-hidden="true" id="ka-anim-play" ng-class="playPauseIcon" class="icon-step-middle ka-icon-gray pointer gray-out" ng-click="togglePlayPause()"></a>
               </div>
-              <div class="col-xs-2">
+              </div>
+              <div class="col-xs-2 " >
                 <a aria-hidden="true" id="ka-anim-step-forward" class="icon-step-right ka-icon-gray pointer gray-out" ng-click="stepForward()"></a>
               </div>
             </div>
+      
+  
           </div>
-          <div id="ka-typeface-container" ng-switch-when="typeface">
+          <div id="ka-typeface-container"  class="typeface-container" ng-switch-when="typeface">
             <div ng-click="setDetailMode('video')" class="ka-typefaces" ng-switch="typeface">
               <img ng-switch-when="shino" ng-src="{{doc.shino_source}}">
               <img ng-switch-when="tensho" ng-src="{{doc.tensho_source}}">
@@ -80,6 +91,26 @@
               <a ng-click="nextTypeface()" class="ka-typeface-right pointer gray-out">〉</a>
               </div>
             </div>
+                   
+                   
+                      <!--  
+                  <div class="col-xs-3 nav-section-2">
+    <div class="control-wrapper">
+      <a class="icon icon-left" ng-click="prevKanji(false)">〈</a>
+      
+      <a ng-href="{{lastSearch}}"><span>{{currentIndex + 1}} of {{results.length}}</span></a>
+      <a class="icon icon-right" ng-click="nextKanji(false)">〉</a>
+    </div>
+  </div>
+            --
+                   
+            
+            
+            
+            -->
+            
+            
+     
           </div>
         </div>
       </div>

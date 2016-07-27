@@ -9,12 +9,20 @@
         </p>
     </div>
     <div class="col-xs-3 nav-section-2">
-        <div class="control-wrapper">
-            <a ng-click="scrollBackward()" class="icon icon-left">〈</a>
-            <a ng-click="sort(1)"><span>Sort</span></a>
-            <a ng-click="scrollForward()" class="icon icon-right">〉</a>
-        </div>
+    <div class="control-wrapper">
+    <div class="col-xs-2">
+       <a ng-click="scrollBackward()" class="icon icon-left">〈</a>    
+     </div>
+     <div class="col-xs-4">
+       <a ng-click="sort(1)"><span>Sort</span></a>  
+   </div>
+   <div class="col-xs-2 ">
+      <a ng-click="scrollForward()" class="icon icon-right">〉</a>
+      </div>
     </div>
+  </div>
+    
+ 
     <div class="col-xs-3 nav-section-3">
         <img src="http://kanjialive.com/wp-content/uploads/2013/10/fan_logo_104.png"/>
         <a ng-click="showHelpModal('lg')"><span>Info</span></a>
