@@ -686,26 +686,6 @@ a.ka:hover, a.ka:active {
 
 }
 
-/* added TGJ 26/7/16 css for kanji div on welcome page */
-.TypeSquare {
-	font-family: font-family: "学参 常改教科書ICA L" または "GJ Kyoukasho ICA Light";
-	font-family: "GJ Kyoukasho ICA Light";
-	font-size: 24px;
-	text-rendering: optimizelegibility;
-	ms-writing-mode: tb-rl;
-	-webkit-writing-mode: vertical-rl;
-	-moz-writing-mode: vertical-rl;
-	-ms-writing-mode: vertical-rl;
-	writing-mode: vertical-rl;
-	-webkit-text-orientation: upright;
-	-moz-text-orientation: upright;
-	-ms-text-orientation: upright;
-	text-orientation: upright;
-	-moz-font-feature-settings: "vkrn", "vpal", "vert”, "vkna";
-	-ms-font-feature-settings: "vkrn", "vert”, "vpal", "vkna";
-	-webkit-font-feature-settings: "vkrn", "vert”, "vpal", "vkna";
-	font-feature-settings: "vkrn", "vert”, "vpal", "vkna";
-}
 
 
 /* for dev purposes */
@@ -716,5 +696,23 @@ div {
 	}
 	
 	
-
+/* added TGJ 26/7/16 css for kanji div on welcome page */
+.TypeSquare {
+	font-family: font-family: "学参 常改教科書ICA L" または "GJ Kyoukasho ICA Light" ;
+	font-family: "GJ Kyoukasho ICA Light" ;
+	font-size: 24px;
+	text-rendering: optimizelegibility;
+	ms-writing-mode: tb-rl;
+	-webkit-writing-mode: vertical-rl;
+	-moz-writing-mode: vertical-rl  ;
+	-ms-writing-mode: vertical-rl;
+	writing-mode: vertical-rl;
+	-webkit-text-orientation: upright;
+	-moz-text-orientation: upright;
+	-ms-text-orientation: upright;
+	text-orientation: upright;
+	-moz-font-feature-settings: "vert", "vkna" ;
+	-ms-font-feature-settings: "vert", "vkna"  ;
+	-webkit-font-feature-settings: "vert", "vkna"  ;
+	font-feature-settings: "vert", "vkna"  ;
 }
