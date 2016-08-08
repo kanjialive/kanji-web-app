@@ -151,7 +151,49 @@ app.controller(
     $scope.showTranslation = function(index) { $scope.translations[index] = true; };
     $scope.hideTranslation = function(index) {$scope.translations[index] = false; };
 
-    $scope.renderHtml = function(html){ return $sce.trustAsHtml(html); };
+    $scope.renderHtml = function(html){ 
+    	
+    	switch(html) {
+        case "東京都23区（とうきょうと23く）":
+        	html = '<span class="example10"> 東京都23区（とうきょうと23く）</span>';
+            break;
+        case "机上の空論（きじょうのくうろん）":
+        case "今昔物語（こんじゃくものがたり）":
+        case "即席ラーメン（そくせきラーメン）":
+        case "直情径行（ちょくじょうけいこう）":
+        case "断腸の思い（だんちょうのおもい）":
+        case "公衆浴場（こうしゅうよくじょう）":
+        case "超自然的な（ちょうしぜんてきな）":
+        case "駐停車する（ちゅうていしゃする）":
+        case "珍紛漢紛な（ちんぷんかんぷんな）":
+        case "開眼する（かいがん/かいげんする）":   
+        	html = '<span class="example10">' + html.split('（')[0] + '</span><span class="example9">（' + html.split('（')[1] + '</span>';  	
+        	break;
+        	
+        case "立ち往生する（たちおうじょうする）": 
+        case "終身雇用制（しゅうしんこようせい）":  	
+        case "沈着冷静な（ちんちゃくれいせいな）":  	
+        case "沈思黙考する（ちんしもっこうする）":   	
+        case "一泊二食付き（いっぱくにしょくつき）": 	    
+        case "右往左往する（うおうさおうする）":
+        	html = '<span class="example10">' + html.split('（')[0] + '</span><span class="example8">（' + html.split('（')[1] + '</span>';  
+        	break;
+        	
+        case "清涼飲料水（せいりょういんりょうすい）":
+        	html = '<span class="example10">' + html.split('（')[0] + '</span><span class="example7">（' + html.split('（')[1] + '</span>';  
+        	break;
+        default:
+        
+    }
+    	return $sce.trustAsHtml(html);
+    	
+    	
+    	
+    	
+    
+    
+    
+    };
 
     $scope.startRadicalAnimation = function(){
       $timeout(function(){$scope.radicalFrame=1;$scope.$apply();}, 1250, false);
