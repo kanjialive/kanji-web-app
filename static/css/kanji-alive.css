@@ -153,43 +153,12 @@ video {
   height:254px;
 }
 
-.nav-section-1 a {
-  margin-right:15px;
-}
 
-.nav-section-2 {
-  text-align: center;
-}
-
-.nav-section-3 {
-  margin-top:5px;
-}
-
-.nav-section-2 .icon-left {
-  margin-right:15px;
-}
-
-.nav-section-2 .icon-right {
-  margin-left:15px;
-}
 h3.nav-header {
     color:#B64630;
     margin-top:22px;
 }
 
-.nav-section-3 span {
-  float:right;
-  display:none;
-}
-
-.nav-section-1, .nav-section-2, .nav-section-3 {
-  margin-top:15px;
-  margin-bottom:3px;
-}
-
-.nav-section-1 p, .nav-section-2 p, .nav-section-3 p{
-  display:inline;
-}
 
 .animation-controls {
 
@@ -216,11 +185,6 @@ h3.nav-header {
   margin-bottom:10px;
 }
 
-.nav-section-3 img {
-  width:25px;
-  padding-top:2px;
-  float:right;
-}
 
  video {width:100%;}
 
@@ -327,26 +291,17 @@ img.ka-breakdown {
     display:block;
     margin-top:4px;
   }
-  .nav-section-1, .nav-section-2, .nav-section-3 {
-    margin-top:15px;
-  }
-  .nav-section-2 a {
-    margin-left:-10px;
-  }
-  .nav-section-3 span {
-  display:block;
-  }
-  .nav-section-3 img {
-    display:none;
-  }
+  
+  
+  
+  
   .mobile-branding img {
     display:none;
   }
-  .nav-section-4 a {
-    display:block;
-    margin-top:15px;
-    float:left;
-  }
+  
+  
+ 
+  
   .nav .icon {
     float:left;
   }
@@ -688,12 +643,7 @@ a.ka:hover, a.ka:active {
 
 
 
-/* for dev purposes */
-div {
-//border:2px !important;
-//border-style:dotted !important;
-	
-	}
+
 	
 	
 /* added TGJ 26/7/16 css for kanji div on welcome page */
@@ -734,7 +684,75 @@ div {
 	font-size:7pt;
 }
 
+.example-audio {
+margin-right:-1px;
+}
 
 
+/* for dev purposes */
+div {
+//border:1px !important;
+//border-style:dotted !important;
+	
+	}
+	
+/* correct alignments August 2016 TGJ*/
 
+ .nav-section-1, .nav-section-2, .nav-section-3 {
+    margin-top:15px;
+    margin-bottom:3px;
+  }
+ .nav-section-1 p, .nav-section-2 p, .nav-section-3 p{  display:inline;}
 
+.nav-section-1 a {  margin-right:15px;}
+
+.nav-section-2 {
+  text-align: center;
+  margin-left:-20px; 
+}
+
+.nav-section-2 a {   margin-left:-10px; }
+.nav-section-2 .icon-left {  margin-right:15px;}
+.nav-section-2 .icon-right {  margin-left:15px;}  
+
+.nav-section-3 {  
+	 margin-top:5px;
+     margin-top:19px;
+     margin-left: 8px;
+    }
+    
+  .nav-section-3 img {
+  width:25px;
+  padding-top:2px;
+  float:right;
+  display:none;
+  
+  }  
+  
+ .nav-section-4{
+    width: 307px;
+    margin-left: -3px  ;
+  margin-bottom:-4px  ;
+  margin-right:-50px ;
+  }
+  
+  .nav-section-4 a {
+    display:block;
+    margin-top:15px;
+    float:left;
+  }
+
+  .nav-section-4 span {  margin-top: 8px  ;  }
+	
+.nav-section-4 img {
+	margin-top:-6px !important;
+	margin-left:3px;
+}	
+	
+.detailBox { margin-left: -5px !important;}
+
+.detailBox2 {	margin-left: -4px;}
+
+.detailBox3 { margin-left: -15px;}
+
+.detailBox4{ margin-left: -10px}

@@ -13,9 +13,9 @@
         </form>
         </p>
     </div>
-<div class="col-xs-3 nav-section-2">
-    <div class="control-wrapper">
-    <div class="col-xs-2">
+<div class="col-xs-3 nav-section-2" >
+    <div class="control-wrapper" >
+    <div class="col-xs-2" >
       <a class="icon icon-left" ng-click="prevKanji(false)">〈</a>
       <!-- updated by TGJ 26/07/16 to link back to last search -->
      </div>
@@ -27,11 +27,11 @@
       </div>
     </div>
   </div>
-  <div class="col-xs-3 nav-section-3">
+  <div class="col-xs-3 nav-section-3" >
     <img src="http://kanjialive.com/wp-content/uploads/2013/10/fan_logo_104.png"/>
     <a ng-click="showHelpModal('lg')"><span>Info</span></a>
   </div>
-  <div class="desktop-branding col-xs-3 nav-section-4">
+  <div class="desktop-branding col-xs-3 nav-section-4" >
     <a href="http://kanjialive.com" target="_blank"><span>Kanji alive</span></a>
     <img src="http://kanjialive.com/wp-content/uploads/2013/10/fan_logo_104.png"/>
   </div>
@@ -91,30 +91,11 @@
               <a ng-click="nextTypeface()" class="ka-typeface-right pointer gray-out">〉</a>
               </div>
             </div>
-                   
-                   
-                      <!--  
-                  <div class="col-xs-3 nav-section-2">
-    <div class="control-wrapper">
-      <a class="icon icon-left" ng-click="prevKanji(false)">〈</a>
-      
-      <a ng-href="{{lastSearch}}"><span>{{currentIndex + 1}} of {{results.length}}</span></a>
-      <a class="icon icon-right" ng-click="nextKanji(false)">〉</a>
-    </div>
-  </div>
-            --
-                   
-            
-            
-            
-            -->
-            
-            
-     
+
           </div>
         </div>
       </div>
-      <div class="col-xs-6">
+      <div class="col-xs-6 detailBox">
         <div class="meaning">
           <h3>Meaning</h3>
           <p>{{doc.meaning}}</p>
@@ -130,7 +111,7 @@
           <p>{{doc.kunyomi_ka_display}}</p>
         </div>
 
-        <div class="border-no-padding">
+        <div class="border-no-padding" >
           <div class="border-inner"></div>
         </div>
 
@@ -141,7 +122,7 @@
               <img class="radical-character" ng-src="{{doc.rad_char_source}}">
               <img class="radical-position" ng-show="doc.rad_position" class="radical-position" ng-src="{{doc.rad_position_file}}">
             </div>
-            <div class="col-xs-6">
+            <div class="col-xs-6"  class="detailBox">
               <div>{{doc.rad_name_ja}}</div>
               <div>{{doc.rad_meaning}}</div>
               <div>{{doc.rad_stroke}}</div>
@@ -171,38 +152,38 @@
       </div>
     </div>
   </div>
-  <div class="col-xs-6">
+  <div class="col-xs-6 detailBox2">
     <div class="row">
-      <div class="col-xs-6">
+      <div class="col-xs-6 detailBox2">
 
         <div class="row strokes-grade">
-          <div class="col-xs-6">
+          <div class="col-xs-6 detailBox2">
             <h3>Strokes</h3>
             <p>{{doc.kstroke}}</p>
           </div>
 
-          <div class="col-xs-6">
+          <div class="col-xs-6 detailBox3">
             <h3>Grade</h3>
             <p>{{doc.grade}}</p>
           </div>
         </div>
         <div class="row kodansha-nelson">
-          <div class="col-xs-12">
+          <div class="col-xs-12 detailBox2">
             <div class="border-no-padding">
               <div class="border-inner"></div>
             </div>
           </div>
-          <div class="col-xs-6">
+          <div class="col-xs-6 detailBox2">
             <h3>Kodansha</h3>
             <p>{{doc.dick}}</p>
           </div>
-          <div class="col-xs-6">
+          <div class="col-xs-6 detailBox3">
             <h3>Classic Nelson</h3>
             <p>{{doc.dicn}}</p>
           </div>
         </div>
         <div class="row luminous-hint">
-          <div class="col-xs-12">
+          <div class="col-xs-12 detailBox2">
             <div class="luminous">
               <h3>Luminous</h3>
               <p ng-switch="doc.luminous">
@@ -210,8 +191,8 @@
                 <a ng-switch-default target="_blank" href="{{doc.luminous}}">Example sentences using {{doc.ka_utf}}</a>
               </p>
             </div>
-            <div class="border-no-padding">
-              <div class="border-inner"></div>
+            <div class="border-no-padding" >
+              <div class="border-inner" ></div>
             </div>
 
             <div class="hint">
@@ -226,7 +207,7 @@
         </div>
       </div>
 
-      <div class="col-xs-6 examples">
+      <div class="col-xs-6 examples detailBox4">
 
         <div class="border-no-padding visible-xs">
           <div class="border-inner"></div>
