@@ -159,14 +159,6 @@ h3.nav-header {
     margin-top:22px;
 }
 
-
-.animation-controls {
-
-  height:100px;
-/* added by TGJ 26/07/16 align navigation bar */
-  vertical-align:bottom !important;
-}
-
 .search-results {
   height:529px;
   /*padding-left:0px;*/
@@ -174,7 +166,6 @@ h3.nav-header {
   /*margin-left:15px;*/
   /*margin-right:15px;*/
 }
-
 
 .docs-container {
     padding-top:30px;
@@ -696,7 +687,7 @@ div {
 	
 	}
 	
-/* correct alignments August 2016 TGJ*/
+/* correct alignments 10 August 2016 TGJ*/
 
  .nav-section-1, .nav-section-2, .nav-section-3 {
     margin-top:15px;
@@ -756,3 +747,28 @@ div {
 .detailBox3 { margin-left: -15px;}
 
 .detailBox4{ margin-left: -10px}
+
+
+
+
+/*alignment of animation controls 11 August 2016*/
+
+.animation-controls {
+  height:100px;
+  vertical-align:bottom !important;
+  margin-top:17px;
+}
+
+.icon-step-left{
+ margin-left:19.5px;	
+}
+
+.icon-step-middle{
+  margin-left:3.5px;	
+}
+
+.icon-step-right{
+ margin-left:-12.5px;	
+}
+
+
