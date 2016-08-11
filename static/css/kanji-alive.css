@@ -417,25 +417,7 @@ you can use the generic selector below, but it's slower:
 
 
 
-.ka-typeface-left, .ka-typeface-right{
-  color:#000000;
-  font-size:20px; 
-  font-family:'mplus-1m-icons';
-  -webkit-user-select: none;
-  -khtml-user-select:none;
-  -moz-user-select:none;
-  -ms-user-select: none;
-}
 
-.typeface-name {
-
-  text-align:center;
-  font-size:15px;
-  position:absolute;
-  width:100px;
-  left:0;
-  top:3px;
-}
 
 
 <!-- added TGJ 26/7/16 css for kanji div on welcome page -->
@@ -751,7 +733,7 @@ div {
 
 
 
-/*alignment of animation controls 11 August 2016*/
+/*alignment of animation controls 11 August 2016 TGJ */
 
 .animation-controls {
   height:100px;
@@ -772,3 +754,32 @@ div {
 }
 
 
+/* alignment of text controls in detail view 11 August 2016 TGJ */
+
+.typeface-name {
+  text-align:center;
+  font-size:15px;
+  position:absolute;
+  width:100px;
+  left:0;
+  top:1px;
+}
+
+.ka-typeface-left, .ka-typeface-right{
+  color:#000000;
+  font-size:20px; 
+  font-family:'mplus-1m-icons';
+  -webkit-user-select: none;
+  -khtml-user-select:none;
+  -moz-user-select:none;
+  -ms-user-select: none;
+  margin-top:-2px;
+}
+
+.ka-typeface-left {
+margin-left:12px;
+}
+
+.ka-typeface-right{
+	margin-left:-4px;
+}
