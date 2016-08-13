@@ -356,21 +356,7 @@ img.ka-breakdown {
   .nav .icon-right {
     margin-left:12%;
   }
-  .container {
-    width:1128px !important;
-    min-height: 577px !important;
-    margin-left:42px; 
-    margin-right:auto; 
-    margin-top:42px;
-    -moz-box-shadow:    0 3px 6px rgba(100, 100, 100, 0.3);
-    -webkit-box-shadow: 0 3px 6px rgba(100, 100, 100, 0.3);
-    box-shadow:         0 3px 6px rgba(100, 100, 100, 0.3);
-  //  padding-top:29px;
-   // padding-left:42px;
-   // padding-right:42px;
-    background-color:white;
-
-  }
+ 
   .mobile-branding {
     display:none;
   }
@@ -742,25 +728,26 @@ foundation layer
 .col1{ 
 	width:258px;
    min-height: 577px !important;
-	left:42px;
+	left:0px;
 	position:absolute;
+	
 }
 .col2{ 
 	width:258px;
 	min-height: 577px !important;
-	left:326px;
+    left:283px;
 	position:absolute;
 }
 .col3{ 
 	width:258px;
 	min-height: 577px !important;
-	left:610px;
+	left:565px;
 	position:absolute;
 }
 .col4{
 	width:258px;
 	min-height: 577px !important;
-	left: 894px;
+	left: 848px;
 	position:absolute;
 }
 
@@ -768,8 +755,7 @@ foundation layer
 .row1{
 	width:100%;
 	min-height:25px !important;
-	//background-color:lightgreen;
-	
+	margin-top:7px !important ;
 }
 
  .row1 a {
@@ -795,16 +781,20 @@ foundation layer
 	background-color:gold;
 }
 
-.row1  {
-	margin-top:7px !important ;
-	
-}
+
 
 .recordCounter{
 	
 	width:50% !important;
     float:left;
 	height:25px !important;
+	
+}
+
+
+.recordCounter a.icon {
+	
+margin-left:-12px !important;	
 	
 }
 
@@ -818,8 +808,8 @@ foundation layer
 
 .logo {
 	position:absolute;
-	top:21px;
-	left:1117px;
+	top:76px;
+	left:1174px;
 	
 	
 }
@@ -831,6 +821,27 @@ foundation layer
 }
 
 
+ .container {
+    width:1196px !important;
+    min-height: 658px !important;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 55px;
+
+    
+    -moz-box-shadow:    0 3px 6px rgba(100, 100, 100, 0.3);
+    -webkit-box-shadow: 0 3px 6px rgba(100, 100, 100, 0.3);
+    box-shadow:         0 3px 6px rgba(100, 100, 100, 0.3);
+ 
+    background-color:white;
+
+  }
+
+.container2{
+	margin-left:41px !important; 
+    margin-top:42px !important;
+    position:relative;
+}
 
 
 
