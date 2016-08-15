@@ -1,8 +1,63 @@
 <div class="container2">
 
 <div class="col1">
-<div class="row1"></div>
-<div class="row2"></div>
+<div class="row1">
+
+        <form class="search-form" ng-submit="search()">
+            <input ng-model="query" id="search-kid" class="search-bar" type="text" spellcheck="false" autocapitalize="off" autocorrect="off">
+            <a class="search-button" ng-click="search()"></a>
+            <input type="submit" class="hidden"/>
+        </form>
+       
+</div>
+<div class="row2">
+<h3>Kanji</h3>
+        
+        <div ng-switch="detailMode">
+          <div class="video-container" ng-switch-default>
+            <div class="video">
+              <video ng-click="setDetailMode('typeface')" ng-attr-poster='{{doc.poster_video_source}}' preload='auto' vg-src="sources" preload='metadata' vg-video>
+              </video>
+            </div>
+            <div class="animation-controls">
+             
+                <a aria-hidden="true" id="ka-anim-step-back" class="icon-step-left ka-icon-gray pointer gray-out" ng-click="stepBackward()"></a>
+             
+                <a aria-hidden="true" id="ka-anim-play" ng-class="playPauseIcon" class="ka-icon-gray pointer gray-out" ng-click="togglePlayPause()"></a>
+              
+                <a aria-hidden="true" id="ka-anim-step-forward" class="icon-step-right ka-icon-gray pointer gray-out" ng-click="stepForward()"></a>
+              
+            </div>
+          </div>
+          <!--  
+          <div id="ka-typeface-container" ng-switch-when="typeface">
+            <div ng-click="setDetailMode('video')" class="ka-typefaces" ng-switch="typeface">
+              <img ng-switch-when="shino" ng-src="{{doc.shino_source}}">
+              <img ng-switch-when="tensho" ng-src="{{doc.tensho_source}}">
+              <img ng-switch-when="kyokasho" ng-src="{{doc.kyokasho_source}}">
+              <img ng-switch-when="maru" ng-src="{{doc.maru_source}}">
+              <img ng-switch-when="mincho" ng-src="{{doc.mincho_source}}">
+              <img ng-switch-when="gothic" ng-src="{{doc.gothic_source}}">
+              <img ng-switch-when="hiragino" ng-src="{{doc.hiragino_source}}">
+              <img ng-switch-when="kanteiryu" ng-src="{{doc.kanteiryu_source}}">
+              <img ng-switch-when="suzumushi" ng-src="{{doc.suzumushi_source}}">
+            </div>
+            <div class="row animation-controls">
+              <div class="col-xs-2 col-xs-offset-2">
+              <a ng-click="previousTypeface()" class="ka-typeface-left pointer gray-out">〈</a>
+              </div>
+              <div class="col-xs-4">
+              <span class="typeface-name" ng-bind-html="renderHtml(typefaceDisplay)"></span>
+              </div>
+              <div class="col-xs-2">
+              <a ng-click="nextTypeface()" class="ka-typeface-right pointer gray-out">〉</a>
+              </div>
+            </div>
+          </div>
+        </div>
+        -->
+        </div>
+</div>
 </div>
 <div class="col2">
 <div class="row1"><div class="recordCounter">
@@ -25,10 +80,24 @@
 <div class="row2"></div>
 </div>
 
+<div class="border1">
+    <div class="border-inner"></div>
+  </div>
+
+<div class="border2">
+    <div class="border-inner"></div>
+  </div>
+
 </div>
+
+
+
 <div class="logo">
 <img src="http://kanjialive.com/wp-content/uploads/2013/10/fan_logo_104.png"/>
 </div>
+
+
+
 
 
 

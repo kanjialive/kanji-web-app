@@ -101,57 +101,19 @@ a:hover {
     text-decoration: none;
 }
 
-.search-form {
-  width:259px;
-  background: #F6F6F6;
-}
-
-.search-button {
-  background: url('/static/img/search-icon.png');
-  background-size:22px 22px;
-  width: 22px;
-  height:22px;
-  position:absolute;
-  top:0;
-  left:240px;
-}
 
 
-.search-bar {
-  border:0; 
-  outline:none; 
-  background-color:#F6F6F6;
-  box-shadow:none;
-  color:#B64630;
-  padding: 4px 0 1px 10px;
-  height:29px;
-  font-family:'SourceSansPro-Regular','ヒラギノ角ゴ Pro W3','Hiragino Kaku Gothic Pro','メイリオ',Meiryo,'ＭＳ Ｐゴシック',MS-Gothic,sans-serif; 
-}
+
+
+
+
 
 .nav a.icon {
   font-family:'mplus-1m-icons' !important; 
   font-size:20px;
 }
 
-.video-container  {
-  width:254px;
-  height:254px;
-}
 
-.video-container .video {
-  width:254px;
-  height:254px;
-}
-
-video[poster] {
-  width:254px;
-  height:254px;
-}
-
-video {
-  width:254px;
-  height:254px;
-}
 
 .nav-section-1 a {
   margin-right:15px;
@@ -191,12 +153,7 @@ h3.nav-header {
   display:inline;
 }
 
-.animation-controls {
 
-  height:100px;
-/* added by TGJ 26/07/16 align navigation bar */
-  vertical-align:bottom !important;
-}
 
 .search-results {
   height:529px;
@@ -224,14 +181,7 @@ h3.nav-header {
 
  video {width:100%;}
 
-h3 {
-    font-family: "SourceSansPro-Regular", sans-serif;
-    font-size:17px;
-    color:#607F3A;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    margin-top:15px;
-}
+
 
 h4 {
     font-family: "SourceSansPro-Regular", sans-serif;
@@ -728,6 +678,7 @@ foundation layer
 .col1{ 
 	width:258px;
    min-height: 577px !important;
+   max-height: 577px !important;
 	left:0px;
 	position:absolute;
 	
@@ -756,6 +707,7 @@ foundation layer
 	width:100%;
 	min-height:25px !important;
 	margin-top:7px !important ;
+	background-color:limegreen;
 }
 
  .row1 a {
@@ -844,4 +796,103 @@ margin-left:-12px !important;
 }
 
 
+/* UI alignment August 15th 2016 - detail view */
+.search-form {
+  width:100%;
+  background: #F6F6F6;
+ margin-top:-5px;
+}
 
+.search-button {
+  background: url('/static/img/search-icon.png');
+  background-size:22px 22px;
+  width: 22px;
+  height:22px;
+  position:absolute;
+  top:4px;
+  left:228px;
+}
+
+.search-bar {
+  border:0; 
+  outline:none; 
+  background-color:#F6F6F6;
+  box-shadow:none;
+  color:#B64630;
+  padding: 4px 0 1px 10px;
+  height:32px;
+  
+  font-family:'SourceSansPro-Regular','ヒラギノ角ゴ Pro W3','Hiragino Kaku Gothic Pro','メイリオ',Meiryo,'ＭＳ Ｐゴシック',MS-Gothic,sans-serif; 
+}
+
+
+.border1 {
+  position:absolute;
+  height:auto;
+  width:1106px !important;
+  display:inline;
+  margin-top:50px !important;
+ 
+}
+
+.border2 {
+  position:absolute;
+  height:auto;
+  width:1106px !important;
+  display:inline;
+  margin-top:564px !important;
+ 
+}
+
+.border-inner {
+  height:1px;
+  background-color: #CBCCD0;
+}
+
+
+h3 {
+    font-family: "SourceSansPro-Regular", sans-serif;
+    font-size:17px;
+    color:#607F3A;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    margin-top:29px;
+    margin-left:-1px;
+}
+
+.video-container  {
+  width:248px;
+  height:248px;
+  background-color:silver;
+  margin-left:4px;
+  margin-top:5px;
+  
+}
+
+.video-container .video {
+  width:248px;
+  height:248px;
+  
+}
+
+video[poster] {
+  width:248px;
+  height:248px;
+}
+
+.animation-controls {
+
+  height:34px;
+  width:141px !important;
+  margin-left:62px;
+  margin-top:17px;
+ padding-top:5px;
+}
+
+.icon-step-left{
+	
+}
+
+.icon-step-left{
+margin-right:88px;
+}
