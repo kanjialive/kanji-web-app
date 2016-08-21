@@ -135,8 +135,8 @@ a:hover {
   margin-left:15px;
 }
 h3.nav-header {
-    color:#B64630;
-    margin-top:22px;
+//    color:#B64630;
+ //   margin-top:22px;
 }
 
 .nav-section-3 span {
@@ -201,7 +201,7 @@ label {
     font-weight: 300;
 }
 
-.example { min-height:41px; }
+
 .detail-body {min-height:536px; !important }
 
 .submit { margin-top:20px; }
@@ -220,12 +220,7 @@ img.ka-breakdown {
     padding-bottom:10px;
 }
 
-.stroke-breakdown {
-    width:530px;
-    height:130px;
-    margin:0;
-    padding-top:15px;
-}
+
 
 
 
@@ -370,27 +365,6 @@ you can use the generic selector below, but it's slower:
   font-size:15px; 
 }
 
-.ka-rad-anim img {
-  cursor: pointer;
-  width:54px; 
-  height:54px; 
-  position:absolute;
-  left:0;
-  -webkit-transition: opacity 1s ease-in-out;
-  -moz-transition: opacity 1s ease-in-out;
-  -o-transition: opacity 1s ease-in-out;
-  transition: opacity 1s ease-in-out;
-  opacity:0;
-  -ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";
-  filter: alpha(opacity=0);
-}
-
-.ka-rad-anim img.opaque {
-  opacity:1;
-  -ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=100)";
-  filter: alpha(opacity=1);
-}
-
 .ka-typefaces {
 
   height:254px ;
@@ -406,26 +380,6 @@ you can use the generic selector below, but it's slower:
 }
 
 
-
-.ka-typeface-left, .ka-typeface-right{
-  color:#000000;
-  font-size:20px; 
-  font-family:'mplus-1m-icons';
-  -webkit-user-select: none;
-  -khtml-user-select:none;
-  -moz-user-select:none;
-  -ms-user-select: none;
-}
-
-.typeface-name {
-
-  text-align:center;
-  font-size:15px;
-  position:absolute;
-  width:100px;
-  left:0;
-  top:3px;
-}
 
 
 <!-- added TGJ 26/7/16 css for kanji div on welcome page -->
@@ -563,15 +517,7 @@ a.ka:hover, a.ka:active {
  /*}*/
 /*}*/
 
-.radical-character {
-  width:100%;
-  height:37px
-}
-.radical-position {
-  margin:7px;
-  height:12px; 
-  width:12px;
-}
+
 
 .inline {
   display:inline-table;
@@ -670,6 +616,18 @@ div {
 	
 	}
 
+h3 {
+//border:1px !important;
+//border-style:dotted !important;
+	
+	}
+
+p {
+//border:1px !important;
+//border-style:dotted !important;
+
+	}
+
 
 /*
 foundation layer
@@ -686,17 +644,17 @@ foundation layer
 .col2{ 
 	width:258px;
 	min-height: 577px !important;
-    left:283px;
+    left:282px;
 	position:absolute;
 }
 .col3{ 
 	width:258px;
 	min-height: 577px !important;
-	left:565px;
+	left:564px;
 	position:absolute;
 }
 .col4{
-	width:258px;
+	width:255px;
 	min-height: 577px !important;
 	left: 848px;
 	position:absolute;
@@ -704,10 +662,10 @@ foundation layer
 
 
 .row1{
+	position:absolute;
 	width:100%;
-	min-height:25px !important;
-	margin-top:7px !important ;
-	background-color:limegreen;
+	min-height:32px !important;
+	padding-top: 8px !important;
 }
 
  .row1 a {
@@ -723,14 +681,15 @@ foundation layer
     -khtml-user-select:none; 
     -moz-user-select:none; 
     -ms-user-select: none; 
-  
   }
 
 
 .row2{
+	position:absolute;
+	top:32px;
 	width:100%;
 	min-height:545px !important;
-	background-color:gold;
+	//background-color:gold;
 }
 
 
@@ -813,6 +772,8 @@ margin-left:-12px !important;
   left:228px;
 }
 
+
+
 .search-bar {
   border:0; 
   outline:none; 
@@ -825,11 +786,19 @@ margin-left:-12px !important;
   font-family:'SourceSansPro-Regular','ヒラギノ角ゴ Pro W3','Hiragino Kaku Gothic Pro','メイリオ',Meiryo,'ＭＳ Ｐゴシック',MS-Gothic,sans-serif; 
 }
 
+span.search{
+	position:absolute;
+	width:120px !important;
+
+	text-align:center !important;
+	
+}
+
 
 .border1 {
   position:absolute;
   height:auto;
-  width:1106px !important;
+  width:1103px !important;
   display:inline;
   margin-top:50px !important;
  
@@ -838,11 +807,12 @@ margin-left:-12px !important;
 .border2 {
   position:absolute;
   height:auto;
-  width:1106px !important;
+  width:1103px !important;
   display:inline;
   margin-top:564px !important;
  
 }
+
 
 .border-inner {
   height:1px;
@@ -856,16 +826,28 @@ h3 {
     color:#607F3A;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    margin-top:29px;
-    margin-left:-1px;
+   
+}
+
+h3#kanji{
+	position:absolute;
+	 top:10px;
+margin-left:-1px;
+	
+}
+
+.container-typeface-video{
+   position:absolute;
+  width:248px;
+  height:248px;
+ 
+  margin-left:4px;
+  top:59px;
+	
 }
 
 .video-container  {
-  width:248px;
-  height:248px;
-  background-color:silver;
-  margin-left:4px;
-  margin-top:5px;
+	
   
 }
 
@@ -889,10 +871,239 @@ video[poster] {
  padding-top:5px;
 }
 
-.icon-step-left{
-	
-}
 
 .icon-step-left{
 margin-right:88px;
 }
+
+#ka-anim-play{
+	position:absolute;
+	left:120px !important;
+}
+
+
+.ka-typeface-left, .ka-typeface-right{
+  color:#000000;
+  font-size:20px; 
+  font-family:'mplus-1m-icons';
+  -webkit-user-select: none;
+  -khtml-user-select:none;
+  -moz-user-select:none;
+  -ms-user-select: none;
+}
+
+.typeface-name {
+
+  text-align:center;
+  font-size:15px;
+  position:absolute;
+  width:112px !important;
+ left:72px;
+  top:270px;
+}
+
+.ka-typeface-left{
+	left:52px;
+	position:absolute;
+	  top:270px;
+}
+
+.ka-typeface-right{
+	right:0px;
+	position:absolute;
+	  top:270px;
+	  right:46px;
+}
+
+/* column 2*/
+
+
+
+
+
+h3.meaning, h3.strokes, h3.grade, h3.examples {
+  position:absolute;
+  top:10px;
+}
+
+  p.meaning, p.strokes, p.grade, div.examples  {
+	top: 60px ;
+position:absolute;
+}
+
+
+h3.onyomi, h3.kodansha, h3.nelson  {
+	top: 123px;
+	position:absolute;
+	  margin-top: -8px;
+}
+
+p.onyomi, p.kodansha, p.nelson  {
+	top: 142px;
+	position:absolute;
+}
+
+h3.kunyomi, h3.luminous  {
+	top: 194px;	
+	position:absolute;
+	  margin-top: -8px;
+}
+
+p.kunyomi, p.luminous {
+	top:214px;
+	position:absolute;
+}
+
+
+div.border3 {
+  position:absolute;
+  height:auto;
+  width:100%;
+  display:inline;
+  top:253px;
+	
+}
+
+
+/* RADICAL */
+
+h3.radical, h3.hint {
+	top: 273px;	
+	position:absolute;
+	  margin-top: -8px;
+	
+}
+
+.radical-character {
+	
+	top: 290px;	
+	position:absolute;
+	margin-left:0px;
+	width:31px;
+    height:32px;
+    margin-left:2px;
+}
+.radical-position {
+	
+  top: 336px;	
+  position:absolute;
+  margin-left:10px;
+  height:14px; 
+  width:14px;
+}
+
+
+.ka-rad-anim img {
+  cursor: pointer;
+  width:64px; 
+  height:66px; 
+  position:absolute;
+  top:294px;
+  right:1px;
+  
+  -webkit-transition: opacity 1s ease-in-out;
+  -moz-transition: opacity 1s ease-in-out;
+  -o-transition: opacity 1s ease-in-out;
+  transition: opacity 1s ease-in-out;
+  opacity:0;
+  -ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";
+  filter: alpha(opacity=0);
+}
+
+.ka-rad-anim img.opaque {
+  opacity:1;
+  -ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=100)";
+  filter: alpha(opacity=1);
+}
+
+div.radical-name{
+	 top: 294px;	
+  position:absolute;
+  
+  left:47px;
+}
+
+div.radical-meaning{
+	 top: 316px;	
+  position:absolute;
+  left:47px;
+}
+
+div.radical-stroke{
+	 top: 336px;	
+  position:absolute;
+	left:47px;
+	margin-top:-2px;
+}
+
+
+/* COLUMN 3 */
+
+
+div.hint {
+	 
+  position:absolute;
+	top: 294px;	
+}
+
+div.border4, div.border5 {
+  position:absolute;
+  height:auto;
+  width:100%;
+  display:inline;
+  top:253px;
+	
+}
+
+
+div.border6 {
+  position:absolute;
+  height:auto;
+  width:100%;
+  display:inline;
+  top:391px;
+	
+}
+
+
+h3.grade, p.grade, h3.nelson, p.nelson {
+	left:131px ;	
+}
+
+.icon-play{
+	right:-27px !important;
+	position:absolute;
+}
+
+.example { min-height:41px;
+width:255px !important;
+
+margin-left:-15px;
+}
+
+
+
+div.border7{
+	
+  position:absolute;
+  height:auto;
+  width:540px;
+  margin-left:25px;
+  display:inline;
+  top:520px;
+	
+}
+
+
+.stroke-breakdown {
+	position:absolute;
+    width:540px;
+    height:120px;
+    margin-left:25px;
+    
+     top:530px;
+    
+}
+
+
+
