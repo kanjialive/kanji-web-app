@@ -48,6 +48,7 @@ app.controller('searchController',
     $scope.query = searchService.query;
 
     var w = Math.max(289, (Math.ceil(($scope.results.length / 63)) * 289));
+  
     $scope.kanjiResultsStyle = {'width':w + 'px'};
 
 
