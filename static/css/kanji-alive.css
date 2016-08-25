@@ -101,20 +101,66 @@ a:hover {
     text-decoration: none;
 }
 
+.search-form {
+  width:100%;
+  background: #F6F6F6;
+ margin-top:-5px;
+}
+
+.search-button {
+  background: url('/static/img/search-icon.png');
+  background-size:22px 22px;
+  width: 22px;
+  height:22px;
+  position:absolute;
+  top:4px;
+  left:228px;
+}
 
 
 
-
-
-
+.search-bar {
+  border:0; 
+  outline:none; 
+  background-color:#F6F6F6;
+  box-shadow:none;
+  color:#B64630;
+  padding: 4px 0 1px 10px;
+  height:32px;
+  width:220px !important;
+  font-family:'SourceSansPro-Regular','ヒラギノ角ゴ Pro W3','Hiragino Kaku Gothic Pro','メイリオ',Meiryo,'ＭＳ Ｐゴシック',MS-Gothic,sans-serif; 
+font-size:17px;
+}
 
 .nav a.icon {
   font-family:'mplus-1m-icons' !important; 
   font-size:20px;
 }
 
+.container-typeface-video{
+   position:absolute;
+  width:248px;
+  height:248px;
+ 
+  margin-left:4px;
+  top:59px;
+	
+}
 
+.video-container .video {
+  width:248px;
+  height:248px;
+  
+}
 
+video[poster] {
+  width:248px;
+  height:248px;
+}
+
+video {
+  width:100%;
+}
 .nav-section-1 a {
   margin-right:15px;
 }
@@ -153,9 +199,19 @@ h3.nav-header {
   display:inline;
 }
 
+.animation-controls {
+  height:34px;
+  width:141px !important;
+  margin-left:62px;
+  margin-top:17px;
+  padding-top:5px;
+}
 
 
-
+.search-results{
+	height: 529px;
+	
+}
 
 
 .docs-container {
@@ -173,9 +229,17 @@ h3.nav-header {
   float:right;
 }
 
- video {width:100%;}
 
 
+
+h3 {
+    font-family: "SourceSansPro-Regular", sans-serif;
+    font-size:17px;
+    color:#607F3A;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+   
+}
 
 h4 {
     font-family: "SourceSansPro-Regular", sans-serif;
@@ -215,6 +279,14 @@ img.ka-breakdown {
 }
 
 
+.stroke-breakdown {
+	position:absolute;
+    width:540px;
+    height:120px;
+    margin-left:25px;
+    top:530px;
+    
+}
 
 
 
@@ -295,7 +367,18 @@ img.ka-breakdown {
   .nav .icon-right {
     margin-left:12%;
   }
- 
+.container {
+    width:1196px !important;
+    min-height: 658px !important;
+    margin-left:auto;
+    margin-right:auto;
+    margin-top: 55px;
+    -moz-box-shadow:    0 3px 6px rgba(100, 100, 100, 0.3);
+    -webkit-box-shadow: 0 3px 6px rgba(100, 100, 100, 0.3);
+    box-shadow:         0 3px 6px rgba(100, 100, 100, 0.3);
+    background-color:white;
+
+  }
   .mobile-branding {
     display:none;
   }
@@ -359,6 +442,34 @@ you can use the generic selector below, but it's slower:
   font-size:15px; 
 }
 
+.ka-rad-anim img {
+  cursor: pointer;
+  width:64px; 
+  height:66px; 
+  position:absolute;
+  top:294px;
+  right:1px;
+  -webkit-transition: opacity 1s ease-in-out;
+  -moz-transition: opacity 1s ease-in-out;
+  -o-transition: opacity 1s ease-in-out;
+  transition: opacity 1s ease-in-out;
+  opacity:0;
+  -ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";
+  filter: alpha(opacity=0);
+}
+
+.ka-rad-anim img.opaque {
+  opacity:1;
+  -ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=100)";
+  filter: alpha(opacity=1);
+}
+
+div.radical-name{
+  top: 294px;	
+  position:absolute;
+  left:47px;
+}
+
 .ka-typefaces {
   height:254px ;
   width:254px ;
@@ -372,10 +483,171 @@ you can use the generic selector below, but it's slower:
 }
 
 
+.ka-typeface-left, .ka-typeface-right{
+  color:#000000;
+  font-size:20px; 
+  font-family:'mplus-1m-icons';
+  -webkit-user-select: none;
+  -khtml-user-select:none;
+  -moz-user-select:none;
+  -ms-user-select: none;
+}
+
+.typeface-name {
+
+  text-align:center;
+  font-size:15px;
+  position:absolute;
+  width:112px !important;
+ left:72px;
+  top:270px;
+}
+
+.ka-welcome-title{
+	
+position:absolute;
+top:44px !important;
+width:538px;
+	 font-family: "SourceSansPro-Regular", sans-serif;
+  font-size:22px;
+ 
+  color:#607F3A; 
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.ka-welcome-text{
+	 font-size: 18px;
+  font-family: "SourceSansPro-Regular", sans-serif;
+  line-height: 136%;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  white-space: normal;
+ position:absolute;
+ top:76px !important;
+ width:538px !important;	
+ 
+}
+
+
+.ka-typeface-left{
+	left:52px;
+	position:absolute;
+	  top:270px;
+}
+
+.ka-typeface-right{
+	right:0px;
+	position:absolute;
+	  top:270px;
+	  right:46px;
+}
+
+
+.ka-results-h1 {
+  font-family: "SourceSansPro-Regular", sans-serif;
+  font-size:17px; 
+  color:#607F3A;  
+  padding:10px 0px 0px 0px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  position:absolute;
+  top:-6px !important;
+
+}
+
+
+.ka-results-h3 {
+  font-family: "SourceSansPro-Regular", sans-serif;
+  font-size:17px; 
+  color:#607F3A; 
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  position:absolute;
+  top: 36px;
+}
+
+.ka-border-bottom{
+	top:64px;
+	position:absolute;
+    height:auto;
+    width:100%;
+    display:inline;
+}
+
+.no-results{
+		top:79px;
+	position:absolute;
+	
+}
+
+.kanji {
+	
+  font-family:"mplus-1m-light", sans-serif;
+  font-size:25px;
+  -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+p	 {
+	position:absolute;
+	top:79px;
+ 
+  margin-left:3px;
+  margin-bottom:28px; 
+  margin-right:0; 
+ word-wrap: break-word !important;
+  white-space:normal;
+
+}
 
 
 
 
+.ka-welcome-header {
+  font-family: "SourceSansPro-Regular", sans-serif;
+  font-size:22px;
+  padding-top:30px; 
+  padding-bottom:24px; 
+  color:#607F3A; 
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.ka-welcome-italic {
+  font-family: 'SourceSansPro-It','SourceSansPro-Regular',sans-serif;
+/* workaround for FireFox */  
+  font-style: italic;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.ka-welcome-p {
+  font-size: 18px;
+  font-family: "SourceSansPro-Regular", sans-serif;
+  line-height: 136%;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  white-space: normal;
+}
+
+
+
+
+
+.ka-bottom-bar {
+  height: 18px;
+  margin-top:-4px; 
+  border-top:1px solid #CBCCD0; 
+}
+
+.ka-radical {
+  font-family:"JapaneseRadicals-Regular", sans-serif;
+  font-size:22px; 
+  color:#CBCCD0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
 
 
 a:hover {
@@ -411,14 +683,61 @@ a.ka:hover, a.ka:active {
  /*}*/
 /*}*/
 
-
+.radical-character {
+	top: 290px;	
+	position:absolute;
+	margin-left:0px;
+	width:31px;
+    height:32px;
+    margin-left:2px;
+}
+.radical-position {	
+  top: 336px;	
+  position:absolute;
+  margin-left:10px;
+  height:14px; 
+  width:14px;
+}
 
 .inline {
   display:inline-table;
 }
 
 
+.results-group {
+  //min-width: 258px !important;
+  
+}
 
+.grouped-results  {
+ margin-top:79px;
+ 
+}
+
+
+.grouped-results .grouped-column {
+  
+  width:258px !important;
+  margin-right:25px !important
+}
+
+
+
+.scroller {
+  white-space: nowrap;
+  height: 529px;
+  overflow-y:hidden;
+  overflow: hidden;
+  position: relative;
+  top:23px;
+}
+
+.scrollbar-wrapper{
+   width:1103px !important;
+  height:auto;
+  overflow: hidden;
+  float:left;
+}
 
 
 .typeface-container  {
@@ -444,26 +763,6 @@ a.ka:hover, a.ka:active {
 .example7 {
 	font-size:7pt;
 }
-
-
-/* for dev purposes */
-div {
-//border:1px !important;
-//border-style:dotted !important;
-	
-	}
-
-h3 {
-//border:1px !important;
-//border-style:dotted !important;
-	
-	}
-
-p {
-//border:1px !important;
-//border-style:dotted !important;
-
-	}
 
 
 /*
@@ -509,7 +808,7 @@ foundation layer
  .row1 a {
   font-family: 'SourceSansPro-It','SourceSansPro-Regular',sans-serif;
   /*workaround for FireFox*/  
-  font-style: italic;
+  
     font-family:'SourceSansPro-Regular','ヒラギノ角ゴ Pro W3','Hiragino Kaku Gothic Pro','メイリオ',Meiryo,'ＭＳ Ｐゴシック',MS-Gothic,sans-serif; 
     font-size:17px; 
     color:#B64630;
@@ -581,21 +880,7 @@ margin-left:-12px !important;
 }
 
 
- .container {
-    width:1196px !important;
-    min-height: 658px !important;
-    margin-left: auto;
-    margin-right: auto;
-    margin-top: 55px;
-
-    
-    -moz-box-shadow:    0 3px 6px rgba(100, 100, 100, 0.3);
-    -webkit-box-shadow: 0 3px 6px rgba(100, 100, 100, 0.3);
-    box-shadow:         0 3px 6px rgba(100, 100, 100, 0.3);
  
-    background-color:white;
-
-  }
 
 .container2{
 	margin-left:25px !important; 
@@ -605,35 +890,7 @@ margin-left:-12px !important;
 
 
 /* UI alignment August 15th 2016 - detail view */
-.search-form {
-  width:100%;
-  background: #F6F6F6;
- margin-top:-5px;
-}
 
-.search-button {
-  background: url('/static/img/search-icon.png');
-  background-size:22px 22px;
-  width: 22px;
-  height:22px;
-  position:absolute;
-  top:4px;
-  left:228px;
-}
-
-
-
-.search-bar {
-  border:0; 
-  outline:none; 
-  background-color:#F6F6F6;
-  box-shadow:none;
-  color:#B64630;
-  padding: 4px 0 1px 10px;
-  height:32px;
-  width:220px !important;
-  font-family:'SourceSansPro-Regular','ヒラギノ角ゴ Pro W3','Hiragino Kaku Gothic Pro','メイリオ',Meiryo,'ＭＳ Ｐゴシック',MS-Gothic,sans-serif; 
-}
 
 span.search{
 	position:absolute;
@@ -669,14 +926,7 @@ span.search{
 }
 
 
-h3 {
-    font-family: "SourceSansPro-Regular", sans-serif;
-    font-size:17px;
-    color:#607F3A;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-   
-}
+
 
 h3#kanji{
 	position:absolute;
@@ -685,40 +935,9 @@ margin-left:-1px;
 	
 }
 
-.container-typeface-video{
-   position:absolute;
-  width:248px;
-  height:248px;
- 
-  margin-left:4px;
-  top:59px;
-	
-}
 
-.video-container  {
-	
-  
-}
 
-.video-container .video {
-  width:248px;
-  height:248px;
-  
-}
 
-video[poster] {
-  width:248px;
-  height:248px;
-}
-
-.animation-controls {
-
-  height:34px;
-  width:141px !important;
-  margin-left:62px;
-  margin-top:17px;
- padding-top:5px;
-}
 
 
 .icon-step-left{
@@ -731,38 +950,6 @@ margin-right:88px;
 }
 
 
-.ka-typeface-left, .ka-typeface-right{
-  color:#000000;
-  font-size:20px; 
-  font-family:'mplus-1m-icons';
-  -webkit-user-select: none;
-  -khtml-user-select:none;
-  -moz-user-select:none;
-  -ms-user-select: none;
-}
-
-.typeface-name {
-
-  text-align:center;
-  font-size:15px;
-  position:absolute;
-  width:112px !important;
- left:72px;
-  top:270px;
-}
-
-.ka-typeface-left{
-	left:52px;
-	position:absolute;
-	  top:270px;
-}
-
-.ka-typeface-right{
-	right:0px;
-	position:absolute;
-	  top:270px;
-	  right:46px;
-}
 
 /* column 2*/
 
@@ -823,54 +1010,10 @@ h3.radical, h3.hint {
 	
 }
 
-.radical-character {
-	
-	top: 290px;	
-	position:absolute;
-	margin-left:0px;
-	width:31px;
-    height:32px;
-    margin-left:2px;
-}
-.radical-position {
-	
-  top: 336px;	
-  position:absolute;
-  margin-left:10px;
-  height:14px; 
-  width:14px;
-}
 
 
-.ka-rad-anim img {
-  cursor: pointer;
-  width:64px; 
-  height:66px; 
-  position:absolute;
-  top:294px;
-  right:1px;
-  
-  -webkit-transition: opacity 1s ease-in-out;
-  -moz-transition: opacity 1s ease-in-out;
-  -o-transition: opacity 1s ease-in-out;
-  transition: opacity 1s ease-in-out;
-  opacity:0;
-  -ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";
-  filter: alpha(opacity=0);
-}
 
-.ka-rad-anim img.opaque {
-  opacity:1;
-  -ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=100)";
-  filter: alpha(opacity=1);
-}
 
-div.radical-name{
-	 top: 294px;	
-  position:absolute;
-  
-  left:47px;
-}
 
 div.radical-meaning{
 	 top: 316px;	
@@ -924,10 +1067,10 @@ h3.grade, p.grade, h3.nelson, p.nelson {
 	position:absolute;
 }
 
-.example { min-height:41px;
-width:255px !important;
-
-margin-left:-15px;
+.example { 	
+  min-height:41px; 
+  width:255px !important;
+  margin-left:-15px;
 }
 
 
@@ -944,44 +1087,11 @@ div.border7{
 }
 
 
-.stroke-breakdown {
-	position:absolute;
-    width:540px;
-    height:120px;
-    margin-left:25px;
-    
-     top:530px;
-    
-}
+
 
 /* SEARCH AND WELCOME */
 
 
-.ka-welcome-title{
-	
-position:absolute;
-top:44px !important;
-width:538px;
-	 font-family: "SourceSansPro-Regular", sans-serif;
-  font-size:22px;
- 
-  color:#607F3A; 
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-.ka-welcome-text{
-	 font-size: 18px;
-  font-family: "SourceSansPro-Regular", sans-serif;
-  line-height: 136%;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  white-space: normal;
- position:absolute;
- top:76px !important;
- width:538px !important;	
- 
-}
 
 
 div.typesquare-container {
@@ -1031,158 +1141,36 @@ left:553px;
 
 
 
-.scrollbar-wrapper{
-  width:1124px;
-  height:auto;
-  overflow: hidden;
-  float:left;
-  
-}
 
 
-.scroller {
- 
-  height: 100%;
-  overflow:hidden;
-  position: absolute;
-  top:23px;
 
- 
-}
 
 
 .scroller-kanji {
- width:258px;
-}
-
-.scroller-radical, .scroller-kanjistroke {
-	white-space: nowrap;
- overflow:hidden;
- overflow-y:hidden;
- width:1103px !important;
- 
-}
-
-
-.ka-results-h1 {
-  font-family: "SourceSansPro-Regular", sans-serif;
-  font-size:17px; 
-  color:#607F3A;  
-  padding:10px 0px 0px 0px;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  position:absolute;
-  top:-6px !important;
+ width:1103px;
+ overflow-y:hidden !important;
 
 }
-
-
-.ka-results-h3 {
-  font-family: "SourceSansPro-Regular", sans-serif;
-  font-size:17px; 
-  color:#607F3A; 
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  position:absolute;
-  top: 36px;
 }
 
-.ka-border-bottom{
-	top:64px;
-	position:absolute;
-    height:auto;
-    width:100%;
-    display:inline;
-}
-
-.no-results{
-		top:79px;
-	position:absolute;
-	
-}
-
-.kanji {
-	
-  font-family:"mplus-1m-light", sans-serif;
-  font-size:25px;
-  -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-}
-
-p.kanji {
-	position:absolute;
-	top:79px;
- 
-  margin-left:3px;
-  margin-bottom:28px; 
-  margin-right:0; 
- word-wrap: break-word !important;
-  white-space:normal;
-
-}
-
-
-
-
-.ka-welcome-header {
-  font-family: "SourceSansPro-Regular", sans-serif;
-  font-size:22px;
-  padding-top:30px; 
-  padding-bottom:24px; 
-  color:#607F3A; 
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-.ka-welcome-italic {
-  font-family: 'SourceSansPro-It','SourceSansPro-Regular',sans-serif;
-/* workaround for FireFox */  
-  font-style: italic;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-.ka-welcome-p {
-  font-size: 18px;
-  font-family: "SourceSansPro-Regular", sans-serif;
-  line-height: 136%;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  white-space: normal;
-}
-
-
-
-
-
-.ka-bottom-bar {
-  height: 18px;
-  margin-top:-4px; 
-  border-top:1px solid #CBCCD0; 
-}
-
-.ka-radical {
-  font-family:"JapaneseRadicals-Regular", sans-serif;
-  font-size:22px; 
-  color:#CBCCD0;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
 
 
 /* RADICAL STROKE SEARCH */
 
-.results-group {
-  min-width: 258px !important;
-  margin-right:26px !important;
-  margin-left:-1px;
-  background-color:whitesmoke;
+
+
+.list-inline{
+	margin-left:15px;
+	
 }
 
-.grouped-results  {
-top:79px;
- position:absolute;
-}
+.list-inline>li {		
+   padding-left:0px;		
+   padding-right:0px;		
+ }
+ 
+
+
 
 
 

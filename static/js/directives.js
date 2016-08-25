@@ -72,7 +72,7 @@ angular.module('kanjiAlive.directives', ['duScroll']).
                 scope.$parent.scrollForward = function() {
                     scope.currentGroup = Math.min(scope.groups.length - 1, scope.currentGroup + 1);
                     var targetGroup = scope.groups[scope.currentGroup];
-                    var offsetLeft = Math.max(0, targetGroup.offsetLeft + 5);
+                    var offsetLeft = Math.max(0, targetGroup.offsetLeft - 15);
                     angular.element(elem).duScrollLeft(offsetLeft, 900, duScrollDefaultEasing);
                    
                 };
@@ -80,7 +80,7 @@ angular.module('kanjiAlive.directives', ['duScroll']).
                 scope.$parent.scrollBackward = function() {
                     scope.currentGroup = Math.max(0, scope.currentGroup - 1);
                     var targetGroup = scope.groups[scope.currentGroup];
-                    var offsetLeft = Math.max(0, targetGroup.offsetLeft + 5);
+                    var offsetLeft = Math.max(0, targetGroup.offsetLeft - 15);
                   angular.element(elem).duScrollLeft(offsetLeft, 900, duScrollDefaultEasing);
                  
                   

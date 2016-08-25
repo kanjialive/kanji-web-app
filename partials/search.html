@@ -26,7 +26,7 @@
 
 </div>
 <div class="col4">
-<div class="row1"><a href="http://kanjialive.com" target="_blank"><span>Kanji alive</span></a>
+<div class="row1 desktop-branding"><a href="http://kanjialive.com" target="_blank"><span>Kanji alive</span></a>
     </div>
 </div>
 
@@ -43,7 +43,7 @@
 <div  ng-switch="mode">
 
 <!-- KANJI -->
-    <div class="row3" ng-switch-when="kanji">
+    <div class="row3 scrollbar-wrapper" ng-switch-when="kanji">
     
      <perfect-scrollbar class="scroller scroller-kanji" wheel-propagation="true" wheel-speed="50" >
 
@@ -65,12 +65,10 @@
     
     
     </div>
-    
-    <!-- RADICAL STROKE -->
-    <div class="row3" ng-switch-when="rsort">
-
-    <perfect-scrollbar class="scroller scroller-radical" wheel-propagation="true" wheel-speed="50" ka-group-scrollable>
-        <div >
+      <!-- RADICAL STROKE -->
+        <div class="scrollbar-wrapper row3" ng-switch-when="rsort">
+    <perfect-scrollbar class="scroller row search-results-container" wheel-propagation="true" wheel-speed="50" ka-group-scrollable>
+        <div class="search-results">
             <ul class="list-inline">
                 <li class="results-group" ng-repeat="group in radicalStrokeGroups">
                     <div class="ka-results-h1">{{group.stroke}}</div>
@@ -78,7 +76,6 @@
                     <div class="ka-border-bottom">
                         <div class="border-inner"></div>
                     </div>
-                    
                     <div class="grouped-results">
                         <div class="grouped-column inline" ng-repeat="column in group.columns">
                             <div ng-repeat="radical in column">
@@ -97,12 +94,12 @@
         </div>
     </perfect-scrollbar>
         </div>
-        
+    
         <!-- KANJI STROKE SORT -->
-    <div class="row3" ng-switch-when="ksort">
+    <div class="scrollbar-wrapper row3" ng-switch-when="ksort">
 
-    <perfect-scrollbar class="scroller scroller-kanjistroke" wheel-propagation="true" wheel-speed="50" ka-group-scrollable>
-        <div>
+    <perfect-scrollbar class="scroller row search-results-container" wheel-propagation="true" wheel-speed="50" ka-group-scrollable>
+        <div class="search-results">
             <ul class="list-inline">
                 <li class="results-group" ng-repeat="group in kanjiStrokeGroups">
                     <div class="ka-results-h1">{{group.stroke}}</div>
@@ -179,9 +176,3 @@
 <div class="logo">
 <img src="http://kanjialive.com/wp-content/uploads/2013/10/fan_logo_104.png"/>
 </div>
-
-
-
-
-
-

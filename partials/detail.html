@@ -172,8 +172,8 @@
 <div class="examples">
         <div class="example" ng-repeat="example in doc.examples" >
           <div ng-mouseenter="showTranslation($index)" ng-mouseleave="hideTranslation($index)">
-            <div ng-hide="translations[$index]" class="col-xs-10 example-ja" ng-bind-html="renderHtml(example.japanese)"></div>
-            <div ng-show="translations[$index]" class="col-xs-10 example-ja" ng-bind-html="renderHtml(example.english)"></div>
+            <div ng-hide="translations[$index]" class="example-ja" ng-bind-html="renderHtml(example.japanese)"></div>
+            <div ng-show="translations[$index]" class="example-ja" ng-bind-html="renderHtml(example.english)"></div>
           </div>
           <div class="col-xs-1 example-audio">
             <ka-audio>
