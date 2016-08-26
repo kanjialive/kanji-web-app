@@ -683,30 +683,9 @@ a.ka:hover, a.ka:active {
  /*}*/
 /*}*/
 
-.radical-character {
-	top: 290px;	
-	position:absolute;
-	margin-left:0px;
-	width:31px;
-    height:32px;
-    margin-left:2px;
-}
-.radical-position {	
-  top: 336px;	
-  position:absolute;
-  margin-left:10px;
-  height:14px; 
-  width:14px;
-}
 
 .inline {
   display:inline-table;
-}
-
-
-.results-group {
-  //min-width: 258px !important;
-  
 }
 
 .grouped-results  {
@@ -1012,25 +991,40 @@ h3.radical, h3.hint {
 
 
 
+.radical-character {
+	top: 290px;	
+	position:absolute;
+	margin-left:0px;
+	width:31px;
+    height:32px;
+    margin-left:2px;
+}
+.radical-stroke {	
+  top: 334px;	
+  position:absolute;
+  margin-left:0px;
+  
+}
 
+.radical-position {	
+  top: 336px;	
+  position:absolute;
+  margin-left:20px;
+  height:14px; 
+  width:14px;
+}
 
 
 div.radical-meaning{
 	 top: 316px;	
   position:absolute;
   left:47px;
-}
-
-div.radical-stroke{
-	 top: 336px;	
-  position:absolute;
-	left:47px;
-	margin-top:-2px;
+  white-space:normal;
+  width:143px;
 }
 
 
 /* COLUMN 3 */
-
 
 div.hint {
 	 
@@ -1063,14 +1057,14 @@ h3.grade, p.grade, h3.nelson, p.nelson {
 }
 
 .icon-play{
-	right:-27px !important;
-	position:absolute;
+	//right:-27px !important;
+//	position:absolute;
 }
 
 .example { 	
   min-height:41px; 
-  width:255px !important;
-  margin-left:-15px;
+  width:258px !important;
+
 }
 
 
@@ -1131,33 +1125,12 @@ left:553px;
 	
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 .scroller-kanji {
  width:1103px;
  overflow-y:hidden !important;
 
 }
 }
-
-
-
-/* RADICAL STROKE SEARCH */
-
-
 
 .list-inline{
 	margin-left:15px;
@@ -1170,8 +1143,17 @@ left:553px;
  }
  
 
+.example{
+	display:table;
+	
+}
 
+div.example-audio, div.example-ja {
+	display:table-cell;
+}
 
-
-
-
+.icon-play{
+	position:absolute;
+	right:3px !important;
+	
+}
