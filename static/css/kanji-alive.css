@@ -1106,6 +1106,11 @@ div.example-audio, div.example-ja {
 	display:table-cell;
 }
 
+div.example-audio .icon-play {
+	margin-top:3px;
+}
+
+
 .icon-play{
 	position:absolute;
 	right:3px !important;
