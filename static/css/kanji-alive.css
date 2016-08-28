@@ -210,14 +210,16 @@ h3.nav-header {
 
 .search-results{
 	height: 529px;
-	
+	margin-left:19px;
 }
 
+.search-results-kanji{
+	margin-left:0px;
+}
 
 .docs-container {
     padding-top:30px;
 }
-
 
 .mobile-branding {
   margin-bottom:10px;
@@ -677,12 +679,6 @@ a.ka:hover, a.ka:active {
   text-decoration:none; 
 }
 
-/*@media (min-width:1200px){*/
-/*.container {*/
-    /*margin-top: 55px;*/
- /*}*/
-/*}*/
-
 
 .inline {
   display:inline-table;
@@ -709,6 +705,7 @@ a.ka:hover, a.ka:active {
   overflow: hidden;
   position: relative;
   top:23px;
+  
 }
 
 .scrollbar-wrapper{
@@ -1026,6 +1023,7 @@ div.radical-meaning{
 
 /* COLUMN 3 */
 
+
 div.hint {
 	 
   position:absolute;
@@ -1157,3 +1155,5 @@ div.example-audio, div.example-ja {
 	right:3px !important;
 	
 }
+
+
