@@ -486,7 +486,7 @@ width:538px;
   -moz-osx-font-smoothing: grayscale;
 }
 
-.ka-welcome-text{
+.ka-welcome-text {
 	 font-size: 18px;
   font-family: "SourceSansPro-Regular", sans-serif;
   line-height: 136%;
@@ -559,20 +559,15 @@ width:538px;
     -moz-osx-font-smoothing: grayscale;
 }
 
-p	 {
+p.kanji	 {
 	position:absolute;
 	top:79px;
- 
   margin-left:3px;
   margin-bottom:28px; 
   margin-right:0; 
  word-wrap: break-word !important;
   white-space:normal;
-
 }
-
-
-
 
 .ka-welcome-header {
   font-family: "SourceSansPro-Regular", sans-serif;
@@ -592,6 +587,7 @@ p	 {
   -moz-osx-font-smoothing: grayscale;
 }
 
+/*
 .ka-welcome-p {
   font-size: 18px;
   font-family: "SourceSansPro-Regular", sans-serif;
@@ -600,7 +596,7 @@ p	 {
   -moz-osx-font-smoothing: grayscale;
   white-space: normal;
 }
-
+*/
 
 
 
