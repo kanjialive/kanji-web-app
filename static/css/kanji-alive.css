@@ -161,6 +161,8 @@ video[poster] {
 video {
   width:100%;
 }
+
+/*
 .nav-section-1 a {
   margin-right:15px;
 }
@@ -198,6 +200,7 @@ h3.nav-header {
 .nav-section-1 p, .nav-section-2 p, .nav-section-3 p{
   display:inline;
 }
+*/
 
 .animation-controls {
   height:34px;
@@ -330,45 +333,10 @@ img.ka-breakdown {
   color:#999;
 }
 
-
-/*@media (min-width: 768px) {*/
-  .nav {
-    height:62px;
-  }
-  .nav span {
-    float:left;
-    display:block;
-    margin-top:4px;
-  }
-  .nav-section-1, .nav-section-2, .nav-section-3 {
-    margin-top:15px;
-  }
-  .nav-section-2 a {
-    margin-left:-10px;
-  }
-  .nav-section-3 span {
-  display:block;
-  }
-  .nav-section-3 img {
-    display:none;
-  }
   .mobile-branding img {
     display:none;
   }
-  .nav-section-4 a {
-    display:block;
-    margin-top:15px;
-    float:left;
-  }
-  .nav .icon {
-    float:left;
-  }
-  .nav .icon-left {
-    margin-right:12%;
-  }
-  .nav .icon-right {
-    margin-left:12%;
-  }
+  
 .container {
     width:1196px !important;
     min-height: 658px !important;
@@ -818,35 +786,35 @@ position:absolute;
 
 
 
-.recordCounter{
-	
-	width:50% !important;
+.recordCounter{	
+	width:128px !important;
     float:left;
 	height:25px !important;
-	
 }
 
-
-.recordCounter a.icon {
-	
-margin-left:-12px !important;	
-	
+.recordCounter a.icon-left {
+    margin-left:-10px !important;	
 }
 
-.recordCounterRight{
-
-	width:50% !important;
+.recordCounter a.icon-right {
+    position:absolute;
 	height:25px !important;
-	float:right
-	
+	left: 121px !important;		
 }
+
+
+span.search{
+	position:absolute;
+	width:114px !important;
+    left:7px;
+	text-align:center !important;
+}
+
 
 .logo {
 	position:relative;
 	top:-21px !important;
 	left:1100px !important;
-	
-	
 }
 
 .logo img{
@@ -865,16 +833,8 @@ margin-left:-12px !important;
 }
 
 
-/* UI alignment August 15th 2016 - detail view */
+/
 
-
-span.search{
-	position:absolute;
-	width:120px !important;
-
-	text-align:center !important;
-	
-}
 
 
 .border1 {
@@ -1054,10 +1014,6 @@ h3.grade, p.grade, h3.nelson, p.nelson {
 	left:131px ;	
 }
 
-.icon-play{
-	//right:-27px !important;
-//	position:absolute;
-}
 
 .example { 	
   min-height:41px; 
