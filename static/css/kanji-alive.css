@@ -446,12 +446,9 @@ div.radical-name{
 }
 
 .ka-typefaces img {
-/* modified by TGJ 26/07/16 align kanji animation in detail view */
-  height:254px ;
-  width:254px ;
-
+  height:248px ;
+  width:248px ;
 }
-
 
 .ka-typeface-left, .ka-typeface-right{
   color:#000000;
