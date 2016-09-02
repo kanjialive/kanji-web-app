@@ -1,4 +1,4 @@
-html, body {
+html {
     max-width: 100%;
     overflow-x: hidden;
 }
@@ -66,7 +66,11 @@ html, body {
 }
 
 body {
-  background-color: #D0D0D0;
+    font-family:'SourceSansPro-Regular','mplus-1m-regular','ヒラギノ角ゴ Pro W3','Hiragino Kaku Gothic Pro', 'メイリオ',Meiryo,'ＭＳ Ｐゴシック',MS-Gothic,sans-serif;
+    background-color:#D0D0D0; 
+    font-size:15px; 
+    max-width: 100%;
+    overflow-x: hidden;
 }
 
 
