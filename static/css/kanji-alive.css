@@ -222,12 +222,14 @@ h3.nav-header {
 
 
 .search-results{
-	height: 510px;
+	height: 500px;
 	margin-left:19px;
+	
 }
 
 .search-results-kanji{
 	margin-left:0px;
+	width: 1103px !important;
 }
 
 .docs-container {
@@ -1097,7 +1099,7 @@ div.typesquare-container {
 
 .scroller-kanji {
  width:1103px;
- overflow-y:hidden !important;
+ overflow:hidden !important;
 
 }
 }
@@ -1144,7 +1146,7 @@ kbd {
 	pointer:cursor;
 	width:379px !important;
 	
-	
 }
+
 
 
