@@ -485,7 +485,7 @@ width:538px;
 }
 
 .ka-welcome-text {
-  font-size: 18px;
+  font-size: 17px;
   font-family: "SourceSansPro-Regular", sans-serif;
   line-height: 136%;
   -webkit-font-smoothing: antialiased;
@@ -1039,9 +1039,9 @@ div.border7{
 div.typesquare-container {
 	
 	position:absolute;
-top:44px !important;
-width:538px !important;
-left:553px;
+    top: 50px !important;
+    width: 538px !important;
+    left: 524px;
 }
 
 .TypeSquare {
