@@ -418,7 +418,7 @@ you can use the generic selector below, but it's slower:
   width:64px; 
   height:66px; 
   position:absolute;
-  top:294px;
+  top:291px;
   right:1px;
   -webkit-transition: opacity 1s ease-in-out;
   -moz-transition: opacity 1s ease-in-out;
@@ -819,8 +819,6 @@ span.search{
 }
 
 
- 
-
 .container2{
 	margin-left:25px !important; 
     margin-top:42px !important;
@@ -944,22 +942,23 @@ h3.radical, h3.hint {
 
 
 .radical-character {
-	top: 290px;	
+	top: 297px;	
 	position:absolute;
 	margin-left:0px;
 	width:31px;
     height:32px;
     margin-left:2px;
 }
+
 .radical-stroke {	
-  top: 334px;	
+  top: 337px;	
   position:absolute;
-  margin-left:0px;
+  margin-left:1px;
   
 }
 
-.radical-position {	
-  top: 336px;	
+img.radical-position {	
+  top: 338px;	
   position:absolute;
   margin-left:20px;
   height:14px; 
