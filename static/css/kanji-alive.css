@@ -218,7 +218,7 @@ h3.nav-header {
 
 
 .search-results{
-	height: 529px;
+	height: 510px;
 	margin-left:19px;
 }
 
@@ -667,7 +667,7 @@ a.ka:hover, a.ka:active {
 
 .scroller {
   white-space: nowrap;
-  height: 529px;
+  height: 516px;
   overflow-y:hidden;
   overflow: hidden;
   position: relative;
@@ -1127,3 +1127,15 @@ kbd {
     background-color: #f9f2f4;
     font-size: 12px;
 }
+
+.ps-scrollbar-x{
+	
+	height:5px !important;
+	background: black !important;
+	pointer:cursor;
+	width:379px !important;
+	
+	
+}
+
+
