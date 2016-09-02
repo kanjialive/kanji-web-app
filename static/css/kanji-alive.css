@@ -1026,10 +1026,15 @@ h3.grade, p.grade, h3.nelson, p.nelson {
 
 
 .example {
-  font-size: 16px;
+ 
   min-height: 39px;
   width: 258px !important;
   display:table;
+}
+
+
+.example-japanese {
+	  font-size: 16px;
 }
 
 
