@@ -853,6 +853,13 @@ span.search{
  
 }
 
+.version{
+  position:absolute;
+  width:1110px !important;
+  display:inline;
+  margin-top:579px !important;
+  color: #999;
+}
 
 .border-inner {
   height:1px;
