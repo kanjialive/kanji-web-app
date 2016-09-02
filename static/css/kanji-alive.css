@@ -1009,12 +1009,12 @@ h3.grade, p.grade, h3.nelson, p.nelson {
 }
 
 
-.example { 	
-  min-height:41px; 
-  width:258px !important;
-
+.example {
+  font-size: 16px;
+  min-height: 39px;
+  width: 258px !important;
+  display:table;
 }
-
 
 
 div.border7{
@@ -1092,10 +1092,7 @@ left:553px;
  }
  
 
-.example{
-	display:table;
-	
-}
+
 
 div.example-audio, div.example-ja {
 	display:table-cell;
