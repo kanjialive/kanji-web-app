@@ -1,3 +1,14 @@
+.ka-welcome-text p {
+	font-size: 18px;
+    font-family: "SourceSansPro-Regular", sans-serif;
+    line-height: 136%;
+    -webkit-font-smoothing: antialiased;
+    word-wrap: normal;
+    white-space: normal;
+    margin-bottom: 8px !important;
+}
+
+
 html {
     max-width: 100%;
     overflow-x: hidden;
@@ -485,16 +496,15 @@ div.radical-name{
 }
 
 .ka-welcome-title{
-	
-position:absolute;
-top:44px !important;
-width:538px;
-	 font-family: "SourceSansPro-Regular", sans-serif;
+  position:absolute;
+  top:44px !important;
+  width:538px;
+  font-family: "SourceSansPro-Regular", sans-serif;
   font-size:22px;
- 
   color:#607F3A; 
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  
 }
 
 .ka-welcome-text {
@@ -505,7 +515,7 @@ width:538px;
   -moz-osx-font-smoothing: grayscale;
   white-space: normal;
   position:absolute;
-  top:76px !important;
+  top:96px !important;
   width:538px !important;	
  
 }
