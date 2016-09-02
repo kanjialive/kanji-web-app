@@ -1161,4 +1161,8 @@ kbd {
 }
 
 
+a.gray-out:hover{
+	color:gray;
+}
+
 
