@@ -1111,3 +1111,8 @@ div.example-audio .icon-play {
 }
 
 
+kbd {
+	color: #c7254e ;
+    background-color: #f9f2f4;
+    font-size: 12px;
+}
