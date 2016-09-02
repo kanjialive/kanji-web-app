@@ -148,11 +148,9 @@ font-size:17px;
 }
 
 .container-typeface-video{
-   position:absolute;
+  position:absolute;
   width:248px;
   height:248px;
- 
-  margin-left:4px;
   top:59px;
 	
 }
@@ -453,13 +451,17 @@ div.radical-name{
 }
 
 .ka-typefaces {
-  height:254px ;
-  width:254px ;
+  height:248px ;
+  width:248px ;
 }
 
 .ka-typefaces img {
   height:238px ;
   width:238px ;
+  margin-left:5px;
+  margin-top:5px;
+  margin-right:5px;
+  margin-bottom:5px;
 }
 
 .ka-typeface-left, .ka-typeface-right{
