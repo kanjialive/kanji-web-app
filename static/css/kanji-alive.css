@@ -467,7 +467,7 @@ div.radical-name{
   position:absolute;
   width:112px !important;
  left:72px;
-  top:273px;
+  top:270px;
 }
 
 .ka-welcome-title{
@@ -484,15 +484,15 @@ width:538px;
 }
 
 .ka-welcome-text {
-	 font-size: 18px;
+  font-size: 18px;
   font-family: "SourceSansPro-Regular", sans-serif;
   line-height: 136%;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   white-space: normal;
- position:absolute;
- top:76px !important;
- width:538px !important;	
+  position:absolute;
+  top:76px !important;
+  width:538px !important;	
  
 }
 
@@ -500,14 +500,14 @@ width:538px;
 .ka-typeface-left{
 	left:52px;
 	position:absolute;
-	  top:270px;
+	top:267px;
 }
 
 .ka-typeface-right{
 	right:0px;
 	position:absolute;
-	  top:270px;
-	  right:46px;
+	top:267px;
+	right:46px;
 }
 
 
