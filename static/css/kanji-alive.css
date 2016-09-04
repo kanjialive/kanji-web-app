@@ -225,8 +225,8 @@ h3.nav-header {
   height:34px;
   width:141px !important;
   margin-left:62px;
-  margin-top:17px;
-  padding-top:5px;
+  margin-top:27px;
+/*  padding-top:5px; */
 }
 
 
@@ -491,8 +491,8 @@ div.radical-name{
   font-size:15px;
   position:absolute;
   width:112px !important;
- left:72px;
-  top:270px;
+  left:72px;
+  top:277px;
 }
 
 .ka-welcome-title{
@@ -525,13 +525,13 @@ div.radical-name{
 .ka-typeface-left{
 	left:52px;
 	position:absolute;
-	top:267px;
+	top:273px;
 }
 
 .ka-typeface-right{
 	right:0px;
 	position:absolute;
-	top:267px;
+	top:273px;
 	right:46px;
 }
 
