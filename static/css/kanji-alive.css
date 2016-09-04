@@ -134,7 +134,7 @@ a:hover {
   width: 22px;
   height:22px;
   position:absolute;
-  top:4px;
+  top:6px;
   left:228px;
 }
 
@@ -225,8 +225,8 @@ h3.nav-header {
   height:34px;
   width:141px !important;
   margin-left:62px;
-  margin-top:17px;
-  padding-top:5px;
+  margin-top:27px;
+/*  padding-top:5px; */
 }
 
 
@@ -359,7 +359,7 @@ img.ka-breakdown {
   }
   
 .container {
-    width:1196px !important;
+    width:1188px !important;
     min-height: 658px !important;
     margin-left:auto;
     margin-right:auto;
@@ -491,8 +491,8 @@ div.radical-name{
   font-size:15px;
   position:absolute;
   width:112px !important;
- left:72px;
-  top:270px;
+  left:72px;
+  top:278px;
 }
 
 .ka-welcome-title{
@@ -504,12 +504,14 @@ div.radical-name{
   color:#607F3A; 
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  letter-spacing: -0.02em;
   
 }
 
 .ka-welcome-text {
   font-size: 17px;
   font-family: "SourceSansPro-Regular", sans-serif;
+  color: #1a1a1a;
   line-height: 136%;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -524,13 +526,13 @@ div.radical-name{
 .ka-typeface-left{
 	left:52px;
 	position:absolute;
-	top:267px;
+	top:273px;
 }
 
 .ka-typeface-right{
 	right:0px;
 	position:absolute;
-	top:267px;
+	top:273px;
 	right:46px;
 }
 
@@ -710,19 +712,19 @@ a.ka:hover, a.ka:active {
 
 
 .example10 {
-	font-size:10pt;
+	font-size:11pt;
 }
 
 .example9 {
-	font-size:9pt;
+	font-size:10pt;
 }
 
 .example8 {
-	font-size:8pt;
+	font-size:10pt;
 }
 
 .example7 {
-	font-size:7pt;
+	font-size:9pt;
 }
 
 
@@ -983,23 +985,24 @@ h3.radical, h3.hint {
 }
 
 .radical-stroke {	
-  top: 337px;	
+  top: 336px;	
   position:absolute;
   margin-left:1px;
+  font-size:16px;
   
 }
 
 img.radical-position {	
-  top: 338px;	
-  position:absolute;
-  margin-left:20px;
-  height:14px; 
-  width:14px;
+  top: 339px; 
+  position: absolute;
+  margin-left: 20px;
+  height: 12px; 
+  width: 12px;
 }
 
 
 div.radical-meaning{
-	 top: 316px;	
+  top: 315px;	
   position:absolute;
   left:47px;
   white-space:normal;
@@ -1171,3 +1174,6 @@ a.gray-out:hover{
 }
 
 
+code {
+	font-size: 0.85em;
+}
