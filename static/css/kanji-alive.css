@@ -134,7 +134,7 @@ a:hover {
   width: 22px;
   height:22px;
   position:absolute;
-  top:4px;
+  top:6px;
   left:228px;
 }
 
@@ -359,7 +359,7 @@ img.ka-breakdown {
   }
   
 .container {
-    width:1196px !important;
+    width:1188px !important;
     min-height: 658px !important;
     margin-left:auto;
     margin-right:auto;
@@ -510,6 +510,7 @@ div.radical-name{
 .ka-welcome-text {
   font-size: 17px;
   font-family: "SourceSansPro-Regular", sans-serif;
+  color: #1a1a1a;
   line-height: 136%;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -981,23 +982,24 @@ h3.radical, h3.hint {
 }
 
 .radical-stroke {	
-  top: 337px;	
+  top: 336px;	
   position:absolute;
   margin-left:1px;
+  font-size:16px;
   
 }
 
 img.radical-position {	
-  top: 338px;	
-  position:absolute;
-  margin-left:20px;
-  height:14px; 
-  width:14px;
+  top: 339px; 
+  position: absolute;
+  margin-left: 20px;
+  height: 12px; 
+  width: 12px;
 }
 
 
 div.radical-meaning{
-	 top: 316px;	
+  top: 315px;	
   position:absolute;
   left:47px;
   white-space:normal;
