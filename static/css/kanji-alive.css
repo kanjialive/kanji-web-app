@@ -930,6 +930,9 @@ h3.meaning, h3.strokes, h3.grade, h3.examples {
 position:absolute;
 }
 
+p.strokes, p.kodansha, p.nelson, p.grade{
+	font-size:16px;
+}
 
 h3.onyomi, h3.kodansha, h3.nelson  {
 	top: 123px;
