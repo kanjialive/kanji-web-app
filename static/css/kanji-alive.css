@@ -905,8 +905,10 @@ margin-right:88px;
 
 #ka-anim-play{
 	position:absolute;
-	left:120px !important;
+	left:120px;
+	width:30px;
 }
+
 
 
 
