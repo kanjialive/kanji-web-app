@@ -1042,15 +1042,18 @@ h3.grade, p.grade, h3.nelson, p.nelson {
 
 
 .example {
- 
   min-height: 39px;
-  width: 258px !important;
-  display:table;
+  width: 258px;
+}
+
+.example-ja {
+	float:left;
 }
 
 
 .example-japanese {
 	  font-size: 16px;
+	   
 }
 
 
@@ -1132,7 +1135,7 @@ div.typesquare-container {
 
 
 div.example-audio, div.example-ja {
-	display:table-cell;
+	float:left;
 }
 
 div.example-audio .icon-play {
