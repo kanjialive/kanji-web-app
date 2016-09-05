@@ -815,13 +815,15 @@ position:absolute;
 }
 
 .recordCounter a.icon-left {
-    margin-left:-10px !important;	
+    margin-left:-10px !important;
+    font-size: 20px;	
 }
 
 .recordCounter a.icon-right {
     position:absolute;
 	height:25px !important;
-	left: 121px !important;		
+	left: 121px !important;
+	font-size: 20px;	
 }
 
 
