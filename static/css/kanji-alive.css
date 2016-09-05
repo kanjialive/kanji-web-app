@@ -137,7 +137,7 @@ a:hover {
   width: 22px;
   height:22px;
   position:absolute;
-  top:6px;
+  top:8px;
   left:228px;
 }
 
@@ -766,7 +766,7 @@ foundation layer
 	position:absolute;
 	width:100%;
 	min-height:32px !important;
-	padding-top: 8px !important;
+	padding-top: 11px !important;
 	
 }
 
@@ -831,6 +831,7 @@ span.search{
 	position:absolute;
 	width:114px !important;
     left:7px;
+    padding-top: 1px;
 	text-align:center !important;
 }
 
