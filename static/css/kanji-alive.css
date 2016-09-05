@@ -1193,3 +1193,11 @@ a.gray-out:hover{
 code {
 	font-size: 0.85em;
 }
+
+
+.col2 .row1, .col3 .row1, .col4 .row1 {
+	padding-top:10px !important;
+}
+
+
+
