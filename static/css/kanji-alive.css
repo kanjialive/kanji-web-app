@@ -303,19 +303,19 @@ textarea { resize: none; }
   max-height:12px;
 }
 img.ka-breakdown {
-    height:48px;
-    width:48px;
-    padding-bottom:10px;
+    height: 49px;
+    width: 49px;
+    margin-bottom: 10px;
+    margin-top: 5px;
 }
 
 
 .stroke-breakdown {
-	position:absolute;
-    width:540px;
-    height:120px;
-    margin-left:25px;
-    top:530px;
-    
+    position: absolute;
+    width: 550px;
+    height: 120px;
+    margin-left: 24px;
+    top: 530px;
 }
 
 
