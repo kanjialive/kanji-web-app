@@ -122,6 +122,9 @@ a:hover {
     text-decoration: none;
 }
 
+
+
+
 .search-form {
   width:100%;
   background: #F6F6F6;
@@ -226,6 +229,7 @@ h3.nav-header {
   width:141px !important;
   margin-left:62px;
   margin-top:27px;
+  overflow:hidden !important;
 /*  padding-top:5px; */
 }
 
@@ -639,9 +643,7 @@ p.kanji	 {
 }
 
 
-a:hover {
-  text-decoration:none; 
-}
+
 
 a.ka {
   font-family:"mplus-1m-light", sans-serif;
@@ -771,16 +773,17 @@ foundation layer
  .row1 a {
   font-family: 'SourceSansPro-It','SourceSansPro-Regular',sans-serif;
   /*workaround for FireFox*/  
-  
+ 
     font-family:'SourceSansPro-Regular','ヒラギノ角ゴ Pro W3','Hiragino Kaku Gothic Pro','メイリオ',Meiryo,'ＭＳ Ｐゴシック',MS-Gothic,sans-serif; 
     font-size:17px; 
-    color:#B64630;
-    font-weight:normal; 
-    -webkit-touch-callout: none; 
-    -webkit-user-select: none; 
-    -khtml-user-select:none; 
+   color:#B64630;
+   font-weight:normal; 
+   -webkit-touch-callout: none; 
+  /*    -webkit-user-select: none;  */
+      -khtml-user-select:none; 
     -moz-user-select:none; 
     -ms-user-select: none; 
+   
   }
 
 
@@ -892,24 +895,34 @@ span.search{
 h3#kanji{
 	position:absolute;
 	 top:10px;
-margin-left:-1px;
+     margin-left:-1px;
 	
 }
 
 
-
-
-
-
-.icon-step-left{
-margin-right:88px;
+#ka-anim-step-back {
+	position:absolute;
+	left:62px;
+	width:20px;
+	
 }
 
 #ka-anim-play{
 	position:absolute;
 	left:120px;
-	width:30px;
+	width:20px;
+	
 }
+
+#ka-anim-step-forward {
+	position:absolute;
+	left:172px;
+	width:20px;
+	
+}
+
+
+
 
 
 
@@ -1173,7 +1186,7 @@ kbd {
 
 
 a.gray-out:hover{
-	color:gray;
+	color:gray !important;
 }
 
 
