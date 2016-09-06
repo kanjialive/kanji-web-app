@@ -29,7 +29,7 @@ var app = express();
  *
  * @type {string}
  */
-var MONGODB_URI = 'mongodb://heroku_app30411812:l4u7h89gdjl80535ompvdvdffj@ds043220.mongolab.com:43220/heroku_app30411812';
+var MONGODB_URI = 'mongodb://dayj:eastern-egret-nobility@ds019806.mlab.com:19806/heroku_0c91r1nz';
 
 /**
  *
