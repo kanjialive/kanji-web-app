@@ -16,8 +16,7 @@ html {
 
 @font-face {
   font-family: 'mplus-1m-light';
-  src: url('/static/css/fonts/mplus-1m-light-webfont.eot');
-  src: url('/static/css/fonts/mplus-1m-light-webfont.eot?#iefix') format('embedded-opentype'),
+  src: url('/static/css/fonts/mplus-1m-light-webfont.woff2') format('woff2'),
        url('/static/css/fonts/mplus-1m-light-webfont.woff') format('woff'),
        url('/static/css/fonts/mplus-1m-light-webfont.ttf') format('truetype');
   font-style: normal;
@@ -30,9 +29,8 @@ html {
 @font-face {
   font-family: 'SourceSansPro-Regular';
   src: local('SourceSansPro-Regular');
-  src: url('/static/css/fonts/sourcesanspro-regular-webfont.eot');
-  src: url('/static/css/fonts/sourcesanspro-regular-webfont.eot?#iefix') format('embedded-opentype'),
-       url('/static/css/fonts/sourcesanspro-regular-webfont.woff') format('woff'),
+  src: url('/static/css/fonts/sourcesanspro-regular-webfont.woff2') format('woff2'),
+       url('/static/css/fonts/sourcesanspro-regular-webfont.woff') format('woff')
        url('/static/css/fonts/sourcesanspro-regular-webfont.ttf') format('truetype');
   unicode-range: U+0000-007F; 
   font-style: normal;
@@ -43,9 +41,7 @@ html {
 @font-face {
   font-family: 'SourceSansPro-It';
   src: local('SourceSansPro-It');
-  src: url('/static/css/fonts/sourcesanspro-italic-webfont.eot');
-  src: url('/static/css/fonts/sourcesanspro-italic-webfont.eot?#iefix') format('embedded-opentype'),
-       url('/static/css/fonts/sourcesanspro-italic-webfont.woff') format('woff'),
+ src: url('/static/css/fonts/sourcesanspro-italic-webfont.woff') format('woff'),
        url('/static/css/fonts/sourcesanspro-italic-webfont.ttf')  format('truetype');
   font-style: italic;
   font-weight: normal;
@@ -55,8 +51,7 @@ html {
 @font-face {
   font-family: 'JapaneseRadicals-Regular';
   src: local('JapaneseRadicals-Regular');
-  src: url('/static/css/fonts/JapaneseRadicals-Regular.eot');
-  src: url('/static/css/fonts/JapaneseRadicals-Regular.eot?#iefix') format('embedded-opentype'),
+  src: url('/static/css/fonts/JapaneseRadicals-Regular.woff2') format('woff2'), 
        url('/static/css/fonts/JapaneseRadicals-Regular.woff') format('woff'),
        url('/static/css/fonts/JapaneseRadicals-Regular.ttf')  format('truetype');
   font-weight: normal;
@@ -65,9 +60,7 @@ html {
 
 @font-face {
   font-family: 'mplus-1m-icons';
-  src: url('/static/css/fonts/mplus-1m-icons.eot');
-  src: url('/static/css/fonts/mplus-1m-icons.eot?#iefix') format('embedded-opentype'),
-       url('/static/css/fonts/mplus-1m-icons.woff') format('woff'),
+  src: url('/static/css/fonts/mplus-1m-icons.woff') format('woff'),
        url('/static/css/fonts/mplus-1m-icons.ttf')  format('truetype');
   font-style: normal;
   font-weight: normal;
