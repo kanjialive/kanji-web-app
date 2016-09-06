@@ -2,7 +2,7 @@
  * Created by dayj on 12/13/14.
  */
 
-//db.kanji.find().forEach(
+// db.kanji.find().forEach(
 //    function(doc){
 //        var pos = positions[doc.rad_name];
 //        if (pos != undefined){
@@ -15,9 +15,7 @@
 //    });
 
 
-
-
-//db.kanji.find().forEach(
+// db.kanji.find().forEach(
 //   function(doc){
 //
 //       if (doc.onyomi.length === 0 || doc.kunyomi.length === 0){
@@ -35,22 +33,22 @@
 //
 //   });
 
-db.kanji.find().forEach(
+// db.kanji.find().forEach(
+//
+//   function(doc){
+//
+//       var noResults = ['々', '央', '械', '穫', '較', '況', '康', '績', '燥', '覧'];
+//       if (noResults.indexOf(doc['ka_utf']) === -1){
+//           doc['luminous'] = 'http://www.kenkyusha.co.jp/collab/KanjiAlive/index.php?book=lumi_waei&method=forward&field=' + doc['ka_utf'];
+//       } else {
+//           doc['luminous'] = 'n/a';
+//          print(doc['ka_utf']);
+//       }
+//       db.kanji.save(doc);
+//   }
+// );
 
-  function(doc){
-
-      var noResults = ['々', '央', '械', '穫', '較', '況', '康', '績', '燥', '覧'];
-      if (noResults.indexOf(doc['ka_utf']) === -1){
-          doc['luminous'] = 'http://www.kenkyusha.co.jp/collab/KanjiAlive/index.php?book=lumi_waei&method=forward&field=' + doc['ka_utf'];
-      } else {
-          doc['luminous'] = 'n/a';
-         print(doc['ka_utf']);
-      }
-      db.kanji.save(doc);
-  }
-);
-
-/*
+// /*
 db.kanji.find().forEach(
 
     function(doc){
@@ -97,7 +95,7 @@ db.kanji.find().forEach(
 
     });
 
-    */
+    // */
 
 // db.kanji.find().forEach(
 //   function(doc){
@@ -245,10 +243,10 @@ Object.deepExtend = function(destination, source) {
     }
     return destination;
 };
+
+// load('import_5_2012.js');
 //
-//load('import_5_2012.js');
-//
-//for (var i in import_data){
+// for (var i in import_data){
 //    var ka = import_data [i];
 //    ka.examples = JSON.parse(ka.examples);
 //    ka.txt_books = JSON.parse(ka.txt_books);
@@ -260,7 +258,7 @@ Object.deepExtend = function(destination, source) {
 //    Object.deepExtend(doc, ka);
 //    db.kanji.save(doc);
 //
-//}
+// }
 
 //db.kanji.find().forEach(function (doc) {
 //
