@@ -55,6 +55,14 @@ html {
   -moz-osx-font-smoothing: grayscale;
 }
 
+@font-face {
+  font-family: 'ka-multimedia';
+    src url('/static/css/fonts/ka-multimedia.woff2') format('woff2'),
+    url('/static/css/fonts/ka-multimedia.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+}
+
 body {
     font-family:'SourceSansPro-Regular','mplus-1m-regular','ヒラギノ角ゴ Pro W3','Hiragino Kaku Gothic Pro', 'メイリオ',Meiryo,'ＭＳ Ｐゴシック',MS-Gothic,sans-serif;
     background-color:#D0D0D0; 
@@ -368,14 +376,6 @@ img.ka-breakdown {
   .luminous {height:89px;}
   .hint {height:115px;}
 /*}*/
-
-@font-face {
-  font-family: 'ka-multimedia';
-    url('/static/css/fonts/ka-multimedia.woff2') format('woff2'),
-    url('/static/css/fonts/ka-multimedia.woff') format('woff');
-  font-weight: normal;
-  font-style: normal;
-}
 
 /* Use the following CSS code if you want to have a class per icon */
 /*
