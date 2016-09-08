@@ -57,7 +57,7 @@ html {
 
 @font-face {
   font-family: 'ka-multimedia';
-    src url('/static/css/fonts/ka-multimedia.woff2') format('woff2'),
+    src: url('/static/css/fonts/ka-multimedia.woff2') format('woff2'),
     url('/static/css/fonts/ka-multimedia.woff') format('woff');
   font-weight: normal;
   font-style: normal;
