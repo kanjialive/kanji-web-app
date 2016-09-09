@@ -149,19 +149,21 @@ font-size:17px;
   position:absolute;
   width:248px;
   height:248px;
-  top:59px;
+  top:50px;
 	
 }
 
 .video-container .video {
   width:248px;
   height:248px;
+  margin-left: 3px;
   
 }
 
 video[poster] {
   width:248px;
   height:248px;
+  margin-left: 3px;
 }
 
 video {
@@ -209,12 +211,12 @@ h3.nav-header {
 */
 
 .animation-controls {
-  height:34px;
-  width:141px !important;
-  margin-left:62px;
-  margin-top:27px;
-  overflow:hidden !important;
-/*  padding-top:5px; */
+	/* height: 34px; */
+	/* width: 141px !important; */
+	/* margin-left: 62px; */
+	margin-top: 17px;
+	/* overflow: hidden !important; */
+	/* padding-top:5px; */
 }
 
 
@@ -444,12 +446,10 @@ div.radical-name{
 }
 
 .ka-typefaces img {
-  height:238px ;
-  width:238px ;
-  margin-left:5px;
-  margin-top:5px;
-  margin-right:5px;
-  margin-bottom:5px;
+	height: 220px;
+	width: 220px;
+	margin-left: 20px;
+	margin-top: 20px;
 }
 
 .ka-typeface-left, .ka-typeface-right{
@@ -463,13 +463,12 @@ div.radical-name{
 }
 
 .typeface-name {
-
-  text-align:center;
-  font-size:15px;
-  position:absolute;
-  width:112px !important;
-  left:72px;
-  top:278px;
+	text-align: center;
+	font-size: 15px;
+	position: absolute;
+	width: 112px !important;
+	left: 72px;
+	top: 265px;
 }
 
 .ka-welcome-title{
@@ -508,16 +507,15 @@ div.radical-name{
 }
 
 .ka-typeface-left{
-	left:52px;
-	position:absolute;
-	top:273px;
+	left: 52px;
+	position: absolute;
+	top: 261px;
 }
 
 .ka-typeface-right{
-	right:0px;
-	position:absolute;
-	top:273px;
-	right:46px;
+	position: absolute;
+	top: 261px;
+	right: 47px;
 }
 
 
