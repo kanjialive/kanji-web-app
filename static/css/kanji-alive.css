@@ -155,15 +155,12 @@ font-size:17px;
 
 .video-container .video {
   width:248px;
-  height:248px;
-  margin-left: 3px;
-  
+  height:248px;  
 }
 
 video[poster] {
   width:248px;
   height:248px;
-  margin-left: 3px;
 }
 
 video {
