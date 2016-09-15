@@ -114,7 +114,7 @@ var extendKanjiWithAssets = function (doc){
     var strokes_path= 'https://www.kanjialive.link/kanji_strokes/';
     var typeface_path = 'https://www.kanjialive.link/ka_typefaces/';
     var rad_char_path = 'https://www.kanjialive.link/radical_character/';
-    var examples_path = 'https://www.kanjialive.link/examples_audio/';
+    var examples_path = 'https://media.kanjialive.com/examples_audio/';
     var rad_position_path = 'https://www.kanjialive.link/rad_positions/';
 
     var id = '000000' + doc.ka_id.split('_')[1];

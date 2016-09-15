@@ -119,10 +119,10 @@ var extendKanjiWithAssets = function (doc){
         example.japanese = doc.examples[i][0];
         example.english = doc.examples[i][1];
         example.filename = doc.kname + "_06_" + alpha[i];
-        example.opus = 'https://www.kanjialive.link/examples_audio/audio-opus/' + example.filename + '.opus';
-        example.aac = 'https://www.kanjialive.link/examples_audio/audio-aac/' + example.filename + '.aac';
-        example.ogg = 'https://www.kanjialive.link/examples_audio/audio-ogg/' + example.filename + '.ogg';
-        example.mp3 = 'https://www.kanjialive.link/examples_audio/audio-mp3/' + example.filename + '.mp3';
+        example.opus = 'https://media.kanjialive.com/examples_audio/audio-opus/' + example.filename + '.opus';
+        example.aac = 'https://media.kanjialive.com/examples_audio/audio-aac/' + example.filename + '.aac';
+        example.ogg = 'https://media.kanjialive.com/examples_audio/audio-ogg/' + example.filename + '.ogg';
+        example.mp3 = 'https://media.kanjialive.com/examples_audio/audio-mp3/' + example.filename + '.mp3';
         examples.push(example);
     }
 
