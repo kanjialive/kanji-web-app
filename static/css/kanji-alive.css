@@ -583,10 +583,10 @@ p.kanji	 {
 
 .ka-welcome-italic {
   font-family: 'SourceSansPro-It','SourceSansPro-Regular',sans-serif;
-/* workaround for FireFox */  
+/* workaround for FireFox 
   font-style: italic;
   -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  -moz-osx-font-smoothing: grayscale; */  
 }
 
 /*
