@@ -121,7 +121,7 @@ a:hover {
   width: 22px;
   height:22px;
   position:absolute;
-  top:9px;
+  top:8px;
   left:228px;
 }
 
@@ -211,7 +211,7 @@ h3.nav-header {
 	/* height: 34px; */
 	/* width: 141px !important; */
 	/* margin-left: 62px; */
-	margin-top: 17px;
+	margin-top: 16px;
 	/* overflow: hidden !important; */
 	/* padding-top:5px; */
 }
@@ -464,7 +464,7 @@ div.radical-name{
 	font-size: 15px;
 	position: absolute;
 	width: 112px !important;
-	left: 72px;
+	left: 75px;
 	top: 265px;
 }
 
@@ -504,7 +504,7 @@ div.radical-name{
 }
 
 .ka-typeface-left{
-	left: 52px;
+	left: 53px;
 	position: absolute;
 	top: 261px;
 }
@@ -512,7 +512,7 @@ div.radical-name{
 .ka-typeface-right{
 	position: absolute;
 	top: 261px;
-	right: 47px;
+	right: 41px;
 }
 
 
@@ -741,7 +741,7 @@ foundation layer
 	position:absolute;
 	width:100%;
 	min-height:32px !important;
-	padding-top: 11px !important;
+	padding-top: 10px !important;
 	
 }
 
@@ -784,6 +784,7 @@ position:absolute;
 	width:128px !important;
     float:left;
 	height:25px !important;
+	margin-top: -1px;
 }
 
 .recordCounter a.icon-left {
@@ -802,7 +803,7 @@ position:absolute;
 span.search{
 	position:absolute;
 	width:114px !important;
-    left:7px;
+    left:8px;
     padding-top: 1px;
 	text-align:center !important;
 }
@@ -811,7 +812,7 @@ span.search{
 .logo {
 	position:relative;
 	top:-8px !important;
-	left:1073px !important;
+	left:1074px !important;
 	
 }
 
@@ -877,35 +878,27 @@ h3#kanji{
 
 #ka-anim-step-back {
 	position:absolute;
-	left:62px;
+	left:63px;
 	width:20px;
 	
 }
 
 #ka-anim-play{
 	position:absolute;
-	left:120px;
+	left:123px;
 	width:20px;
 	
 }
 
 #ka-anim-step-forward {
 	position:absolute;
-	left:172px;
+	left:176px;
 	width:20px;
 	
 }
 
 
-
-
-
-
-
 /* column 2*/
-
-
-
 
 
 h3.meaning, h3.strokes, h3.grade, h3.examples {
@@ -976,7 +969,7 @@ h3.radical, h3.hint {
 }
 
 .radical-stroke {	
-  top: 336px;	
+  top: 335px;	
   position:absolute;
   margin-left:1px;
   font-size:16px;
@@ -984,9 +977,9 @@ h3.radical, h3.hint {
 }
 
 img.radical-position {	
-  top: 339px; 
+  top: 338px; 
   position: absolute;
-  margin-left: 20px;
+  margin-left: 21px;
   height: 12px; 
   width: 12px;
 }
@@ -1036,7 +1029,7 @@ h3.grade, p.grade, h3.nelson, p.nelson {
 
 
 .example {
-  min-height: 39px;
+  min-height: 39.5px;
   width: 258px;
 }
 
@@ -1133,8 +1126,8 @@ div.example-audio, div.example-ja {
 }
 
 div.example-audio .icon-play {
-	margin-top:2px;
-}
+	margin-top: 2px; /* also causes vertical misalignment in FireFox */
+} 
 
 
 .icon-play{
@@ -1171,7 +1164,7 @@ code {
 
 
 .col2 .row1, .col3 .row1, .col4 .row1 {
-	padding-top:10px !important;
+	padding-top:11px !important;
 }
 
 
