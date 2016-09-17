@@ -1,14 +1,3 @@
-.ka-welcome-text p {
-	font-size: 18px;
-    font-family: "SourceSansPro-Regular", sans-serif;
-    line-height: 136%;
-    -webkit-font-smoothing: antialiased;
-    word-wrap: normal;
-    white-space: normal;
-    margin-bottom: 8px !important;
-}
-
-
 html {
     max-width: 100%;
     overflow-x: hidden;
@@ -16,10 +5,8 @@ html {
 
 @font-face {
   font-family: 'mplus-1m-light';
-  src: url('/static/css/fonts/mplus-1m-light-webfont.eot');
-  src: url('/static/css/fonts/mplus-1m-light-webfont.eot?#iefix') format('embedded-opentype'),
-       url('/static/css/fonts/mplus-1m-light-webfont.woff') format('woff'),
-       url('/static/css/fonts/mplus-1m-light-webfont.ttf') format('truetype');
+  src: url('/static/css/fonts/mplus-1m-light-webfont.woff2') format('woff2'),
+       url('/static/css/fonts/mplus-1m-light-webfont.woff') format('woff');
   font-style: normal;
   font-weight: normal;
   font-variant: normal;
@@ -30,10 +17,8 @@ html {
 @font-face {
   font-family: 'SourceSansPro-Regular';
   src: local('SourceSansPro-Regular');
-  src: url('/static/css/fonts/sourcesanspro-regular-webfont.eot');
-  src: url('/static/css/fonts/sourcesanspro-regular-webfont.eot?#iefix') format('embedded-opentype'),
-       url('/static/css/fonts/sourcesanspro-regular-webfont.woff') format('woff'),
-       url('/static/css/fonts/sourcesanspro-regular-webfont.ttf') format('truetype');
+  src: url('/static/css/fonts/sourcesanspro-regular-webfont.woff2') format('woff2'),
+       url('/static/css/fonts/sourcesanspro-regular-webfont.woff') format('woff');
   unicode-range: U+0000-007F; 
   font-style: normal;
   font-weight: normal;
@@ -43,10 +28,8 @@ html {
 @font-face {
   font-family: 'SourceSansPro-It';
   src: local('SourceSansPro-It');
-  src: url('/static/css/fonts/sourcesanspro-italic-webfont.eot');
-  src: url('/static/css/fonts/sourcesanspro-italic-webfont.eot?#iefix') format('embedded-opentype'),
-       url('/static/css/fonts/sourcesanspro-italic-webfont.woff') format('woff'),
-       url('/static/css/fonts/sourcesanspro-italic-webfont.ttf')  format('truetype');
+ src: url('/static/css/fonts/sourcesanspro-italic-webfont.woff2') format('woff2'),
+      url('/static/css/fonts/sourcesanspro-italic-webfont.woff') format('woff');
   font-style: italic;
   font-weight: normal;
   font-variant: normal;
@@ -55,25 +38,29 @@ html {
 @font-face {
   font-family: 'JapaneseRadicals-Regular';
   src: local('JapaneseRadicals-Regular');
-  src: url('/static/css/fonts/JapaneseRadicals-Regular.eot');
-  src: url('/static/css/fonts/JapaneseRadicals-Regular.eot?#iefix') format('embedded-opentype'),
-       url('/static/css/fonts/JapaneseRadicals-Regular.woff') format('woff'),
-       url('/static/css/fonts/JapaneseRadicals-Regular.ttf')  format('truetype');
+  src: url('/static/css/fonts/JapaneseRadicals-Regular.woff2') format('woff2'), 
+       url('/static/css/fonts/JapaneseRadicals-Regular.woff') format('woff');
   font-weight: normal;
   font-variant: normal;
 }
 
 @font-face {
   font-family: 'mplus-1m-icons';
-  src: url('/static/css/fonts/mplus-1m-icons.eot');
-  src: url('/static/css/fonts/mplus-1m-icons.eot?#iefix') format('embedded-opentype'),
-       url('/static/css/fonts/mplus-1m-icons.woff') format('woff'),
-       url('/static/css/fonts/mplus-1m-icons.ttf')  format('truetype');
+  src: url('/static/css/fonts/mplus-1m-icons.woff2') format('woff2'),
+       url('/static/css/fonts/mplus-1m-icons.woff') format('woff');
   font-style: normal;
   font-weight: normal;
   font-variant: normal;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+@font-face {
+  font-family: 'ka-multimedia';
+    src: url('/static/css/fonts/ka-multimedia.woff2') format('woff2'),
+    url('/static/css/fonts/ka-multimedia.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
 }
 
 body {
@@ -122,9 +109,6 @@ a:hover {
     text-decoration: none;
 }
 
-
-
-
 .search-form {
   width:100%;
   background: #F6F6F6;
@@ -165,14 +149,13 @@ font-size:17px;
   position:absolute;
   width:248px;
   height:248px;
-  top:59px;
+  top:50px;
 	
 }
 
 .video-container .video {
   width:248px;
-  height:248px;
-  
+  height:248px;  
 }
 
 video[poster] {
@@ -225,12 +208,12 @@ h3.nav-header {
 */
 
 .animation-controls {
-  height:34px;
-  width:141px !important;
-  margin-left:62px;
-  margin-top:27px;
-  overflow:hidden !important;
-/*  padding-top:5px; */
+	/* height: 34px; */
+	/* width: 141px !important; */
+	/* margin-left: 62px; */
+	margin-top: 17px;
+	/* overflow: hidden !important; */
+	/* padding-top:5px; */
 }
 
 
@@ -393,17 +376,6 @@ img.ka-breakdown {
   .hint {height:115px;}
 /*}*/
 
-@font-face {
-  font-family: 'ka-multimedia';
-  src:url('/static/css/fonts/ka-multimedia.eot');
-  src:url('/static/css/fonts/ka-multimedia.eot?#iefix') format('embedded-opentype'),
-    url('/static/css/fonts/ka-multimedia.woff') format('woff'),
-    url('/static/css/fonts/ka-multimedia.ttf') format('truetype'),
-    url('/static/css/fonts/ka-multimedia.svg#ka-multimedia') format('svg');
-  font-weight: normal;
-  font-style: normal;
-}
-
 /* Use the following CSS code if you want to have a class per icon */
 /*
 Instead of a list of all class selectors,
@@ -471,12 +443,10 @@ div.radical-name{
 }
 
 .ka-typefaces img {
-  height:238px ;
-  width:238px ;
-  margin-left:5px;
-  margin-top:5px;
-  margin-right:5px;
-  margin-bottom:5px;
+	height: 220px;
+	width: 220px;
+	margin-left: 20px;
+	margin-top: 20px;
 }
 
 .ka-typeface-left, .ka-typeface-right{
@@ -490,13 +460,12 @@ div.radical-name{
 }
 
 .typeface-name {
-
-  text-align:center;
-  font-size:15px;
-  position:absolute;
-  width:112px !important;
-  left:72px;
-  top:278px;
+	text-align: center;
+	font-size: 15px;
+	position: absolute;
+	width: 112px !important;
+	left: 72px;
+	top: 265px;
 }
 
 .ka-welcome-title{
@@ -509,7 +478,6 @@ div.radical-name{
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   letter-spacing: -0.02em;
-  
 }
 
 .ka-welcome-text {
@@ -523,21 +491,28 @@ div.radical-name{
   position:absolute;
   top:96px !important;
   width:538px !important;	
- 
 }
 
+.ka-welcome-text p {
+	font-size: 18px;
+    font-family: "SourceSansPro-Regular", sans-serif;
+    line-height: 136%;
+    -webkit-font-smoothing: antialiased;
+    word-wrap: normal;
+    white-space: normal;
+    margin-bottom: 8px !important;
+}
 
 .ka-typeface-left{
-	left:52px;
-	position:absolute;
-	top:273px;
+	left: 52px;
+	position: absolute;
+	top: 261px;
 }
 
 .ka-typeface-right{
-	right:0px;
-	position:absolute;
-	top:273px;
-	right:46px;
+	position: absolute;
+	top: 261px;
+	right: 47px;
 }
 
 
@@ -608,10 +583,10 @@ p.kanji	 {
 
 .ka-welcome-italic {
   font-family: 'SourceSansPro-It','SourceSansPro-Regular',sans-serif;
-/* workaround for FireFox */  
+/* workaround for FireFox 
   font-style: italic;
   -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  -moz-osx-font-smoothing: grayscale; */  
 }
 
 /*
@@ -792,8 +767,6 @@ foundation layer
 	top:32px;
 	width:100%;
 	min-height:545px !important;
-//	background-color:gold;
-
 }
 
 
@@ -803,7 +776,6 @@ position:absolute;
 	top:32px;
 	width:100%;
 	min-height:545px !important;
-
 }
 
 
@@ -839,7 +811,7 @@ span.search{
 .logo {
 	position:relative;
 	top:-8px !important;
-	left:1075px !important;
+	left:1073px !important;
 	
 }
 
@@ -1107,7 +1079,7 @@ div.typesquare-container {
 }
 
 .TypeSquare {
-	font-family: font-family: "学参 常改教科書ICA L" または "GJ Kyoukasho ICA Light" ;
+	font-family: "学参 常改教科書ICA L" または "GJ Kyoukasho ICA Light" ;
 	font-family: "GJ Kyoukasho ICA Light" ;
 	font-size: 24px;
 	text-rendering: optimizelegibility;
