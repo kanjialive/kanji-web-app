@@ -100,9 +100,19 @@ app.controller('searchController',
     if (params.length > 0) {
 
       var query = params.join('&');
+
+      /* In the query language that users type in, keys and values are separated by colons
+       * and multiple terms are separated by spaces. In the query language that is passed in
+       * the URL the colons are replaced with = and spaces with & to help with compatibility.
+       * The server api accepts the raw URL value.
+       */
+
+      // Because we are appending to a URI/Route use the raw URI values
       endpoint += query;
 
-      searchService.query = query.replace(/=/g, ':');
+      // Because we are pasting into the user visible search box, perform the appropriate
+      // transformations from raw to user facing.
+      searchService.query = query.replace(/=/g, ':').replace(/&/g, ' ');
 
       $scope.getKanji(endpoint);
 
