@@ -5,8 +5,6 @@
     <div class="desktop-branding col-xs-3 nav-section-4">
     </div>
     <div class="desktop-branding col-xs-3 nav-section-4">
-        <a href="http://kanjialive.com" target="_blank"><span><em>Kanji alive</em></span></a>
-        <img src="http://kanjialive.com/wp-content/uploads/2013/10/fan_logo_104.png"/>
     </div>
     <div class="border">
         <div class="border-inner"></div>
@@ -16,10 +14,12 @@
 <div class="row docs-container">
     <div class="col-xs-6 border-right docs-detail">
         <h3>Introduction</h3>
-        <p>Almost all of the functionality of the <em>Kanji Alive</em> web application (<a href="http://app.kanjialive.com">http://app.kanjialive.com</a>) can be accessed using the <a href="https://www.mashape.com/kanjialive/learn-to-read-and-write-japanese-kanji" target="_blank">public developer API</a> hosted and documented on <a href="https://www.mashape.com/kanjialive/learn-to-read-and-write-japanese-kanji" target="_blank">Mashape</a>. The only exceptions are searching for kanji by textbook and viewing the mnemonic hints for individual kanji. Due to licensing restrictions these features are not available in the public API.</p>
+        <p>Almost all of the functionality of the <em>Kanji Alive</em> <a href="http://app.kanjialive.com">web application</a> can be accessed using the <a href="https://www.mashape.com/kanjialive/learn-to-read-and-write-japanese-kanji" target="_blank">public developer API</a> hosted and documented on <a href="https://www.mashape.com/kanjialive/learn-to-read-and-write-japanese-kanji" target="_blank">Mashape</a> under a <a href="http://creativecommons.org/licenses/by/4.0/" target="_blank">Creative Commons Attribution (CC-BY)</a> license. If you prefer, you can also download our language data and media from our <a href="https://github.com/kanjialive/media">GitHub repository</a> for offline use under the same license.</p>
+                
+        <p>The only exceptions are searching for kanji by textbook and viewing the mnemonic hints for individual kanji. Due to licensing restrictions these features and data are not available in the public API or offline on GitHub.</p> 
         
-        <p>All of the <em>Kanji alive</em> data and media accessible through the API is freely available for private and commercial use under a <a href="http://creativecommons.org/licenses/by/4.0/" target="_blank">Creative Commons Attribution (CC-BY)</a> license. We encourage developers to download our language data, media and <a href="https://github.com/kanjialive/media">custom Japanese Radicals font</a> from our <a href="https://github.com/kanjialive/media">GitHub repository</a> for offline use.</p>
-        <p>The documentation on this page is intended to supplement the <a href="https://www.mashape.com/kanjialive/learn-to-read-and-write-japanese-kanji" target="_blank">API documented on Mashape</a>. If necessary, please review the <em>Kanji alive</em> <a href="https://kanjialive.com/user-guide/" target="_blank">User Guide</a> for  further details on individual fields and components.</p>
+        
+        <p>The documentation on this page supplements the <a href="https://www.mashape.com/kanjialive/learn-to-read-and-write-japanese-kanji" target="_blank">API documented on Mashape</a>. If necessary, please review the <em>Kanji alive</em> <a href="https://kanjialive.com/user-guide/" target="_blank">User Guide</a> for  further details on individual fields and components.</p>
         <h3>Basic Search</h3>
         <p>Valid search strings for the basic search endpoint <code>:search</code> are a single kanji character, an Onyomi reading in katakana, a Kunyomi reading in hiragana, or a kanji's simplified English meaning.</p>
         <pre>https://kanjialive-api.p.mashape.com/api/public/search/</pre>
@@ -122,13 +122,13 @@
 ]
 ]</pre>
         <p>If your search does not yield any results, an empty JSON Array will be returned</p>
-<p><strong>Please Note:</strong> As illustrated above some of the radical characters supported by <em>Kanji alive</em> are not defined in Unicode and had to be assigned PUA (Private Use Area) encodings in the range U+E700..U+E759. To view these characters correctly, your users will first have to install our custom <a href="https://github.com/kintopp/Kanji-alive/tree/master/radicals-font">Japanese Radicals font</a> (freely available in .ttf, .otf, .woff, and .woff2 formats). 
+<p><strong>Note:</strong> As illustrated above some of the radical characters supported by <em>Kanji alive</em> are not defined in Unicode and had to be assigned PUA (Private Use Area) encodings in the range U+E700..U+E759. To view these characters correctly, your users will first have to install our custom <a href="https://github.com/kintopp/Kanji-alive/tree/master/radicals-font">Japanese Radicals font</a> (also available in several webfont formats). 
     </div>
     <div class="col-xs-6 docs-detail">
         <h3>Kanji Details</h3>
-        <p>If you know the kanji that you want more detail for, you can use the detail endpoint to get all of the information <em>Kanji Alive</em> has to offer. The information offered through the API is largely the same as found in the web app's detail view, with the following two differences:
+        <p>The detail endpoint to gives you all the information <em>Kanji Alive</em> has to offer on a specific kanji (currently <a href="https://kanjialive.com/2014/03/list-kanji-supported-kanji-alive/">1235 kanji</a>). The information offered through the API is largely the same as found in the web app's detail view, with two differences:
         <ol>
-        <li>The API offers romaji versions of a kanji's Onyomi and Kunyomi readings and access to the timing information for each kanji stroke</li>
+        <li>The API also provides romaji versions of a kanji's Onyomi and Kunyomi readings and access to the timing information for each kanji stroke</li>
         <li> The API does not offer data on an individual kanji's mnemonic hints</li>
         </ol></p>
         <p>The detail endpoint has one parameter, and that is the <code>:character</code> itself.</p>
@@ -136,7 +136,7 @@
         <p>Here is an example of how to use the detail endpoint</p>
         <pre>https://kanjialive-api.p.mashape.com/api/public/kanji/訪</pre>
         <h3>Response</h3>
-        <p>The JSON response will be a single JSON Object for the kanji that you have appended to the detail endpoint. All asset URLs that you might be interested will always be fully qualified.</p>
+        <p>The JSON response will be a single JSON Object for the kanji that you have appended to the detail endpoint. All asset URLs will always be fully qualified.</p>
         <pre>
  {
   "kanji": {
@@ -238,10 +238,10 @@
   ]
 }
         </pre>
-        <p>If you ask for a kanji character that Kanji Alive does not have any data for you will get an error response that looks like this:</p>
+        <p>If you request a kanji character for which <em>Kanji Alive</em> does not have data you will get an error response:</p>
         <pre>
 {
-  "error": "no kanji found."
+  "Error": "No kanji found."
 }</pre>
 
     </div>
