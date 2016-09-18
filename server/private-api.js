@@ -32,7 +32,7 @@ var getKanjiWithObject = function(obj, req, res){
     db.collection('kanji', function (error, collection) {
         collection.findOne(obj, function (error, result) {
             (error || result == null)
-                ? res.send({'error': 'no kanji found.'})
+                ? res.send({'Error': 'No kanji found.'})
                 : res.send(extendKanjiWithAssets(result));
         });
     });
