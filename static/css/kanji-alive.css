@@ -161,6 +161,7 @@ font-size:17px;
 video[poster] {
   width:248px;
   height:248px;
+  margin-left: 5px;
 }
 
 video {
@@ -445,8 +446,8 @@ div.radical-name{
 .ka-typefaces img {
 	height: 220px;
 	width: 220px;
-	margin-left: 20px;
-	margin-top: 20px;
+	margin-left: 16px;
+	margin-top: 16px;
 }
 
 .ka-typeface-left, .ka-typeface-right{
