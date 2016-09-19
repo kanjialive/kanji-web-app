@@ -226,7 +226,6 @@ h3.nav-header {
 
 .search-results-kanji{
 	margin-left:0px;
-	width: 1103px !important;
 }
 
 .docs-container {
@@ -1149,8 +1148,6 @@ kbd {
 	height:5px !important;
 	background: black !important;
 	pointer:cursor;
-	width:379px !important;
-	
 }
 
 

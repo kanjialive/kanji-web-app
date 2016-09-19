@@ -47,8 +47,17 @@ app.controller('searchController',
     $scope.radicalStrokeGroups = searchService.radicalStrokeGroups;
     $scope.query = searchService.query;
 
-    var w = Math.max(289, (Math.ceil(($scope.results.length / 63)) * 289));
-  
+    var col_width = 38;
+    var total_cols = 30;
+    var total_rows = 12;
+    var min_cols = 7;
+
+    // Calculate the number of columns that would be needed to display these results if all rows were used.
+    var cols_needed = Math.ceil($scope.results.length / total_rows);
+
+    // Calculate the actual width taking into account the minimum column count
+    var w = Math.max(cols_needed, min_cols) * col_width;
+
     $scope.kanjiResultsStyle = {'width':w + 'px'};
 
 

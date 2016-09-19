@@ -54,7 +54,7 @@
             <div class="ka-border-bottom">
                 <div class="border-inner"></div>
             </div>
-            <p class="kanji">
+            <p class="kanji" ng-style="kanjiResultsStyle">
                 <a ng-repeat="kanji in results track by $index" ng-click="setCurrent($index)" id="{{kanji.ka_id}}"
                    class="ka" href="/{{kanji.ka_utf}}">{{kanji.ka_utf}} </a>
 
