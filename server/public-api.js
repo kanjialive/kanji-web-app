@@ -147,7 +147,7 @@ var extendKanjiWithAssets = function (doc){
 
     kanji.kunyomi = {
         'romaji':doc.kunyomi,
-        'hiragana':doc.kunyomi_ja
+        'hiragana':doc.kunyomi_ka_display
     };
 
     kanji.video = {
