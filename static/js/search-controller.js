@@ -47,8 +47,17 @@ app.controller('searchController',
     $scope.radicalStrokeGroups = searchService.radicalStrokeGroups;
     $scope.query = searchService.query;
 
-    var w = Math.max(289, (Math.ceil(($scope.results.length / 63)) * 289));
-  
+    var col_width = 38;
+    var total_cols = 30;
+    var total_rows = 12;
+    var min_cols = 7;
+
+    // Calculate the number of columns that would be needed to display these results if all rows were used.
+    var cols_needed = Math.ceil($scope.results.length / total_rows);
+
+    // Calculate the actual width taking into account the minimum column count
+    var w = Math.max(cols_needed, min_cols) * col_width;
+
     $scope.kanjiResultsStyle = {'width':w + 'px'};
 
 
@@ -100,9 +109,19 @@ app.controller('searchController',
     if (params.length > 0) {
 
       var query = params.join('&');
+
+      /* In the query language that users type in, keys and values are separated by colons
+       * and multiple terms are separated by spaces. In the query language that is passed in
+       * the URL the colons are replaced with = and spaces with & to help with compatibility.
+       * The server api accepts the raw URL value.
+       */
+
+      // Because we are appending to a URI/Route use the raw URI values
       endpoint += query;
 
-      searchService.query = query.replace(/=/g, ':');
+      // Because we are pasting into the user visible search box, perform the appropriate
+      // transformations from raw to user facing.
+      searchService.query = query.replace(/=/g, ':').replace(/&/g, ' ');
 
       $scope.getKanji(endpoint);
 

@@ -19,7 +19,7 @@ app.controller(
     $scope.setup();
 
     var typefaces = ['suzumushi', 'kanteiryu','hiragino','tensho','kyokasho','mincho','gothic', 'maru'];
-    var typefacesDisplay = ['Modern', 'Kanteiryu', 'Gyosho', 'Tensho', 'Kyokashotai', 'Mincho', 'Gothic', 'Maru'];
+    var typefacesDisplay = ['Suzumushi', 'Kanteiryu', 'Gyosho', 'Tensho', 'Kyokashotai', 'Mincho', 'Gothic', 'Maru'];
     //var typefaces = ['kyokasho', 'mincho', 'gothic', 'suzumushi', 'kanteiryu', 'hiragino', 'tensho'];
     //var typefacesDisplay = ['Kyokashotai', 'Mincho', 'Gothic', 'Suzumushi (<a href="http://kanjialive.com">info</a>)', 'Kanteiryu', 'Gyosho', 'Tensho'];
     $scope.typeface = typefaces[searchService.currentTypeface];

@@ -22,14 +22,12 @@ var api = require('./server/api');
  */
 var app = express();
 
-// csv: mongoexport -h ds043220.mongolab.com:43220 -d heroku_app30411812 -c kanji -u heroku_app30411812 -p l4u7h89gdjl80535ompvdvdffj -o export.new.csv --csv -f export_kanji_as_csv.txt
-// cli:  mongo ds043220.mongolab.com:43220/heroku_app30411812 -u heroku_app30411812 -p l4u7h89gdjl80535ompvdvdffj
-
 /**
  *
  * @type {string}
  */
-var MONGODB_URI = 'mongodb://dayj:eastern-egret-nobility@ds019936.mlab.com:19936/heroku_x64n6ln0';
+var MONGODB_URI = process.env.MONGOLAB_BLACK_URI;
+var MASHAPE_SECRET = process.env.MASHAPE_SECRET;
 
 /**
  *
@@ -92,7 +90,7 @@ app.get('/api/search/:search', api.private_api.basicSearch);
  */
 var requiresApiKey = function(req, res, next) {
     var mashape_key = req.get('X-Mashape-Proxy-Secret');
-    if (mashape_key === '1lAf0e0Dwe3B8uTF47MVRn8OBbPF6veLDl54ybh6dJgSXKaR9U') { next(); }
+    if (mashape_key === MASHAPE_SECRET) { next(); }
     else { res.status(403).end(); }
 };
 

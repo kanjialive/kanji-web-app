@@ -27,7 +27,7 @@
 
 </div>
 <div class="col4">
-<div class="row1 desktop-branding"><a href="http://kanjialive.com" target="_blank"><span>Kanji alive</span></a>
+<div class="row1 desktop-branding"><a href="http://kanjialive.com" target="_blank"><span class="ka-welcome-italic">Kanji alive</span></a>
     </div>
 </div>
 
@@ -54,7 +54,7 @@
             <div class="ka-border-bottom">
                 <div class="border-inner"></div>
             </div>
-            <p class="kanji">
+            <p class="kanji" ng-style="kanjiResultsStyle">
                 <a ng-repeat="kanji in results track by $index" ng-click="setCurrent($index)" id="{{kanji.ka_id}}"
                    class="ka" href="/{{kanji.ka_utf}}">{{kanji.ka_utf}} </a>
 
@@ -150,7 +150,7 @@
            
 <div class="typesquare-container">
     <div class="TypeSquare"> 
-   <img src="/static/img/type_small.png"/>
+   <img src="http://kanjialive.link/img/type_large.png" height="400" width="400"/>
    <!--  
 日本語の漢字の世界へようこそ。</br>
 </br>

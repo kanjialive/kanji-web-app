@@ -109,13 +109,13 @@ exports.getAllKanji = function(req, res) {
  */
 var extendKanjiWithAssets = function (doc){
 
-    var animation_path = 'https://media.kanjialive.com/kanji_animations/';
-    var rad_anim_path = 'https://media.kanjialive.com/rad_frames/';
-    var strokes_path= 'https://media.kanjialive.com/kanji_strokes/';
-    var typeface_path = 'https://media.kanjialive.com/ka_typefaces/';
-    var rad_char_path = 'https://media.kanjialive.com/radical_character/';
+    var animation_path = 'https://www.kanjialive.link/kanji_animations/';
+    var rad_anim_path = 'https://www.kanjialive.link/rad_frames/';
+    var strokes_path= 'https://www.kanjialive.link/kanji_strokes/';
+    var typeface_path = 'https://www.kanjialive.link/ka_typefaces/';
+    var rad_char_path = 'https://www.kanjialive.link/radical_character/';
     var examples_path = 'https://media.kanjialive.com/examples_audio/';
-    var rad_position_path = 'https://media.kanjialive.com/rad_positions/';
+    var rad_position_path = 'https://www.kanjialive.link/rad_positions/';
 
     var id = '000000' + doc.ka_id.split('_')[1];
     var paddedID = id.substr(id.length-4);
@@ -147,7 +147,7 @@ var extendKanjiWithAssets = function (doc){
 
     kanji.kunyomi = {
         'romaji':doc.kunyomi,
-        'hiragana':doc.kunyomi_ja
+        'hiragana':doc.kunyomi_ka_display
     };
 
     kanji.video = {

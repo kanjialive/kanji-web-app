@@ -1,3 +1,0 @@
-ka_utf
-ka_id
-kunyomi_ka_display
