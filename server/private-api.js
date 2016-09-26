@@ -126,12 +126,12 @@ var extendKanjiWithAssets = function (doc){
         examples.push(example);
     }
 
-    var animation_path = 'https://www.kanjialive.link/kanji_animations/';
-    var rad_anim_path = 'https://www.kanjialive.link/rad_frames/';
-    var strokes_path= 'https://www.kanjialive.link/kanji_strokes/';
-    var typeface_path = 'https://www.kanjialive.link/ka_typefaces/';
-    var rad_char_path = 'https://www.kanjialive.link/radical_character/';
-    var rad_position_path = 'https://www.kanjialive.link/rad_positions/';
+    var animation_path = 'https://media.kanjialive.com/kanji_animations/';
+    var rad_anim_path = 'https://media.kanjialive.com/rad_frames/';
+    var strokes_path= 'https://media.kanjialive.com/kanji_strokes/';
+    var typeface_path = 'https://media.kanjialive.com/ka_typefaces/';
+    var rad_char_path = 'https://media.kanjialive.com/radical_character/';
+    var rad_position_path = 'https://media.kanjialive.com/rad_positions/';
     var id = '000000' + doc.ka_id.split('_')[1];
     var paddedID = id.substr(id.length-4);
 
@@ -141,7 +141,7 @@ var extendKanjiWithAssets = function (doc){
     }
 
     var hint = doc.mn_hint;
-    hint = hint.replace(/\[([0-9]+)\]/g, '<img src="https://www.kanjialive.link/mnemonic_hints/$1.svg" />');
+    hint = hint.replace(/\[([0-9]+)\]/g, '<img src="https://media.kanjialive.com/mnemonic_hints/$1.svg" />');
 
     if (doc.rad_position.length > 0){
       var rad_positions = doc.rad_position.split(',');
