@@ -5,8 +5,8 @@ html {
 
 @font-face {
   font-family: 'mplus-1m-light';
-  src: url('/static/css/fonts/mplus-1m-light-webfont.woff2') format('woff2'),
-       url('/static/css/fonts/mplus-1m-light-webfont.woff') format('woff');
+  src: url('https://media.kanjialive.com/fonts/mplus-1m-light-webfont.woff2') format('woff2'),
+       url('https://media.kanjialive.com/fonts/mplus-1m-light-webfont.woff') format('woff');
   font-style: normal;
   font-weight: normal;
   font-variant: normal;
@@ -17,8 +17,8 @@ html {
 @font-face {
   font-family: 'SourceSansPro-Regular';
   src: local('SourceSansPro-Regular');
-  src: url('/static/css/fonts/sourcesanspro-regular-webfont.woff2') format('woff2'),
-       url('/static/css/fonts/sourcesanspro-regular-webfont.woff') format('woff');
+  src: url('https://media.kanjialive.com/fonts/sourcesanspro-regular-webfont.woff2') format('woff2'),
+       url('https://media.kanjialive.com/fonts/sourcesanspro-regular-webfont.woff') format('woff');
   unicode-range: U+0000-007F; 
   font-style: normal;
   font-weight: normal;
@@ -28,8 +28,8 @@ html {
 @font-face {
   font-family: 'SourceSansPro-It';
   src: local('SourceSansPro-It');
- src: url('/static/css/fonts/sourcesanspro-italic-webfont.woff2') format('woff2'),
-      url('/static/css/fonts/sourcesanspro-italic-webfont.woff') format('woff');
+ src: url('https://media.kanjialive.com/fonts/sourcesanspro-italic-webfont.woff2') format('woff2'),
+      url('https://media.kanjialive.com/fonts/sourcesanspro-italic-webfont.woff') format('woff');
   font-style: italic;
   font-weight: normal;
   font-variant: normal;
@@ -38,16 +38,16 @@ html {
 @font-face {
   font-family: 'JapaneseRadicals-Regular';
   src: local('JapaneseRadicals-Regular');
-  src: url('/static/css/fonts/JapaneseRadicals-Regular.woff2') format('woff2'), 
-       url('/static/css/fonts/JapaneseRadicals-Regular.woff') format('woff');
+  src: url('https://media.kanjialive.com/fonts/JapaneseRadicals-Regular.woff2') format('woff2'), 
+       url('https://media.kanjialive.com/fonts/JapaneseRadicals-Regular.woff') format('woff');
   font-weight: normal;
   font-variant: normal;
 }
 
 @font-face {
   font-family: 'mplus-1m-icons';
-  src: url('/static/css/fonts/mplus-1m-icons.woff2') format('woff2'),
-       url('/static/css/fonts/mplus-1m-icons.woff') format('woff');
+  src: url('https://media.kanjialive.com/fonts/mplus-1m-icons.woff2') format('woff2'),
+       url('https://media.kanjialive.com/fonts/mplus-1m-icons.woff') format('woff');
   font-style: normal;
   font-weight: normal;
   font-variant: normal;
@@ -57,8 +57,8 @@ html {
 
 @font-face {
   font-family: 'ka-multimedia';
-    src: url('/static/css/fonts/ka-multimedia.woff2') format('woff2'),
-    url('/static/css/fonts/ka-multimedia.woff') format('woff');
+    src: url('https://media.kanjialive.com/fonts/ka-multimedia.woff2') format('woff2'),
+    url('https://media.kanjialive.com/fonts/ka-multimedia.woff') format('woff');
   font-weight: normal;
   font-style: normal;
 }
@@ -116,7 +116,7 @@ a:hover {
 }
 
 .search-button {
-  background: url('/static/img/search-icon.png');
+  background: url('https://media.kanjialive.com/img/search-icon.png');
   background-size:22px 22px;
   width: 22px;
   height:22px;
