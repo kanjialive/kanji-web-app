@@ -16,7 +16,7 @@
         <div class="container-typeface-video" ng-switch="detailMode">
           <div class="video-container" ng-switch-default>
             <div class="video">
-              <video ng-click="setDetailMode('typeface')" ng-attr-poster='{{doc.poster_video_source}}' preload='auto' vg-src="sources" preload='metadata' vg-video>
+              <video ng-click="setDetailMode('typeface')" ng-attr-poster='{{doc.poster_video_source}}' preload="auto" vg-src="sources" preload="metadata" vg-video>
               </video>
             </div>
             <div class="animation-controls">
@@ -185,10 +185,10 @@
           <div class="example-audio">
             <ka-audio>
               <audio class="icon-play audio-play ka-icon-gray pointer gray-out">
-                <source ng-src="{{example.opus}}" type="audio/ogg">
-                <source ng-src="{{example.aac}}" type="audio/aac">
-                <source ng-src="{{example.ogg}}" type="audio/ogg">
-                <source ng-src="{{example.mp3}}" type="audio/mp3">
+                <source ng-src="{{example.opus}}" type="audio/ogg" preload="auto">
+                <source ng-src="{{example.aac}}" type="audio/aac" preload="auto">
+                <source ng-src="{{example.ogg}}" type="audio/ogg" preload="auto">
+                <source ng-src="{{example.mp3}}" type="audio/mp3" preload="auto">
               </audio>
               <a aria-hidden="true" class="icon-play audio-play ka-icon-gray pointer gray-out"></a>
             </ka-audio>
