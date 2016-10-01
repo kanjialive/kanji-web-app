@@ -5,6 +5,7 @@ html {
 
 @font-face {
   font-family: 'mplus-1m-light';
+  src: local('mplus-1m-light');
   src: url('https://media.kanjialive.com/fonts/mplus-1m-light-webfont.woff2') format('woff2'),
        url('https://media.kanjialive.com/fonts/mplus-1m-light-webfont.woff') format('woff');
   font-style: normal;
@@ -64,7 +65,7 @@ html {
 }
 
 body {
-    font-family:'SourceSansPro-Regular','mplus-1m-regular','ヒラギノ角ゴ Pro W3','Hiragino Kaku Gothic Pro', 'メイリオ',Meiryo,'ＭＳ Ｐゴシック',MS-Gothic,sans-serif;
+    font-family:'SourceSansPro-Regular','mplus-1m-regular','ヒラギノ角ゴ Pro W3','Hiragino Kaku Gothic Pro', 'メイリオ',sans-serif;
     background-color:#D0D0D0; 
     font-size:15px; 
     max-width: 100%;
@@ -94,7 +95,7 @@ body {
 
 
 .nav a, .nav {
-    font-family:'SourceSansPro-Regular','ヒラギノ角ゴ Pro W3','Hiragino Kaku Gothic Pro','メイリオ',Meiryo,'ＭＳ Ｐゴシック',MS-Gothic,sans-serif; 
+    font-family:'SourceSansPro-Regular','ヒラギノ角ゴ Pro W3','Hiragino Kaku Gothic Pro','メイリオ',sans-serif; 
     font-size:17px; 
     color:#B64630;
     font-weight:normal; 
@@ -136,7 +137,7 @@ a:hover {
   padding: 4px 0 1px 10px;
   height:32px;
   width:220px !important;
-  font-family:'SourceSansPro-Regular','ヒラギノ角ゴ Pro W3','Hiragino Kaku Gothic Pro','メイリオ',Meiryo,'ＭＳ Ｐゴシック',MS-Gothic,sans-serif; 
+  font-family:'SourceSansPro-Regular','ヒラギノ角ゴ Pro W3','Hiragino Kaku Gothic Pro','メイリオ',sans-serif; 
 font-size:17px;
 }
 
@@ -161,60 +162,16 @@ font-size:17px;
 video[poster] {
   width:248px;
   height:248px;
-  margin-left: 5px;
+  margin-left: 6px;
 }
 
 video {
   width:100%;
 }
 
-/*
-.nav-section-1 a {
-  margin-right:15px;
-}
-
-.nav-section-2 {
-  text-align: center;
-}
-
-.nav-section-3 {
-  margin-top:5px;
-}
-
-.nav-section-2 .icon-left {
-  margin-right:15px;
-}
-
-.nav-section-2 .icon-right {
-  margin-left:15px;
-}
-h3.nav-header {
-//    color:#B64630;
- //   margin-top:22px;
-}
-
-.nav-section-3 span {
-  float:right;
-  display:none;
-}
-
-.nav-section-1, .nav-section-2, .nav-section-3 {
-  margin-top:15px;
-  margin-bottom:3px;
-}
-
-.nav-section-1 p, .nav-section-2 p, .nav-section-3 p{
-  display:inline;
-}
-*/
 
 .animation-controls {
-	/* height: 34px; */
-	/* width: 141px !important; */
-	/* margin-left: 62px; */
 	margin-top: 16px;
-	/* overflow: hidden !important; */
-	/* padding-top:5px; */
 }
 
 
@@ -243,8 +200,6 @@ h3.nav-header {
 }
 
 
-
-
 h3 {
     font-family: "SourceSansPro-Regular", sans-serif;
     font-size:17px;
@@ -271,8 +226,6 @@ label {
     color:#607F3A;
     font-weight: 300;
 }
-
-
 
 
 .submit { margin-top:20px; }
@@ -393,7 +346,6 @@ you can use the generic selector below, but it's slower:
   font-size:20px; 
   color:black; 
   
-
   
 }
 .icon-step-left:before { content: "\e008"; }
@@ -445,7 +397,7 @@ div.radical-name{
 .ka-typefaces img {
 	height: 220px;
 	width: 220px;
-	margin-left: 16px;
+	margin-left: 20px;
 	margin-top: 16px;
 }
 
@@ -512,7 +464,7 @@ div.radical-name{
 .ka-typeface-right{
 	position: absolute;
 	top: 261px;
-	right: 41px;
+	right: 43px;
 }
 
 
@@ -583,24 +535,9 @@ p.kanji	 {
 
 .ka-welcome-italic {
   font-family: 'SourceSansPro-It','SourceSansPro-Regular',sans-serif;
-/* workaround for FireFox 
+/* workaround for FireFox  */ 
   font-style: italic;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale; */  
 }
-
-/*
-.ka-welcome-p {
-  font-size: 18px;
-  font-family: "SourceSansPro-Regular", sans-serif;
-  line-height: 136%;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  white-space: normal;
-}
-*/
-
-
 
 
 .ka-bottom-bar {
@@ -616,8 +553,6 @@ p.kanji	 {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
-
-
 
 
 a.ka {
@@ -748,8 +683,7 @@ foundation layer
  .row1 a {
   font-family: 'SourceSansPro-It','SourceSansPro-Regular',sans-serif;
   /*workaround for FireFox*/  
- 
-    font-family:'SourceSansPro-Regular','ヒラギノ角ゴ Pro W3','Hiragino Kaku Gothic Pro','メイリオ',Meiryo,'ＭＳ Ｐゴシック',MS-Gothic,sans-serif; 
+	font-family:'SourceSansPro-Regular','ヒラギノ角ゴ Pro W3','Hiragino Kaku Gothic Pro','メイリオ',sans-serif; 
     font-size:17px; 
    color:#B64630;
    font-weight:normal; 
@@ -784,7 +718,6 @@ position:absolute;
 	width:128px !important;
     float:left;
 	height:25px !important;
-	margin-top: -1px;
 }
 
 .recordCounter a.icon-left {
@@ -1072,23 +1005,6 @@ div.typesquare-container {
 }
 
 .TypeSquare {
-	font-family: "学参 常改教科書ICA L" または "GJ Kyoukasho ICA Light" ;
-	font-family: "GJ Kyoukasho ICA Light" ;
-	font-size: 24px;
-	text-rendering: optimizelegibility;
-	ms-writing-mode: tb-rl;
-	-webkit-writing-mode: vertical-rl;
-	-moz-writing-mode: vertical-rl  ;
-	-ms-writing-mode: vertical-rl;
-	writing-mode: vertical-rl;
-	-webkit-text-orientation: upright;
-	-moz-text-orientation: upright;
-	-ms-text-orientation: upright;
-	text-orientation: upright;
-	-moz-font-feature-settings: "vert", "vkna" ;
-	-ms-font-feature-settings: "vert", "vkna"  ;
-	-webkit-font-feature-settings: "vert", "vkna"  ;
-	font-feature-settings: "vert", "vkna"  ;
 
 	width:476px !important;
 	min-height: 459px !important;
@@ -1096,8 +1012,6 @@ div.typesquare-container {
     margin-top:22px;
 
 
-
-	
 	
 }
 
@@ -1118,9 +1032,6 @@ div.typesquare-container {
    padding-right:0px;		
  }
  
-
-
-
 div.example-audio, div.example-ja {
 	float:left;
 }
@@ -1159,11 +1070,3 @@ a.gray-out:hover{
 code {
 	font-size: 0.85em;
 }
-
-
-.col2 .row1, .col3 .row1, .col4 .row1 {
-	padding-top:11px !important;
-}
-
-
-
