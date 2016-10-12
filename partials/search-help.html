@@ -1,0 +1,244 @@
+ <!-- SEARCH INFO MODAL -->
+<div id="ka-info-search-modal" >
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true" ng-click="cancel()">×</button>
+    <h3 id="ka-info-label" class="ka">
+      Quick Reference
+    </h3>
+  </div>
+  <div class="modal-body">
+    <p>Please see our 
+      <a href="http://kanjialive.com/user-guide/" target="_blank">User Guide</a> for detailed explanations of all of <em>Kanji alive's</em> features or watch our 
+      <a href="http://www.youtube.com/kanjialive/" target="_blank">short demonstration videos</a>. If you are having technical difficulties, please refer to our 
+      <a href="http://kanjialive.com/troubleshooting" target="_blank">Troubleshooting</a> page.
+    </p> 
+    <p>詳細は、メーニューの「日本語」内にある使用説明とトラブルシューティングをご参照ください。</p> 
+    <h4>
+      Quick Search
+    </h4>
+    <p>
+      Enter a <em>single</em> search term for kanji from one of the following four categories: 1) a kanji character, 2) an Onyomi reading in katakana, 3) a Kunyomi reading in hiragana, 4) a kanji's simplified English meaning.
+    </p>
+    <p>
+      Examples:
+    </p>
+    <ul>
+      <li>親</li>
+      <li>シン</li>
+      <li>おや</li>
+      <li>parent</li>
+    </ul>
+    <p>
+      Note: In Quick Search mode Onyomi and Kunyomi readings may only be entered in Japanese. Please use the Advanced Search mode to search for kanji by reading in romaji.
+    </p>
+    <h4>
+      Advanced Search
+    </h4>
+    <p>
+      Enter one or more search terms in Japanese or romaji from all of the available categories in <em>Kanji alive</em>. Advanced search queries <em>must</em> be entered in the form 
+      <kbd>key:value</kbd> where <em>key</em> refers to the search category (e.g. Onyomi reading) and <em>value</em> refers to the search term for a given key (for example, 
+      <kbd>on:shin</kbd> or 
+      <kbd>on:シン</kbd>).
+    </p>
+    <p>
+      <strong>List of available Keys:</strong>
+    </p>
+    <table class="table table-bordered table-condensed">
+      <tbody><tr>
+        <td><kbd>on:</kbd></td>
+        <td>Onyomi reading, R/J (Katakana)</td>
+        <td><kbd>on:shin</kbd> or <kbd>on:シン</kbd></td>
+      </tr>
+      <tr>
+        <td><kbd>kun:</kbd></td>
+        <td>Kunyomi reading, R/J (Hiragana)</td>
+        <td><kbd>kun:oya</kbd> or <kbd>kun:おや</kbd></td>
+      </tr>
+      <tr>
+        <td><kbd>kem:</kbd></td>
+        <td>Kanji English meaning, E</td>
+        <td><kbd>kem:parent</kbd></td>
+      </tr>
+      <tr>
+        <td><kbd>ks:</kbd></td>
+        <td>Kanji stroke number, #</td>
+        <td><kbd>ks:16</kbd></td>
+      </tr>
+      <tr>
+        <td><kbd>kanji:</kbd></td>
+        <td>Kanji character, J</td>
+        <td><kbd>kanji:親</kbd></td>
+      </tr>
+      <tr>
+        <td><kbd>rjn:</kbd></td>
+        <td>Radical Japanese name, R/J (Hiragana)</td>
+        <td><kbd>rjn:miru</kbd> or <kbd>rjn:みる</kbd></td>
+      </tr>
+      <tr>
+        <td><kbd>rem:</kbd></td>
+        <td>Radical English meaning, E</td>
+        <td><kbd>rem:see</kbd></td>
+      </tr>
+      <tr>
+        <td><kbd>rs:</kbd></td>
+        <td>Radical stroke number, #</td>
+        <td><kbd>rs:7</kbd></td>
+      </tr>
+         <tr>
+        <td><kbd>rpos:</kbd></td>
+        <td>Radical Position, R/J (Hiragana)</td>
+        <td><kbd>rpos:hen</kbd> or <kbd>rpos:へん</kbd></td>
+      </tr>
+      <tr>
+        <td><kbd>grade:</kbd></td>
+        <td>Grade level, #</td>
+        <td><kbd>grade:2</kbd></td>
+      </tr>
+      <tr>
+        <td><kbd>text:</kbd></td>
+        <td>Textbook</td>
+        <td>see below for details</td>
+      </tr>
+      <tr>
+        <td><kbd>list:</kbd></td>
+        <td>Study List</td>
+        <td>see below for details</td>
+      </tr>
+    </tbody></table>
+    <p>
+      In Advanced Search mode, two or more search terms may be combined by entering these one after the other separated by a space. The search results will show only those kanji common to all of the categories listed (for example, 
+      <kbd>grade:3 rjn:ninben</kbd> – all Grade 3 kanji with the radical "ninben"). Any number of search categories may be combined in this manner. 
+    </p>
+    <p>
+      <strong>List of available Values for Textbooks:</strong>
+    </p>
+    <table class="table table-bordered table-condensed">
+      <tbody>
+      <tr>
+        <td><kbd>cij:</kbd></td>
+        <td>Communicating in Japanese</td>
+        <td><kbd>text:cij:c6</kbd></td>
+      </tr>
+      <tr>
+        <td><kbd>cijr:</kbd></td>
+        <td>Communicating in Japanese (reading only)</td>
+        <td><kbd>text:cijr:c7</kbd></td>
+      </tr>
+      <tr>
+        <td><kbd>ij:</kbd></td>
+        <td>Intermediate Japanese for University Students</td>
+        <td><kbd>text:ij:c1</kbd></td>
+      </tr>
+      <tr>
+        <td><kbd>mos:</kbd></td>
+        <td>Mimi o sumaseba</td>
+        <td><kbd>text:mos:c1</kbd></td>
+      </tr>
+       <tr>
+        <td><kbd>mosr:</kbd></td>
+        <td>Mimi o sumaseba (reading only)</td>
+        <td><kbd>text:mosr:c2</kbd></td>
+      </tr>
+      <tr>
+        <td><kbd>mnt:</kbd></td>
+        <td>Majo no takkyuubin</td>
+        <td><kbd>text:mnt:c1</kbd></td>
+      </tr>
+        <tr>
+        <td><kbd>mntr:</kbd></td>
+        <td>Majo no takkyuubin (reading only)</td>
+        <td><kbd>text:mntr:c2</kbd></td>
+      </tr>
+      <tr>
+        <td><kbd>bk:</kbd></td>
+        <td>Basic Kanji Book</td>
+        <td><kbd>text:bk:c1</kbd></td>
+      </tr>
+      <tr>
+        <td><kbd>gen:</kbd></td>
+        <td>Genki</td>
+        <td><kbd>text:gen:c3</kbd></td>
+      </tr>
+      <tr>
+        <td><kbd>aij3:</kbd></td>
+        <td>Adventures in Japanese, 3rd edition</td>
+        <td><kbd>text:aij3:v3</kbd></td>
+      </tr>
+          <tr>
+        <td><kbd>aij4:</kbd></td>
+        <td>Adventures in Japanese, 4th edition</td>
+        <td><kbd>text:aij4:v1</kbd></td>
+      </tr>
+      <tr>
+        <td><kbd>kll:</kbd></td>
+        <td>Kanji Look &amp; Learn</td>
+        <td><kbd>text:kll:c1</kbd></td>
+      </tr>
+      <tr>
+        <td><kbd>ik1:</kbd></td>
+        <td>Intermediate Kanji Book, vol. 1</td>
+        <td><kbd>text:ik1:c1</kbd></td>
+      </tr>
+      <tr>
+        <td><kbd>jt:</kbd></td>
+        <td>Tobira</td>
+        <td><kbd>text:jt:c1</kbd></td>
+      </tr>
+      <tr>
+        <td><kbd>jtr:</kbd></td>
+        <td>Tobira (reading only)</td>
+        <td><kbd>text:jtr:c1</kbd></td>
+      </tr>
+    </tbody></table>
+    <p>
+      Note: Although it is possible to enter only the name of a textbook or study list after the 
+      <kbd>text:</kbd> or 
+      <kbd>list:</kbd> key (e.g. 
+      <kbd>text:cij</kbd> or 
+      <kbd>list:ap</kbd>), this would show <em>all</em> kanji found in the respective resource. For this reason, it is usually helpful to append a volume and/or lesson number to limit your search (e.g. 
+      <kbd>text:cij:c6</kbd> or 
+      <kbd>list:ap:c3</kbd>).
+    </p>
+    <p>
+      Please refer to <a href="http://kanjialive.com/supported-textbooks/">Supported Textbooks and Study Lists</a> on our website for additional details on the division of textbooks into volumes and/or chapters/lessons as well as textbook kanji not supported by <em>Kanji alive</em>.
+    </p>
+    <p>
+      <strong>List of available Values for Study Lists:</strong>
+    </p>
+    <table class="table table-bordered table-condensed">
+      <tbody><tr>
+        <td><kbd>ap:</kbd></td>
+        <td>Advanced Placement Exam</td>
+        <td><kbd>list:ap:c3</kbd></td>
+      </tr>
+      <tr>
+        <td><kbd>mac:</kbd></td>
+        <td>Macquarie University</td>
+        <td><kbd>list:mac:c12</kbd></td>
+      </tr>
+    </tbody></table>
+    <h4>
+      Search Results
+    </h4>
+    <p>All kanji search results are initially shown in a single block, sorted by kanji stroke number. Two additional sort modes are available for viewing kanji, grouped together either by radical stroke number or kanji stroke number. In these two modes all kanji in a group are further sorted by the canonical order of their Japanese radicals. In the results, the radicals are shown in grey and in a smaller type size to the left of their respective kanji.</p>
+    <h4>
+      Navigation
+    </h4>
+    <table class="table table-bordered table-condensed">
+      <tbody><tr>
+        <td>Sort modes</td>
+        <td>Click on the "Sort" icon in the navigation bar or use the <kbd>up</kbd> and <kbd>down</kbd> arrow keys to switch sort modes</td>
+      </tr>
+      <tr>
+        <td>Page results</td>
+        <td>Click on the pointed brackets to the left and right of the "Sort" icon, drag the horizontal scrollbar or use the <kbd>left</kbd> and <kbd>right</kbd> arrow keys to view additional pages of results</td>
+      </tr>
+      <tr>
+        <td>View kanji details</td>
+        <td>Click on a kanji to view its details</td>
+      </tr>
+    </tbody></table>
+  </div>
+  <div class="modal-footer">
+  </div>
+</div>

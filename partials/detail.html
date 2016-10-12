@@ -1,0 +1,242 @@
+<div class="container2">
+
+<div class="col1">
+<div class="row1">
+
+        <form class="search-form" ng-submit="search()">
+            <input ng-model="query" id="search-kid" class="search-bar" type="text" spellcheck="false" autocapitalize="off" autocorrect="off">
+            <a class="search-button" ng-click="search()"></a>
+            <input type="submit" class="hidden"/>
+        </form>
+       
+</div>
+<div class="row2" vg-player>
+<h3 id="kanji">Kanji</h3>
+        
+        <div class="container-typeface-video" ng-switch="detailMode">
+          <div class="video-container" ng-switch-default>
+            <div class="video">
+              <video ng-click="setDetailMode('typeface')" ng-attr-poster='{{doc.poster_video_source}}' preload="auto" vg-src="sources" preload="metadata" vg-video>
+              </video>
+            </div>
+            <div class="animation-controls">
+             
+                <a aria-hidden="true" id="ka-anim-step-back" class="icon-step-left ka-icon-gray pointer gray-out" ng-click="stepBackward()"></a>
+             
+                <a aria-hidden="true" id="ka-anim-play" ng-class="playPauseIcon" class="ka-icon-gray pointer gray-out" ng-click="togglePlayPause()"></a>
+              
+                <a aria-hidden="true" id="ka-anim-step-forward" class="icon-step-right ka-icon-gray pointer gray-out" ng-click="stepForward()"></a>
+              
+            </div>
+          </div>
+          
+          <div id="ka-typeface-container" ng-switch-when="typeface">
+            <div ng-click="setDetailMode('video')" class="ka-typefaces" ng-switch="typeface">
+              <img ng-switch-when="shino" ng-src="{{doc.shino_source}}">
+              <img ng-switch-when="tensho" ng-src="{{doc.tensho_source}}">
+              <img ng-switch-when="kyokasho" ng-src="{{doc.kyokasho_source}}">
+              <img ng-switch-when="maru" ng-src="{{doc.maru_source}}">
+              <img ng-switch-when="mincho" ng-src="{{doc.mincho_source}}">
+              <img ng-switch-when="gothic" ng-src="{{doc.gothic_source}}">
+              <img ng-switch-when="hiragino" ng-src="{{doc.hiragino_source}}">
+              <img ng-switch-when="kanteiryu" ng-src="{{doc.kanteiryu_source}}">
+              <img ng-switch-when="suzumushi" ng-src="{{doc.suzumushi_source}}">
+            </div>
+            <div class="animation-controls">
+             
+              <a ng-click="previousTypeface()" class="ka-typeface-left pointer gray-out">〈</a>
+         
+              <span class="typeface-name" ng-bind-html="renderHtml(typefaceDisplay)"></span>
+           
+              
+              <a ng-click="nextTypeface()" class="ka-typeface-right pointer gray-out">〉</a>
+             
+            </div>
+          </div>
+        </div>
+        </div>
+       </div>
+
+<div class="col2">
+<div class="row1">
+
+<div class="recordCounter">
+
+
+
+<a class="icon icon-left" ng-click="prevKanji(false)">〈</a>  <span class="search">  <a ng-href="{{lastSearch}}">{{currentIndex + 1}} of {{results.length}}</a>
+</span>
+
+        <a class="icon icon-right" ng-click="nextKanji(false)">〉</a>
+      
+ </div>
+
+</div>
+<div class="row2">
+
+          <h3 class="meaning">Meaning</h3> 
+          <p class="meaning">{{doc.meaning}}</p>
+       
+        
+          <h3 class="onyomi">Onyomi</h3>
+          <p class="onyomi">{{doc.onyomi_ja}}</p>
+          
+          <h3 class="kunyomi">Kunyomi</h3>
+          <p class="kunyomi">{{doc.kunyomi_ka_display}}</p>
+        
+
+        <div class="border3">
+          <div class="border-inner"></div>
+        </div>
+
+        <h3 class="radical">Radical</h3>
+
+      
+          
+        
+           
+              <img class="radical-character" ng-src="{{doc.rad_char_source}}">
+              <img class="radical-position" ng-show="doc.rad_position" class="radical-position" ng-src="{{doc.rad_position_file}}">
+         
+           
+              <div class="radical-name">{{doc.rad_name_ja}}</div>
+              <div class="radical-meaning">{{doc.rad_meaning}}</div>
+              <div class="radical-stroke">{{doc.rad_stroke}}</div>
+            
+              <div class="ka-rad-anim" class="pointer" ng-click="startRadicalAnimation()">
+                <img ng-class="{'opaque':radicalFrame === 0}" ng-src="{{doc.rad_anim_frame_0}}">
+                <img ng-class="{'opaque':radicalFrame === 1}" ng-src="{{doc.rad_anim_frame_1}}">
+                <img ng-class="{'opaque':radicalFrame === 2}" ng-src="{{doc.rad_anim_frame_2}}">
+              </div>
+          
+          
+        
+
+
+</div>
+</div>
+<div class="col3">
+<div class="row1 " >
+    <a ng-click="showHelpModal('lg')"><span>Info</span></a></div>
+<div class="row2">
+
+
+         
+            <h3 class="strokes">Strokes</h3>
+            <p class="strokes">{{doc.kstroke}}</p>
+        
+
+         
+            <h3 class="grade">Grade</h3>
+            <p class="grade">{{doc.grade}}</p>
+         
+      
+      
+            <div class="border4">
+              <div class="border-inner"></div>
+            </div>
+        
+         
+            <h3 class="kodansha">Kodansha</h3>
+            <p class="kodansha">{{doc.dick}}</p>
+        
+        
+         
+            <h3 class="nelson">Classic Nelson</h3>
+            <p class="nelson">{{doc.dicn}}</p>
+          
+      
+              <h3 class="luminous">Luminous</h3>
+              <p  class="luminous" ng-switch="doc.luminous">
+                <span ng-switch-when="n/a">{{doc.luminous}}</span>
+                <a ng-switch-default target="_blank" href="{{doc.luminous}}">View sentences using {{doc.ka_utf}}</a>
+              </p>
+          
+            <div class="border5">
+              <div class="border-inner"></div>
+            </div>
+
+          
+              <h3 class="hint">Hint</h3>
+              <div class="hint" id="ka-hint" ng-bind-html="renderHtml(doc.hint)"></div>
+          
+
+            <div class="border6">
+              <div class="border-inner"></div>
+            </div>
+
+
+
+
+</div>
+</div>
+<div class="col4">
+<div class="row1 desktop-branding"><a href="http://kanjialive.com" target="_blank"><span class="ka-welcome-italic">Kanji alive</span></a>
+    </div>
+<div class="row2">
+
+<h3 class="examples">Examples</h3>
+<div class="examples">
+        <div class="example" ng-repeat="example in doc.examples" >
+          <div ng-mouseenter="showTranslation($index)" ng-mouseleave="hideTranslation($index)">
+            <div ng-hide="translations[$index]" class="example-ja example-japanese" ng-bind-html="renderHtml(example.japanese)"></div>
+            <div ng-show="translations[$index]" class="example-ja" ng-bind-html="renderHtml(example.english)"></div>
+          </div>
+          <div class="example-audio">
+            <ka-audio>
+              <audio class="icon-play audio-play ka-icon-gray pointer gray-out">
+                <source ng-src="{{example.opus}}" type="audio/ogg" preload="auto">
+                <source ng-src="{{example.aac}}" type="audio/aac" preload="auto">
+                <source ng-src="{{example.ogg}}" type="audio/ogg" preload="auto">
+                <source ng-src="{{example.mp3}}" type="audio/mp3" preload="auto">
+              </audio>
+              <a aria-hidden="true" class="icon-play audio-play ka-icon-gray pointer gray-out"></a>
+            </ka-audio>
+          </div>
+        </div>
+</div>
+
+
+</div>
+</div>
+
+<div class="border1">
+    <div class="border-inner"></div>
+  </div>
+
+<div class="border2">
+    <div class="border-inner"></div>
+  </div>
+
+
+<div class="version">
+<p>v2.0</p>
+</div>
+
+</div>
+
+<div class="border7">
+              <div class="border-inner"></div>
+            </div>
+
+ <div class="stroke-breakdown">
+          <img ng-repeat="stroke in doc.strokes" class="ka-breakdown" ng-src="{{stroke}}" ng-mouseover="seek(doc.stroketimes[$index + 1])">
+        </div>
+
+
+<div class="logo">
+<img src="https://media.kanjialive.com/img/fan_logo_104.jpg"/>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
