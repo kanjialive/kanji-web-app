@@ -169,9 +169,9 @@ var extendKanjiWithAssets = function (doc){
 
     doc['rad_char_source'] = rad_char_path + doc.rad_name_file + '.svg';
 
-    doc['rad_anim_frame_0'] = rad_anim_path + doc.rad_name + '0.svg';
-    doc['rad_anim_frame_1'] = rad_anim_path + doc.rad_name + '1.svg';
-    doc['rad_anim_frame_2'] = rad_anim_path + doc.rad_name + '2.svg';
+    doc['rad_anim_frame_0'] = rad_anim_path + doc.rad_name_file + '0.svg';
+    doc['rad_anim_frame_1'] = rad_anim_path + doc.rad_name_file + '1.svg';
+    doc['rad_anim_frame_2'] = rad_anim_path + doc.rad_name_file + '2.svg';
     doc['hint'] = hint;
 
     return doc;

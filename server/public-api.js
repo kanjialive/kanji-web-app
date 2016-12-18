@@ -192,9 +192,9 @@ var extendKanjiWithAssets = function (doc){
             'english': doc.rad_meaning
         },
         'animation': [
-            rad_anim_path + doc.rad_name + '0.svg',
-            rad_anim_path + doc.rad_name + '1.svg',
-            rad_anim_path + doc.rad_name + '2.svg'
+            rad_anim_path + doc.rad_name_file + '0.svg',
+            rad_anim_path + doc.rad_name_file + '1.svg',
+            rad_anim_path + doc.rad_name_file + '2.svg'
         ]
     };
 
