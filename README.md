@@ -4,7 +4,7 @@ The angular.js web application for [https://app.kanjialive.com](https://app.kanj
 
 ### Developer API and data
 
-Our [data and media](https://github.com/kanjialive/data-media) repository includes all of the language data and media files created for _Kanji alive_. We expected that these files will primarily interest instructors and students who want to re-use them for teaching and learning. Developers may prefer instead to make use of our free, [public API](https://app.kanjialive.com/api/docs/) to the _Kanji alive_ web application. 
+Our [data and media](https://github.com/kanjialive/data-media) repository includes all of the language data and media files created for _Kanji alive_. We expected that these files will primarily interest instructors and students who want to re-use them for teaching and learning. Developers may prefer instead to make use of our free, [public API](https://market.mashape.com/kanjialive/learn-to-read-and-write-japanese-kanji) ([docs](https://app.kanjialive.com/api/docs/)) to the _Kanji alive_ web application. 
 
 ### Contributions
 
