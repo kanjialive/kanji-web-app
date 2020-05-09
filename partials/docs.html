@@ -14,15 +14,15 @@
 <div class="row docs-container">
     <div class="col-xs-6 border-right docs-detail">
         <h3>Introduction</h3>
-        <p>Almost all of the functionality of the <em>Kanji Alive</em> <a href="http://app.kanjialive.com">web application</a> can be accessed using the <a href="https://rapidapi.com/KanjiAlive/api/learn-to-read-and-write-japanese-kanji" target="_blank">public developer API</a> hosted and documented on <a href="https://rapidapi.com/KanjiAlive/api/learn-to-read-and-write-japanese-kanji" target="_blank">Mashape</a> under a <a href="http://creativecommons.org/licenses/by/4.0/" target="_blank">Creative Commons Attribution (CC-BY)</a> license. If you prefer, you can also download our language data and media from our <a href="https://github.com/kanjialive/media">GitHub repository</a> for offline use under the same license.</p>
+        <p>Almost all of the functionality of the <em>Kanji Alive</em> <a href="http://app.kanjialive.com">web application</a> can be accessed using the <a href="https://rapidapi.com/KanjiAlive/api/learn-to-read-and-write-japanese-kanji" target="_blank">public developer API</a> hosted and documented on <a href="https://rapidapi.com" target="_blank">Rapid API</a> under a <a href="http://creativecommons.org/licenses/by/4.0/" target="_blank">Creative Commons Attribution (CC-BY)</a> license. If you prefer, you can also download our language data and media files from our <a href="https://github.com/kanjialive/media">GitHub repository</a> for offline use under the same license.</p>
                 
-        <p>The only exceptions are searching for kanji by textbook and viewing the mnemonic hints for individual kanji. Due to licensing restrictions these features and data are not available in the public API or offline on GitHub.</p> 
+        <p>The only exceptions are searching for kanji by textbook and viewing the mnemonic hints for individual kanji. Due to licensing restrictions these features and data are not available in the public API or offline on GitHub. Note: You will need to sign-up for a free account at <a href="https://rapidapi.com" target="_blank">Rapid API</a> to get your <em>Kanji Alive</em> API key.</p> 
         
         
-        <p>The documentation on this page supplements the <a href="https://www.mashape.com/kanjialive/learn-to-read-and-write-japanese-kanji" target="_blank">API documented on Mashape</a>. If necessary, please review the <em>Kanji alive</em> <a href="https://kanjialive.com/user-guide/" target="_blank">User Guide</a> for  further details on individual fields and components.</p>
+        <p>The documentation on this page supplements the <a href="https://rapidapi.com/KanjiAlive/api/learn-to-read-and-write-japanese-kanji" target="_blank">API documented on Rapid API</a>. If needed, please review the <em>Kanji alive</em> <a href="https://kanjialive.com/user-guide/" target="_blank">User Guide</a> for  further details on individual fields and components.</p>
         <h3>Basic Search</h3>
         <p>Valid search strings for the basic search endpoint <code>:search</code> are a single kanji character, an Onyomi reading in katakana, a Kunyomi reading in hiragana, or a kanji's simplified English meaning.</p>
-        <pre>https://kanjialive-api.p.mashape.com/api/public/search/</pre>
+        <pre>https://kanjialive-api.p.rapidapi.com/api/public/search/</pre>
         <h3>Advanced Search</h3>
         <p>Advanced search mirrors the advanced search options in the <em>Kanji Alive</em> app with one exception. Due to licensing restrictions you cannot search for kanji by textbook (chapter).</p> 
 <p>You can construct an advanced search with any combination of the following key/value pairs as URL parameters. The base endpoint will always be:<pre>https://app.kanjialive.com/api/public/search/advanced</pre></p>
@@ -85,7 +85,7 @@
             </tbody>
         </table>
         <p>Here is an example of an advanced search matching the radical Japanese name みる with all 7 stroke kanji. The advanced search endpoint accepts an arbitrary number of parameters separated by an ampersand:</p>
-    <pre>https://kanjialive-api.p.mashape.com/api/public/search/advanced?rjn=みる&ks=7</pre>
+    <pre>https://kanjialive-api.p.rapidapi.com/api/public/search/advanced?rjn=みる&ks=7</pre>
         <h3>Advanced Search on Study Lists)</h3>
         <p>Advanced searches on study lists are a slightly idiosyncratic. The aforementioned URL parameter still exists, with the key <code>list</code>, but the value can be constructed using either one or two values in succession.</p>
         <p>The leftmost column shows what the search parameter would look like for all kanji in a specific list. The rightmost column shows a chapter specific search.</p>
@@ -105,7 +105,7 @@
         </table>
         <h3>Response</h3>
         <p>All basic and advanced searches return a JSON array containing individual objects for each kanji that matches the search. You can use the kanji <code>character</code> value that is returned for a kanji with the detail endpoint to get all of the available information regarding a specific kanji. The radical <code>order</code> value indicates the index number of the radical in the <a href="http://kanjialive.com/214-traditional-kanji-radicals/">canonical order of the 214 traditional kanji radicals</a>.</p>
-        <p>Example: <code>https://kanjialive-api.p.mashape.com/api/public/search/坊</code>
+        <p>Example: <code>https://kanjialive-api.p.rapidapi.com/api/public/search/坊</code>
         <pre>
 [
   {
@@ -134,7 +134,7 @@
         <p>The detail endpoint has one parameter, and that is the <code>:character</code> itself.</p>
         <pre>https://app.kanjialive.com/api/public/kanji/:character</pre>
         <p>Here is an example of how to use the detail endpoint</p>
-        <pre>https://kanjialive-api.p.mashape.com/api/public/kanji/訪</pre>
+        <pre>https://kanjialive-api.p.rapidapi.com/api/public/kanji/訪</pre>
         <h3>Response</h3>
         <p>The JSON response will be a single JSON Object for the kanji that you have appended to the detail endpoint. All asset URLs will always be fully qualified.</p>
         <pre>
