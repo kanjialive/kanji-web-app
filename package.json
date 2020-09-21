@@ -6,7 +6,7 @@
   "author": "dayj",
   "dependencies": {
     "express": "3.x",
-    "mongodb": "^1.4.39"
+    "mongodb": "2.x"
   },
   "engines": {
     "node": "0.12.x"

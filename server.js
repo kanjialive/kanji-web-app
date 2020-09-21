@@ -26,7 +26,7 @@ var app = express();
  *
  * @type {string}
  */
-var MONGODB_URI = process.env.MONGOLAB_BLACK_URI;
+var MONGODB_URI = process.env.MONGODB_URI;
 var MASHAPE_SECRET = process.env.MASHAPE_SECRET;
 
 /**
