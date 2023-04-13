@@ -12,6 +12,7 @@
     "node": "18.x"
   },
   "scripts": {
+    "tsc": "./node_modules/typescript/bin/tsc",
     "build": "tsc && npm run copyfiles",
     "start": "npm run build && node dist/index.js",
     "dev": "ts-node index.ts",
