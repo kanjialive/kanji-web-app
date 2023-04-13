@@ -57,11 +57,44 @@ export interface KanjiDocument {
   txt_books: TxtBook[];
 }
 
-export interface ExtendedKanjiDocument extends Omit<KanjiDocument, "examples"> {
+export interface SimpleExtendedKanjiDocument
+  extends Omit<KanjiDocument, "examples"> {
   kanji: Kanji;
   radical: Radical;
   examples: Example[];
   references: Reference;
+}
+
+export interface ExtendedKanjiDocument extends Omit<KanjiDocument, "examples"> {
+  rad_position_file: string;
+  rad_anim_source: string;
+  examples: {
+    japanese: string;
+    english: string;
+    filename: string;
+    opus: string;
+    aac: string;
+    ogg: string;
+    mp3: string;
+  }[];
+  strokes: string[];
+  poster_video_source: string;
+  mp4_video_source: string;
+  webm_video_source: string;
+  kyokasho_source: string;
+  mincho_source: string;
+  gothic_source: string;
+  maru_source: string;
+  shino_source: string;
+  tensho_source: string;
+  hiragino_source: string;
+  kanteiryu_source: string;
+  suzumushi_source: string;
+  rad_char_source: string;
+  rad_anim_frame_0: string;
+  rad_anim_frame_1: string;
+  rad_anim_frame_2: string;
+  hint: string;
 }
 
 export interface Example {
