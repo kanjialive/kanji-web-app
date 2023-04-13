@@ -5,10 +5,10 @@
   "main": "index.js",
   "author": "dayj",
   "dependencies": {
-    "express": "3.x",
-    "mongodb": "2.x"
+    "express": "4.x",
+    "mongodb": "5.x"
   },
   "engines": {
-    "node": "0.12.x"
+    "node": "0.14.x"
   }
 }
