@@ -14,9 +14,10 @@
   "scripts": {
     "tsc": "./node_modules/typescript/bin/tsc",
     "build": "tsc && npm run copyfiles",
-    "start": "npm run build && node dist/index.js",
     "dev": "ts-node index.ts",
-    "copyfiles": "copyfiles 'index.html' 'static/**/*' 'partials/**/*' dist/"
+    "copyfiles": "copyfiles 'index.html' 'static/**/*' 'partials/**/*' dist/",
+    "postinstall": "npm run build",
+    "start": "node dist/index.js"
   },
   "devDependencies": {
     "@types/express": "^4.17.17",
