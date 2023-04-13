@@ -4,6 +4,7 @@ import express, { Request, Response, NextFunction } from "express";
 import * as private_api from "./private-api";
 import * as public_api from "./public-api";
 
+const promBundle = require("express-prom-bundle");
 const app = express();
 
 const MONGODB_URI = process.env.MONGODB_URI as string;
@@ -40,6 +41,22 @@ async function connectMongoDB() {
 }
 
 app.use(express.static(__dirname));
+
+// add the prometheus middleware to all routes
+app.use(
+  promBundle({
+    includeMethod: true,
+    includePath: true,
+    normalizePath: [
+      ["^/api/kanji/id/.*", "/api/kanji/id/#kanji_id"],
+      ["^/api/search/.*", "/api/search/#search_term"],
+      ["^/api/kanji/.*", "/api/kanji/#character"],
+      ["^/api/public/kanji/.*", "/api/public/kanji/#character"],
+      ["^/api/public/search/.*", "/api/public/search/#search_term"],
+    ],
+    metricsPath: "/api/metrics",
+  })
+);
 
 app.get("/api/kanji/id/:id", private_api.getKanjiWithId);
 app.get("/api/kanji/:character", private_api.getKanjiWithCharacter);

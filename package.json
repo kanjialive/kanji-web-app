@@ -6,7 +6,9 @@
   "author": "dayj",
   "dependencies": {
     "express": "4.x",
-    "mongodb": "5.x"
+    "express-prom-bundle": "^6.6.0",
+    "mongodb": "5.x",
+    "prom-client": "^14.2.0"
   },
   "engines": {
     "node": "18.x"
