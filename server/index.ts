@@ -50,6 +50,7 @@ app.use(
 
     normalizePath: [
       ["^/(?:%[0-9A-Fa-f]{2})+$", "/#character"],
+      ["^/search/.*", "/search/#search_term"],
       ["^/api/kanji/id/.*", "/api/kanji/id/#kanji_id"],
       ["^/api/search/.*", "/api/search/#search_term"],
       ["^/api/kanji/.*", "/api/kanji/#character"],
