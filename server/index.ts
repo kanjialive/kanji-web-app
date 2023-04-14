@@ -56,7 +56,7 @@ app.use(
       ["^/api/kanji/.*", "/api/kanji/#character"],
       ["^/api/public/kanji/.*", "/api/public/kanji/#character"],
       ["^/api/public/search/.*", "/api/public/search/#search_term"],
-      ["^.*\.[a-zA-Z0-9]+$", "/#static_files"],
+      ["^.*\\.[a-zA-Z0-9]+$", "/#static_files"],
     ],
     metricsPath: "/api/metrics",
   })
