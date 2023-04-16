@@ -1,14 +1,32 @@
 {
   "name": "kanjialive-api",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "Kanji Alive App",
-  "main": "index.js",
+  "main": "dist/index.js",
   "author": "dayj",
   "dependencies": {
-    "express": "3.x",
-    "mongodb": "^1.4.39"
+    "express": "4.x",
+    "express-prom-bundle": "^6.6.0",
+    "mongodb": "5.x",
+    "prom-client": "^14.2.0"
   },
   "engines": {
-    "node": "0.12.x"
+    "node": "18.x"
+  },
+  "scripts": {
+    "tsc": "./node_modules/typescript/bin/tsc",
+    "build": "tsc && npm run copyfiles",
+    "dev": "ts-node index.ts",
+    "copyfiles": "copyfiles 'index.html' 'static/**/*' 'partials/**/*' dist/",
+    "postinstall": "npm run build",
+    "start": "node dist/index.js"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.17",
+    "@types/mongodb": "^4.0.7",
+    "@types/node": "^18.15.11",
+    "copyfiles": "^2.4.1",
+    "ts-node": "^10.9.1",
+    "typescript": "^5.0.4"
   }
 }

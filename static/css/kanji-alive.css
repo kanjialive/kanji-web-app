@@ -39,8 +39,8 @@ html {
 @font-face {
   font-family: 'JapaneseRadicals-Regular';
   src: local('JapaneseRadicals-Regular');
-  src: url('https://media.kanjialive.com/fonts/JapaneseRadicals-Regular.woff2') format('woff2'), 
-       url('https://media.kanjialive.com/fonts/JapaneseRadicals-Regular.woff') format('woff');
+  src: url('https://media.kanjialive.com/fonts/JapaneseRadicals-Regular.woff2') format('woff2'),
+  url('https://media.kanjialive.com/fonts/JapaneseRadicals-Regular.woff') format('woff');
   font-weight: normal;
   font-variant: normal;
 }
@@ -52,8 +52,6 @@ html {
   font-style: normal;
   font-weight: normal;
   font-variant: normal;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
 }
 
 @font-face {
@@ -65,7 +63,7 @@ html {
 }
 
 body {
-    font-family:'SourceSansPro-Regular','mplus-1m-regular','ヒラギノ角ゴ Pro W3','Hiragino Kaku Gothic Pro', 'メイリオ',sans-serif;
+    font-family:'SourceSansPro-Regular','Yu Gothic Medium', 'mplus-1m-light','ヒラギノ角ゴ Pro W3','Hiragino Kaku Gothic Pro','メイリオ','Meiryo',sans-serif;
     background-color:#D0D0D0; 
     font-size:15px; 
     max-width: 100%;
@@ -95,7 +93,7 @@ body {
 
 
 .nav a, .nav {
-    font-family:'SourceSansPro-Regular','ヒラギノ角ゴ Pro W3','Hiragino Kaku Gothic Pro','メイリオ',sans-serif; 
+    font-family:'SourceSansPro-Regular','Yu Gothic Medium','ヒラギノ角ゴ Pro W3','Hiragino Kaku Gothic Pro','メイリオ','Meiryo',sans-serif; 
     font-size:17px; 
     color:#B64630;
     font-weight:normal; 
@@ -137,7 +135,7 @@ a:hover {
   padding: 4px 0 1px 10px;
   height:32px;
   width:220px !important;
-  font-family:'SourceSansPro-Regular','ヒラギノ角ゴ Pro W3','Hiragino Kaku Gothic Pro','メイリオ',sans-serif; 
+  font-family:'SourceSansPro-Regular','Yu Gothic Medium','ヒラギノ角ゴ Pro W3','Hiragino Kaku Gothic Pro','メイリオ','Meiryo',sans-serif; 
 font-size:17px;
 }
 
@@ -167,6 +165,10 @@ video[poster] {
 
 video {
   width:100%;
+}
+
+video::-webkit-media-controls-start-playback-button {
+  display: none !important;
 }
 
 
@@ -201,7 +203,7 @@ video {
 
 
 h3 {
-    font-family: "SourceSansPro-Regular", sans-serif;
+    font-family: "SourceSansPro-Regular",sans-serif;
     font-size:17px;
     color:#607F3A;
     -webkit-font-smoothing: antialiased;
@@ -210,7 +212,7 @@ h3 {
 }
 
 h4 {
-    font-family: "SourceSansPro-Regular", sans-serif;
+    font-family: "SourceSansPro-Regular",sans-serif;
     font-size:16px;
     color:#B64630;
     -webkit-user-select: text;
@@ -221,7 +223,7 @@ h4 {
 }
 
 label {
-    font-family: "SourceSansPro-Regular", sans-serif;
+    font-family: "SourceSansPro-Regular",sans-serif;
     font-size:13px;
     color:#607F3A;
     font-weight: 300;
@@ -507,7 +509,7 @@ div.radical-name{
 
 .kanji {
 	
-  font-family:"mplus-1m-light", sans-serif;
+  font-family:"Yu Gothic Regular", "mplus-1m-light", sans-serif;
   font-size:25px;
   -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -556,7 +558,7 @@ p.kanji	 {
 
 
 a.ka {
-  font-family:"mplus-1m-light", sans-serif;
+  font-family:'Yu Gothic Regular', 'mplus-1m-light', 'ヒラギノ角ゴ Pro W3','Hiragino Kaku Gothic Pro','メイリオ','Meiryo',sans-serif;
   font-size:25px;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -681,9 +683,7 @@ foundation layer
 }
 
  .row1 a {
-  font-family: 'SourceSansPro-It','SourceSansPro-Regular',sans-serif;
-  /*workaround for FireFox*/  
-	font-family:'SourceSansPro-Regular','ヒラギノ角ゴ Pro W3','Hiragino Kaku Gothic Pro','メイリオ',sans-serif; 
+  font-family:'SourceSansPro-Regular',sans-serif;
     font-size:17px; 
    color:#B64630;
    font-weight:normal; 
@@ -818,14 +818,14 @@ h3#kanji{
 
 #ka-anim-play{
 	position:absolute;
-	left:123px;
+	left:122px;
 	width:20px;
 	
 }
 
 #ka-anim-step-forward {
 	position:absolute;
-	left:176px;
+	left:175px;
 	width:20px;
 	
 }
@@ -972,7 +972,9 @@ h3.grade, p.grade, h3.nelson, p.nelson {
 
 
 .example-japanese {
+	   font-family:'Yu Gothic Medium', 'mplus-1m-light', 'ヒラギノ角ゴ Pro W3','Hiragino Kaku Gothic Pro','メイリオ','Meiryo',sans-serif;
 	  font-size: 16px;
+	  
 	   
 }
 
