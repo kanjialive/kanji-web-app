@@ -12,7 +12,7 @@ Your bug reports, feature suggestions or pull requests with improvements to the 
 
 ### Credits
 
-Application development: Joshua Day. Japanese language data and media: Harumi Hibino Lory and the _Kanji alive_ team. UI Design: Arno Bosse. Contributions and bug fixes: Joshua Day, Peter Thorson, Tanya Gray Jones, Mat Wilcoxson, and Arno Bosse. Please see [our main website](http://kanjialive.com/credits/) for more details.
+Application development: Joshua Day. Japanese language data and media: Harumi Hibino Lory and the _Kanji alive_ team. UI Design: Arno Bosse. Contributions and bug fixes: Eric Volpert, Joshua Day, Peter Thorson, Tanya Gray Jones, Mat Wilcoxson, and Arno Bosse. Please see [our main website](http://kanjialive.com/credits/) for more details.
 
 ### Contact
 
