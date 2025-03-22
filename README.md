@@ -1,6 +1,15 @@
 # Kanji alive web application
 
-The angular.js web application for [https://app.kanjialive.com](https://app.kanjialive.com).
+This project is a Japanese kanji learning web application [https://app.kanjialive.com](https://app.kanjialive.com) built with:
+
+  - Frontend: AngularJS 1.5.8 SPA with Bootstrap UI components
+  - Backend: Node.js + Express serving both static files and API endpoints
+  - Database: MongoDB for kanji data storage
+
+  The architecture follows a client-server model with:
+  1. Server API split into private (internal) and public (external) endpoints
+  2. Angular controllers for search, detail, and documentation views
+  3. Custom media handling for kanji stroke animations and audio
 
 ### Developer API and data
 
