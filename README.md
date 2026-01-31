@@ -4,7 +4,7 @@ This project is a Japanese kanji learning web application [https://app.kanjialiv
 
   - Frontend: AngularJS 1.5.8 SPA with Bootstrap UI components
   - Backend: Node.js 22.x + Express 4.x serving both static files and API endpoints
-  - Database: MongoDB 5.x for kanji data storage
+  - Database: MongoDB 8.x for kanji data storage
 
   The architecture follows a client-server model with:
   1. Server API split into private (internal) and public (external) endpoints
