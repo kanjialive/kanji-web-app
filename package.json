@@ -11,7 +11,7 @@
     "prom-client": "^14.2.0"
   },
   "engines": {
-    "node": "18.x"
+    "node": "22.x"
   },
   "scripts": {
     "tsc": "./node_modules/typescript/bin/tsc",
@@ -24,7 +24,7 @@
   "devDependencies": {
     "@types/express": "^4.17.17",
     "@types/mongodb": "^4.0.7",
-    "@types/node": "^18.15.11",
+    "@types/node": "^22.0.0",
     "copyfiles": "^2.4.1",
     "ts-node": "^10.9.1",
     "typescript": "^5.0.4"
