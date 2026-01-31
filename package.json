@@ -5,6 +5,8 @@
   "main": "dist/index.js",
   "author": "dayj",
   "dependencies": {
+    "@types/ejs": "^3.1.5",
+    "ejs": "^4.0.1",
     "express": "4.x",
     "express-prom-bundle": "^6.6.0",
     "mongodb": "6.x",
@@ -17,7 +19,7 @@
     "tsc": "./node_modules/typescript/bin/tsc",
     "build": "tsc && npm run copyfiles",
     "dev": "ts-node index.ts",
-    "copyfiles": "copyfiles 'index.html' 'static/**/*' 'partials/**/*' dist/",
+    "copyfiles": "copyfiles 'index.html' 'static/**/*' 'partials/**/*' dist/ && cp -r server/views dist/",
     "postinstall": "npm run build",
     "start": "node dist/index.js"
   },

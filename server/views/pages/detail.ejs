@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="<%= doc.ka_utf %> - <%= doc.meaning %>. Learn to read and write this kanji with Kanji alive."/>
+  <title><%= doc.ka_utf %> - <%= doc.meaning %> - Kanji alive</title>
+
+  <!-- CSS -->
+  <link href="/static/css/kanji-alive-modern.css" rel="stylesheet">
+
+  <!-- HTMX + Alpine.js -->
+  <script src="https://unpkg.com/htmx.org@2.0.4" defer></script>
+  <script src="https://unpkg.com/alpinejs@3.14.8/dist/cdn.min.js" defer></script>
+
+  <base href="/">
+</head>
+<body hx-boost="true">
+
+<div class="container2" x-data="detailPage()">
+
+  <!-- Row 1: Header -->
+  <header class="header-row">
+    <!-- Search Form -->
+    <div class="col1">
+      <div class="row1">
+        <form class="search-form" action="/htmx/search" method="get">
+          <input type="text"
+                 name="q"
+                 id="search-input"
+                 class="search-bar"
+                 value=""
+                 spellcheck="false"
+                 autocapitalize="off"
+                 autocorrect="off"
+                 placeholder="Search kanji...">
+          <button type="submit" class="search-button" aria-label="Search"></button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Navigation -->
+    <div class="col2">
+      <div class="row1">
+        <div class="recordCounter">
+          <% if (typeof prevKanji !== 'undefined' && prevKanji) { %>
+            <a class="icon icon-left" href="/htmx/<%= encodeURIComponent(prevKanji) %>">&#12296;</a>
+          <% } else { %>
+            <span class="icon icon-left disabled">&#12296;</span>
+          <% } %>
+          <span class="search">
+            <% if (typeof lastSearch !== 'undefined' && lastSearch) { %>
+              <a href="<%= lastSearch %>"><%= currentIndex + 1 %> of <%= totalResults %></a>
+            <% } else { %>
+              1 of 1
+            <% } %>
+          </span>
+          <% if (typeof nextKanji !== 'undefined' && nextKanji) { %>
+            <a class="icon icon-right" href="/htmx/<%= encodeURIComponent(nextKanji) %>">&#12297;</a>
+          <% } else { %>
+            <span class="icon icon-right disabled">&#12297;</span>
+          <% } %>
+        </div>
+      </div>
+    </div>
+
+    <!-- Info Button -->
+    <div class="col3">
+      <div class="row1">
+        <button @click="$refs.helpDialog.showModal()">
+          <span>Info</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Branding -->
+    <div class="col4">
+      <div class="row1 desktop-branding">
+        <a href="https://kanjialive.com" target="_blank" rel="noopener">
+          <span class="ka-welcome-italic">Kanji alive</span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Row 2: Main Content -->
+  <div class="detail-content">
+    <!-- Column 1: Kanji + Video -->
+    <div class="col1">
+      <div class="row2">
+        <h3 id="kanji">Kanji</h3>
+
+        <div class="container-typeface-video">
+          <!-- Video Mode -->
+          <div class="video-container" x-show="detailMode === 'video'">
+            <div class="video">
+              <video x-ref="video"
+                     @click="detailMode = 'typeface'"
+                     poster="<%= doc.poster_video_source %>"
+                     playsinline
+                     preload="metadata">
+                <source src="<%= doc.mp4_video_source %>" type="video/mp4">
+                <source src="<%= doc.webm_video_source %>" type="video/webm">
+              </video>
+            </div>
+            <div class="animation-controls">
+              <button class="icon-step-left ka-icon-gray pointer"
+                      @click="stepBackward()"
+                      aria-label="Step backward"></button>
+              <button :class="playing ? 'icon-pause' : 'icon-play'"
+                      class="ka-icon-gray pointer"
+                      @click="togglePlayPause()"
+                      aria-label="Play/Pause"></button>
+              <button class="icon-step-right ka-icon-gray pointer"
+                      @click="stepForward()"
+                      aria-label="Step forward"></button>
+            </div>
+          </div>
+
+          <!-- Typeface Mode -->
+          <div id="ka-typeface-container" x-show="detailMode === 'typeface'" x-cloak>
+            <div @click="detailMode = 'video'" class="ka-typefaces">
+              <img x-show="typeface === 'shino'" src="<%= doc.shino_source %>" alt="Shino typeface">
+              <img x-show="typeface === 'tensho'" src="<%= doc.tensho_source %>" alt="Tensho typeface">
+              <img x-show="typeface === 'kyokasho'" src="<%= doc.kyokasho_source %>" alt="Kyokasho typeface">
+              <img x-show="typeface === 'maru'" src="<%= doc.maru_source %>" alt="Maru typeface">
+              <img x-show="typeface === 'mincho'" src="<%= doc.mincho_source %>" alt="Mincho typeface">
+              <img x-show="typeface === 'gothic'" src="<%= doc.gothic_source %>" alt="Gothic typeface">
+              <img x-show="typeface === 'hiragino'" src="<%= doc.hiragino_source %>" alt="Hiragino typeface">
+              <img x-show="typeface === 'kanteiryu'" src="<%= doc.kanteiryu_source %>" alt="Kanteiryu typeface">
+              <img x-show="typeface === 'suzumushi'" src="<%= doc.suzumushi_source %>" alt="Suzumushi typeface">
+            </div>
+            <div class="animation-controls">
+              <button @click="previousTypeface()" class="ka-typeface-left pointer">&#12296;</button>
+              <span class="typeface-name" x-html="typefaceDisplay"></span>
+              <button @click="nextTypeface()" class="ka-typeface-right pointer">&#12297;</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Column 2: Meaning, Readings, Radical -->
+    <div class="col2">
+      <div class="row2">
+        <h3 class="meaning">Meaning</h3>
+        <p class="meaning"><%= doc.meaning %></p>
+
+        <h3 class="onyomi">Onyomi</h3>
+        <p class="onyomi"><%= doc.onyomi_ja %></p>
+
+        <h3 class="kunyomi">Kunyomi</h3>
+        <p class="kunyomi"><%= doc.kunyomi_ka_display %></p>
+
+        <div class="border3"><div class="border-inner"></div></div>
+
+        <h3 class="radical">Radical</h3>
+        <img class="radical-character" src="<%= doc.rad_char_source %>" alt="Radical character">
+        <% if (doc.rad_position && doc.rad_position_file) { %>
+          <img class="radical-position" src="<%= doc.rad_position_file %>" alt="Radical position">
+        <% } %>
+        <div class="radical-name"><%= doc.rad_name_ja %></div>
+        <div class="radical-meaning"><%= doc.rad_meaning %></div>
+        <div class="radical-stroke"><%= doc.rad_stroke %></div>
+
+        <div class="ka-rad-anim pointer" @click="startRadicalAnimation()">
+          <img :class="{'opaque': radicalFrame === 0}" src="<%= doc.rad_anim_frame_0 %>" alt="Radical animation frame 1">
+          <img :class="{'opaque': radicalFrame === 1}" src="<%= doc.rad_anim_frame_1 %>" alt="Radical animation frame 2">
+          <img :class="{'opaque': radicalFrame === 2}" src="<%= doc.rad_anim_frame_2 %>" alt="Radical animation frame 3">
+        </div>
+      </div>
+    </div>
+
+    <!-- Column 3: Strokes, Grade, References, Hint -->
+    <div class="col3">
+      <div class="row2">
+        <h3 class="strokes">Strokes</h3>
+        <p class="strokes"><%= doc.kstroke %></p>
+
+        <h3 class="grade">Grade</h3>
+        <p class="grade"><%= doc.grade %></p>
+
+        <div class="border4"><div class="border-inner"></div></div>
+
+        <h3 class="kodansha">Kodansha</h3>
+        <p class="kodansha"><%= doc.dick %></p>
+
+        <h3 class="nelson">Classic Nelson</h3>
+        <p class="nelson"><%= doc.dicn %></p>
+
+        <div class="border5"><div class="border-inner"></div></div>
+
+        <h3 class="hint">Hint</h3>
+        <div class="hint" id="ka-hint"><%- doc.hint %></div>
+
+        <div class="border6"><div class="border-inner"></div></div>
+      </div>
+    </div>
+
+    <!-- Column 4: Examples -->
+    <div class="col4">
+      <div class="row2">
+        <h3 class="examples">Examples</h3>
+        <div class="examples">
+          <% doc.examples.forEach((example, index) => { %>
+            <div class="example"
+                 x-data="{ showTranslation: false }"
+                 @mouseenter="showTranslation = true"
+                 @mouseleave="showTranslation = false">
+              <div class="example-text">
+                <div x-show="!showTranslation" class="example-ja example-japanese"><%- example.japanese %></div>
+                <div x-show="showTranslation" class="example-ja" x-cloak><%- example.english %></div>
+              </div>
+              <div class="example-audio">
+                <button class="icon-play audio-play ka-icon-gray pointer"
+                        @click="playAudio('<%= example.mp3 %>')"
+                        aria-label="Play audio"></button>
+              </div>
+            </div>
+          <% }); %>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Decorative Borders -->
+  <div class="border1"><div class="border-inner"></div></div>
+  <div class="border2"><div class="border-inner"></div></div>
+  <div class="border7"><div class="border-inner"></div></div>
+
+  <!-- Stroke Breakdown -->
+  <div class="stroke-breakdown">
+    <% doc.strokes.forEach((stroke, index) => { %>
+      <img class="ka-breakdown"
+           src="<%= stroke %>"
+           alt="Stroke <%= index + 1 %>"
+           @mouseover="seek(<%= doc.stroketimes[index + 1] || 0 %>)">
+    <% }); %>
+  </div>
+
+  <!-- Help Modal -->
+  <dialog x-ref="helpDialog" class="help-modal" @click.self="$refs.helpDialog.close()">
+    <%- include('../partials/detail-help-modal') %>
+  </dialog>
+
+  <!-- Version -->
+  <div class="version"><p>v3.00</p></div>
+</div>
+
+<!-- Logo -->
+<div class="logo">
+  <img src="https://media.kanjialive.com/img/fan_logo_104.jpg" alt="Kanji alive logo" loading="lazy"/>
+</div>
+
+<!-- Audio element for examples -->
+<audio id="example-audio" preload="none" style="display: none;"></audio>
+
+<script>
+document.addEventListener('alpine:init', () => {
+  Alpine.data('detailPage', () => ({
+    detailMode: 'video',
+    playing: false,
+    typeface: 'mincho',
+    typefaceIndex: 4,
+    typefaces: ['suzumushi', 'kanteiryu', 'shino', 'tensho', 'kyokasho', 'maru', 'mincho', 'gothic', 'hiragino'],
+    typefaceDisplayNames: {
+      'suzumushi': 'Suzumushi',
+      'kanteiryu': 'Kanteiryu',
+      'shino': 'Shino',
+      'tensho': 'Tensho',
+      'kyokasho': 'Kyokasho',
+      'maru': 'Maru&nbsp;Gothic',
+      'mincho': 'Mincho',
+      'gothic': 'Gothic',
+      'hiragino': 'Hiragino'
+    },
+    radicalFrame: 0,
+    radicalAnimating: false,
+    stroketimes: <%= JSON.stringify(doc.stroketimes) %>,
+
+    get typefaceDisplay() {
+      return this.typefaceDisplayNames[this.typeface] || this.typeface;
+    },
+
+    togglePlayPause() {
+      const video = this.$refs.video;
+      if (video.paused) {
+        video.play();
+        this.playing = true;
+      } else {
+        video.pause();
+        this.playing = false;
+      }
+    },
+
+    stepForward() {
+      const video = this.$refs.video;
+      const currentTime = video.currentTime;
+      // Find next stroke time
+      for (let i = 0; i < this.stroketimes.length; i++) {
+        if (this.stroketimes[i] > currentTime + 0.01) {
+          video.currentTime = this.stroketimes[i];
+          break;
+        }
+      }
+    },
+
+    stepBackward() {
+      const video = this.$refs.video;
+      const currentTime = video.currentTime;
+      // Find previous stroke time
+      for (let i = this.stroketimes.length - 1; i >= 0; i--) {
+        if (this.stroketimes[i] < currentTime - 0.01) {
+          video.currentTime = this.stroketimes[i];
+          break;
+        }
+      }
+    },
+
+    seek(time) {
+      this.$refs.video.currentTime = time;
+    },
+
+    nextTypeface() {
+      this.typefaceIndex = Math.min(this.typefaceIndex + 1, this.typefaces.length - 1);
+      this.typeface = this.typefaces[this.typefaceIndex];
+    },
+
+    previousTypeface() {
+      this.typefaceIndex = Math.max(this.typefaceIndex - 1, 0);
+      this.typeface = this.typefaces[this.typefaceIndex];
+    },
+
+    startRadicalAnimation() {
+      if (this.radicalAnimating) return;
+      this.radicalAnimating = true;
+      this.radicalFrame = 0;
+
+      let frame = 0;
+      const interval = setInterval(() => {
+        frame++;
+        if (frame > 2) {
+          clearInterval(interval);
+          this.radicalFrame = 0;
+          this.radicalAnimating = false;
+        } else {
+          this.radicalFrame = frame;
+        }
+      }, 500);
+    },
+
+    playAudio(src) {
+      const audio = document.getElementById('example-audio');
+      audio.src = src;
+      audio.play();
+    },
+
+    init() {
+      // Video ended handler
+      this.$refs.video?.addEventListener('ended', () => {
+        this.playing = false;
+      });
+
+      // Keyboard shortcuts
+      document.addEventListener('keydown', (e) => {
+        if (e.target.tagName === 'INPUT') return;
+
+        switch(e.code) {
+          case 'Space':
+            e.preventDefault();
+            this.togglePlayPause();
+            break;
+          case 'ArrowLeft':
+            if (e.shiftKey) {
+              this.stepBackward();
+            }
+            break;
+          case 'ArrowRight':
+            if (e.shiftKey) {
+              this.stepForward();
+            }
+            break;
+        }
+      });
+    }
+  }));
+});
+</script>
+
+<!-- Google Analytics -->
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-35022736-2', 'auto');
+  ga('send', 'pageview');
+</script>
+
+</body>
+</html>

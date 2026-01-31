@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Kanji alive is a free web application designed to help Japanese language students of all levels learn to read and write kanji."/>
+  <title><%= typeof query !== 'undefined' && query ? 'Search: ' + query + ' - ' : '' %>Kanji alive Web Application</title>
+
+  <!-- CSS -->
+  <link href="/static/css/kanji-alive-modern.css" rel="stylesheet">
+
+  <!-- HTMX + Alpine.js -->
+  <script src="https://unpkg.com/htmx.org@2.0.4" defer></script>
+  <script src="https://unpkg.com/alpinejs@3.14.8/dist/cdn.min.js" defer></script>
+
+  <base href="/">
+</head>
+<body hx-boost="true">
+
+<div class="container2" x-data="searchPage()">
+
+  <!-- Header Row -->
+  <header class="header-row">
+    <!-- Search Form -->
+    <div class="col1">
+      <div class="row1">
+        <form class="search-form"
+              hx-get="/htmx/partials/results"
+              hx-target="#search-results"
+              hx-trigger="submit"
+              hx-push-url="true"
+              @submit.prevent>
+          <input type="text"
+                 name="q"
+                 id="search-input"
+                 class="search-bar"
+                 value="<%= typeof query !== 'undefined' ? query : '' %>"
+                 spellcheck="false"
+                 autocapitalize="off"
+                 autocorrect="off"
+                 placeholder="Search kanji..."
+                 @keydown.up.prevent="cycleMode(-1)"
+                 @keydown.down.prevent="cycleMode(1)">
+          <button type="submit" class="search-button" aria-label="Search"></button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Sort Controls -->
+    <div class="col2">
+      <div class="row1">
+        <div class="recordCounter">
+          <button class="icon icon-left"
+                  @click="scrollBackward()"
+                  aria-label="Scroll left">&#12296;</button>
+          <span class="search">
+            <button @click="cycleMode(1)" class="sort-button">Sort</button>
+          </span>
+          <button class="icon icon-right"
+                  @click="scrollForward()"
+                  aria-label="Scroll right">&#12297;</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Info Button -->
+    <div class="col3">
+      <div class="row1">
+        <button @click="$refs.helpDialog.showModal()">
+          <span>Info</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Branding -->
+    <div class="col4">
+      <div class="row1 desktop-branding">
+        <a href="https://kanjialive.com" target="_blank" rel="noopener">
+          <span class="ka-welcome-italic">Kanji alive</span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Decorative Borders -->
+  <div class="border1"><div class="border-inner"></div></div>
+  <div class="border2"><div class="border-inner"></div></div>
+
+  <!-- Results Container -->
+  <main id="search-results"
+        class="row3 scrollbar-wrapper"
+        x-ref="resultsContainer"
+        @wheel="handleWheel($event)">
+    <% if (typeof results !== 'undefined' && results.length > 0) { %>
+      <%- include('../partials/results', { results, mode, kanjiStrokeGroups, radicalStrokeGroups }) %>
+    <% } else if (typeof query !== 'undefined' && query) { %>
+      <%- include('../partials/no-results') %>
+    <% } else { %>
+      <%- include('../partials/welcome') %>
+    <% } %>
+  </main>
+
+  <!-- Help Modal -->
+  <dialog x-ref="helpDialog" class="help-modal" @click.self="$refs.helpDialog.close()">
+    <%- include('../partials/search-help-modal') %>
+  </dialog>
+
+  <!-- Version -->
+  <div class="version"><p>v3.00</p></div>
+</div>
+
+<!-- Logo -->
+<div class="logo">
+  <img src="https://media.kanjialive.com/img/fan_logo_104.jpg" alt="Kanji alive logo" loading="lazy"/>
+</div>
+
+<script>
+document.addEventListener('alpine:init', () => {
+  Alpine.data('searchPage', () => ({
+    mode: '<%= typeof mode !== "undefined" ? mode : "kanji" %>',
+    modes: ['kanji', 'ksort', 'rsort'],
+
+    cycleMode(direction) {
+      const currentIndex = this.modes.indexOf(this.mode);
+      const newIndex = (currentIndex + direction + this.modes.length) % this.modes.length;
+      this.mode = this.modes[newIndex];
+
+      // Trigger HTMX request with new mode
+      const input = document.getElementById('search-input');
+      if (input.value) {
+        htmx.ajax('GET', '/htmx/partials/results?q=' + encodeURIComponent(input.value) + '&mode=' + this.mode, '#search-results');
+      }
+    },
+
+    scrollForward() {
+      this.$refs.resultsContainer?.scrollBy({ left: 300, behavior: 'smooth' });
+    },
+
+    scrollBackward() {
+      this.$refs.resultsContainer?.scrollBy({ left: -300, behavior: 'smooth' });
+    },
+
+    handleWheel(event) {
+      // Convert vertical scroll to horizontal
+      if (Math.abs(event.deltaY) > Math.abs(event.deltaX)) {
+        event.preventDefault();
+        this.$refs.resultsContainer.scrollLeft += event.deltaY;
+      }
+    },
+
+    init() {
+      // Keyboard shortcuts for arrow keys
+      document.addEventListener('keydown', (e) => {
+        if (e.target.tagName === 'INPUT') return;
+
+        switch(e.code) {
+          case 'ArrowUp':
+            e.preventDefault();
+            this.cycleMode(-1);
+            break;
+          case 'ArrowDown':
+            e.preventDefault();
+            this.cycleMode(1);
+            break;
+          case 'ArrowLeft':
+            this.scrollBackward();
+            break;
+          case 'ArrowRight':
+            this.scrollForward();
+            break;
+        }
+      });
+    }
+  }));
+});
+</script>
+
+<!-- Google Analytics -->
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-35022736-2', 'auto');
+  ga('send', 'pageview');
+</script>
+
+</body>
+</html>

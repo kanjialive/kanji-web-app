@@ -1,0 +1,109 @@
+<%
+const currentMode = typeof mode !== 'undefined' ? mode : 'kanji';
+%>
+
+<% if (currentMode === 'kanji') { %>
+  <!-- Simple Kanji Grid -->
+  <div class="scroller scroller-kanji">
+    <div class="search-results search-results-kanji">
+      <div id="kanji-count" class="ka-results-h1"><%= results.length %></div>
+      <div class="ka-results-h3">Kanji</div>
+      <div class="ka-border-bottom">
+        <div class="border-inner"></div>
+      </div>
+      <p class="kanji">
+        <% results.forEach((kanji, index) => { %>
+          <a href="/<%= encodeURIComponent(kanji.ka_utf) %>"
+             id="<%= kanji.ka_id %>"
+             class="ka"
+             data-index="<%= index %>"><%= kanji.ka_utf %> </a>
+        <% }); %>
+      </p>
+    </div>
+  </div>
+
+<% } else if (currentMode === 'ksort' && typeof kanjiStrokeGroups !== 'undefined') { %>
+  <!-- Kanji Stroke Groups -->
+  <div class="scroller row search-results-container">
+    <div class="search-results">
+      <ul class="list-inline">
+        <% kanjiStrokeGroups.forEach(group => { %>
+          <li class="results-group">
+            <div class="ka-results-h1"><%= group.stroke %></div>
+            <div class="ka-results-h3">Kanji Stroke<%= group.stroke !== 1 ? 's' : '' %></div>
+            <div class="ka-border-bottom">
+              <div class="border-inner"></div>
+            </div>
+            <div class="grouped-results">
+              <% group.columns.forEach(column => { %>
+                <div class="grouped-column inline">
+                  <% column.forEach(radical => { %>
+                    <div>
+                      <div class="ka-radical inline"><%= radical.radical %></div>
+                      <div class="grouped-row-container inline">
+                        <% radical.rows.forEach(row => { %>
+                          <div class="grouped-row">
+                            <% row.forEach(kanji => { %>
+                              <a href="/<%= encodeURIComponent(kanji.ka_utf) %>"
+                                 id="<%= kanji.ka_id %>"
+                                 class="ka"
+                                 data-index="<%= kanji.sortedIndex %>"><%= kanji.ka_utf %></a>
+                            <% }); %>
+                          </div>
+                        <% }); %>
+                      </div>
+                    </div>
+                  <% }); %>
+                </div>
+              <% }); %>
+            </div>
+          </li>
+        <% }); %>
+      </ul>
+    </div>
+  </div>
+
+<% } else if (currentMode === 'rsort' && typeof radicalStrokeGroups !== 'undefined') { %>
+  <!-- Radical Stroke Groups -->
+  <div class="scroller row search-results-container">
+    <div class="search-results">
+      <ul class="list-inline">
+        <% radicalStrokeGroups.forEach(group => { %>
+          <li class="results-group">
+            <div class="ka-results-h1"><%= group.stroke %></div>
+            <div class="ka-results-h3">Radical Stroke<%= group.stroke !== 1 ? 's' : '' %></div>
+            <div class="ka-border-bottom">
+              <div class="border-inner"></div>
+            </div>
+            <div class="grouped-results">
+              <% group.columns.forEach(column => { %>
+                <div class="grouped-column inline">
+                  <% column.forEach(radical => { %>
+                    <div>
+                      <div class="ka-radical inline"><%= radical.radical %></div>
+                      <div class="grouped-row-container inline">
+                        <% radical.rows.forEach(row => { %>
+                          <div class="grouped-row">
+                            <% row.forEach(kanji => { %>
+                              <a href="/<%= encodeURIComponent(kanji.ka_utf) %>"
+                                 id="<%= kanji.ka_id %>"
+                                 class="ka"
+                                 data-index="<%= kanji.sortedIndex %>"><%= kanji.ka_utf %></a>
+                            <% }); %>
+                          </div>
+                        <% }); %>
+                      </div>
+                    </div>
+                  <% }); %>
+                </div>
+              <% }); %>
+            </div>
+          </li>
+        <% }); %>
+      </ul>
+    </div>
+  </div>
+
+<% } else { %>
+  <%- include('./no-results') %>
+<% } %>

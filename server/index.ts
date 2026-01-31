@@ -3,9 +3,17 @@ import path from "path";
 import express, { Request, Response, NextFunction } from "express";
 import * as private_api from "./private-api";
 import * as public_api from "./public-api";
+import * as html_routes from "./html-routes";
 
 const promBundle = require("express-prom-bundle");
 const app = express();
+
+// Configure EJS as the view engine
+app.set("view engine", "ejs");
+app.set("views", path.join(__dirname, "views"));
+
+// Feature flag for HTMX frontend (set USE_HTMX=true to enable)
+const USE_HTMX = process.env.USE_HTMX === "true";
 
 const MONGODB_URI = process.env.MONGODB_URI as string;
 const MASHAPE_SECRET = process.env.MASHAPE_SECRET as string;
@@ -32,6 +40,7 @@ async function connectMongoDB() {
       db = client.db("kanjialive");
       public_api.init(db);
       private_api.init(db);
+      html_routes.init(db);
 
       app.set("port", process.env.PORT || 5000);
 
@@ -104,7 +113,32 @@ app.get(
   public_api.getKanjiWithCharacter
 );
 
+// HTMX routes (when USE_HTMX=true or ?htmx=true query param)
+app.use("/htmx", html_routes.router);
+
+// Catch-all route: serve HTMX or AngularJS based on feature flag
 app.all("/*", function (req: Request, res: Response) {
+  // Check for ?htmx=true query param to allow testing
+  const useHtmx = USE_HTMX || req.query.htmx === "true";
+
+  if (useHtmx) {
+    // For HTMX mode, redirect root to /htmx/search
+    const path = req.path;
+    if (path === "/" || path === "") {
+      return res.redirect("/htmx/search");
+    }
+    // For kanji character paths, redirect to /htmx/:character
+    if (path.length <= 4 && !path.includes(".")) {
+      return res.redirect(`/htmx${path}`);
+    }
+    // For search paths, redirect to /htmx/search
+    if (path.startsWith("/search/")) {
+      const query = path.replace("/search/", "");
+      return res.redirect(`/htmx/search?q=${encodeURIComponent(query)}`);
+    }
+  }
+
+  // Default: serve AngularJS SPA
   const options = {
     root: path.join(__dirname),
   };

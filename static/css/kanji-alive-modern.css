@@ -1,0 +1,931 @@
+/**
+ * Kanji Alive - Modern CSS
+ * Migrated from Bootstrap/AngularJS to HTMX/Alpine.js
+ * Uses CSS Grid, Flexbox, and CSS Variables
+ */
+
+/* ============================================
+   CSS Variables
+   ============================================ */
+:root {
+  /* Colors */
+  --color-primary: #B64630;       /* rust red - links, accents */
+  --color-secondary: #607F3A;     /* olive green - headings */
+  --color-text: #1a1a1a;          /* main text */
+  --color-text-muted: #999;       /* version, footer */
+  --color-border: #CBCCD0;        /* light gray borders */
+  --color-bg: #F6F6F6;            /* off-white - search bar */
+  --color-bg-dark: #D0D0D0;       /* gray - body background */
+  --color-bg-white: white;        /* container background */
+  --color-radical: #CBCCD0;       /* radical character color */
+  --color-kbd-text: #c7254e;      /* keyboard shortcut text */
+  --color-kbd-bg: #f9f2f4;        /* keyboard shortcut background */
+
+  /* Fonts */
+  --font-jp: 'Yu Gothic Medium', 'mplus-1m-light', 'Hiragino Kaku Gothic Pro', 'Meiryo', sans-serif;
+  --font-en: 'SourceSansPro-Regular', sans-serif;
+  --font-en-italic: 'SourceSansPro-It', 'SourceSansPro-Regular', sans-serif;
+  --font-icons: 'mplus-1m-icons';
+  --font-multimedia: 'ka-multimedia';
+  --font-radicals: 'JapaneseRadicals-Regular', sans-serif;
+
+  /* Sizing */
+  --container-width: 1188px;
+  --container-min-height: 658px;
+  --col-width: 258px;
+  --row-height: 32px;
+  --content-height: 545px;
+
+  /* Spacing */
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --spacing-xl: 42px;
+}
+
+/* ============================================
+   Font Faces
+   ============================================ */
+@font-face {
+  font-family: 'mplus-1m-light';
+  src: url('https://media.kanjialive.com/fonts/mplus-1m-light-webfont.woff2') format('woff2'),
+       url('https://media.kanjialive.com/fonts/mplus-1m-light-webfont.woff') format('woff');
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'SourceSansPro-Regular';
+  src: url('https://media.kanjialive.com/fonts/sourcesanspro-regular-webfont.woff2') format('woff2'),
+       url('https://media.kanjialive.com/fonts/sourcesanspro-regular-webfont.woff') format('woff');
+  unicode-range: U+0000-007F;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'SourceSansPro-It';
+  src: url('https://media.kanjialive.com/fonts/sourcesanspro-italic-webfont.woff2') format('woff2'),
+       url('https://media.kanjialive.com/fonts/sourcesanspro-italic-webfont.woff') format('woff');
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'JapaneseRadicals-Regular';
+  src: url('https://media.kanjialive.com/fonts/JapaneseRadicals-Regular.woff2') format('woff2'),
+       url('https://media.kanjialive.com/fonts/JapaneseRadicals-Regular.woff') format('woff');
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'mplus-1m-icons';
+  src: url('https://media.kanjialive.com/fonts/mplus-1m-icons.woff2') format('woff2'),
+       url('https://media.kanjialive.com/fonts/mplus-1m-icons.woff') format('woff');
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'ka-multimedia';
+  src: url('https://media.kanjialive.com/fonts/ka-multimedia.woff2') format('woff2'),
+       url('https://media.kanjialive.com/fonts/ka-multimedia.woff') format('woff');
+  font-display: swap;
+}
+
+/* ============================================
+   Reset / Base
+   ============================================ */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+body {
+  font-family: var(--font-en), var(--font-jp);
+  background-color: var(--color-bg-dark);
+  font-size: 15px;
+  margin: 0;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+a {
+  color: var(--color-primary);
+  text-decoration: none;
+}
+
+a:hover {
+  cursor: pointer;
+  text-decoration: none;
+}
+
+button {
+  font-family: inherit;
+  font-size: inherit;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: inherit;
+}
+
+h3 {
+  font-family: var(--font-en);
+  font-size: 17px;
+  color: var(--color-secondary);
+  margin: 0;
+}
+
+/* Hide Alpine.js elements until initialized */
+[x-cloak] {
+  display: none;
+}
+
+/* ============================================
+   Layout: Container
+   ============================================ */
+.container {
+  width: var(--container-width);
+  min-height: var(--container-min-height);
+  margin: 55px auto;
+  background-color: var(--color-bg-white);
+  box-shadow: 0 3px 6px rgba(100, 100, 100, 0.3);
+}
+
+.container2 {
+  margin-left: 25px;
+  margin-top: var(--spacing-xl);
+  position: relative;
+}
+
+/* ============================================
+   Layout: Grid Columns
+   ============================================ */
+.col1, .col2, .col3, .col4 {
+  width: var(--col-width);
+  min-height: 577px;
+  position: absolute;
+}
+
+.col1 { left: 0; }
+.col2 { left: 282px; }
+.col3 { left: 564px; }
+.col4 { left: 848px; width: 255px; }
+
+/* ============================================
+   Layout: Rows
+   ============================================ */
+.row1 {
+  position: absolute;
+  width: 100%;
+  min-height: var(--row-height);
+  padding-top: 10px;
+}
+
+.row1 a, .row1 button {
+  font-family: var(--font-en);
+  font-size: 17px;
+  color: var(--color-primary);
+  font-weight: normal;
+  user-select: none;
+}
+
+.row2 {
+  position: absolute;
+  top: var(--row-height);
+  width: 100%;
+  min-height: var(--content-height);
+}
+
+.row3 {
+  position: absolute;
+  top: var(--row-height);
+  width: 100%;
+  min-height: var(--content-height);
+}
+
+/* ============================================
+   Search Form
+   ============================================ */
+.search-form {
+  width: 100%;
+  background: var(--color-bg);
+  margin-top: -5px;
+  display: flex;
+  align-items: center;
+  position: relative;
+}
+
+.search-bar {
+  border: 0;
+  outline: none;
+  background-color: var(--color-bg);
+  box-shadow: none;
+  color: var(--color-primary);
+  padding: var(--spacing-xs) 0 1px 10px;
+  height: 32px;
+  width: 220px;
+  font-family: var(--font-en), var(--font-jp);
+  font-size: 17px;
+}
+
+.search-button {
+  background: url('https://media.kanjialive.com/img/search-icon.png') no-repeat;
+  background-size: 22px 22px;
+  width: 22px;
+  height: 22px;
+  position: absolute;
+  top: 8px;
+  left: 228px;
+  border: none;
+  cursor: pointer;
+}
+
+.sort-button {
+  font-family: var(--font-en);
+  font-size: 17px;
+  color: var(--color-primary);
+}
+
+/* ============================================
+   Record Counter / Navigation
+   ============================================ */
+.recordCounter {
+  width: 128px;
+  height: 25px;
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.recordCounter .icon-left,
+.recordCounter .icon-right {
+  font-size: 20px;
+  color: var(--color-primary);
+}
+
+.recordCounter .icon-left {
+  margin-left: -10px;
+}
+
+.recordCounter .icon-right {
+  position: absolute;
+  right: 0;
+}
+
+.recordCounter .icon-left.disabled,
+.recordCounter .icon-right.disabled {
+  color: var(--color-border);
+  cursor: default;
+}
+
+span.search {
+  position: absolute;
+  width: 114px;
+  left: 8px;
+  padding-top: 1px;
+  text-align: center;
+}
+
+/* ============================================
+   Branding
+   ============================================ */
+.desktop-branding {
+  display: block;
+}
+
+.desktop-branding a {
+  font-family: var(--font-en-italic);
+  font-style: italic;
+}
+
+.ka-welcome-italic {
+  font-family: var(--font-en-italic);
+  font-style: italic;
+}
+
+.logo {
+  position: relative;
+  top: -8px;
+  left: 1074px;
+}
+
+.logo img {
+  width: 54px;
+  height: 54px;
+}
+
+/* ============================================
+   Borders
+   ============================================ */
+.border-inner {
+  height: 1px;
+  background-color: var(--color-border);
+}
+
+.border1 {
+  position: absolute;
+  width: 1103px;
+  margin-top: 50px;
+}
+
+.border2 {
+  position: absolute;
+  width: 1103px;
+  margin-top: 564px;
+}
+
+.border3, .border4, .border5 {
+  position: absolute;
+  width: 100%;
+  top: 253px;
+}
+
+.border6 {
+  position: absolute;
+  width: 100%;
+  top: 391px;
+}
+
+.border7 {
+  position: absolute;
+  width: 540px;
+  margin-left: 25px;
+  top: 520px;
+}
+
+/* ============================================
+   Version
+   ============================================ */
+.version {
+  position: absolute;
+  width: 1103px;
+  margin-top: 579px;
+  color: var(--color-text-muted);
+}
+
+.version p {
+  margin: 0;
+  font-size: 14px;
+}
+
+/* ============================================
+   Search Results
+   ============================================ */
+.scrollbar-wrapper {
+  width: 1103px;
+  height: auto;
+  overflow: hidden;
+  float: left;
+}
+
+.scroller {
+  white-space: nowrap;
+  height: 516px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  position: relative;
+  top: 23px;
+  scroll-behavior: smooth;
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-text) transparent;
+}
+
+.scroller::-webkit-scrollbar {
+  height: 5px;
+}
+
+.scroller::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.scroller::-webkit-scrollbar-thumb {
+  background: var(--color-text);
+  border-radius: 3px;
+}
+
+.search-results {
+  height: 500px;
+  margin-left: 0;
+}
+
+.search-results-kanji {
+  margin-left: 0;
+}
+
+.scroller-kanji {
+  width: 1103px;
+  overflow: hidden;
+}
+
+/* Results header */
+.ka-results-h1 {
+  font-family: var(--font-en);
+  font-size: 17px;
+  color: var(--color-secondary);
+  padding: 10px 0 0 0;
+  position: absolute;
+  top: -6px;
+}
+
+.ka-results-h3 {
+  font-family: var(--font-en);
+  font-size: 17px;
+  color: var(--color-secondary);
+  position: absolute;
+  top: 36px;
+}
+
+.ka-border-bottom {
+  top: 64px;
+  position: absolute;
+  width: 100%;
+}
+
+.no-results {
+  top: 79px;
+  position: absolute;
+}
+
+/* Kanji characters in results */
+.kanji {
+  font-family: 'Yu Gothic Regular', var(--font-jp);
+  font-size: 25px;
+}
+
+p.kanji {
+  position: absolute;
+  top: 79px;
+  margin-left: 3px;
+  margin-bottom: 28px;
+  word-wrap: break-word;
+  white-space: normal;
+}
+
+a.ka {
+  font-family: 'Yu Gothic Regular', var(--font-jp);
+  font-size: 25px;
+  color: black;
+  text-decoration: none;
+}
+
+a.ka:hover,
+a.ka:active {
+  color: var(--color-primary);
+}
+
+/* Grouped results (stroke sorting) */
+.list-inline {
+  margin-left: 15px;
+  padding: 0;
+  list-style: none;
+  display: flex;
+}
+
+.list-inline > li {
+  padding: 0;
+}
+
+.results-group {
+  position: relative;
+  display: inline-block;
+  vertical-align: top;
+  margin-right: 30px;
+}
+
+.grouped-results {
+  margin-top: 79px;
+  display: flex;
+}
+
+.grouped-column {
+  width: 258px;
+  margin-right: 25px;
+  display: inline-table;
+}
+
+.grouped-row > a.ka {
+  padding-left: 12px;
+}
+
+.inline {
+  display: inline-table;
+}
+
+.ka-radical {
+  font-family: var(--font-radicals);
+  font-size: 22px;
+  color: var(--color-radical);
+}
+
+/* ============================================
+   Welcome Page
+   ============================================ */
+.welcome-content {
+  position: relative;
+}
+
+.ka-welcome-title {
+  position: absolute;
+  top: 44px;
+  width: 538px;
+  font-family: var(--font-en);
+  font-size: 22px;
+  color: var(--color-secondary);
+  letter-spacing: -0.02em;
+}
+
+.ka-welcome-text {
+  font-size: 17px;
+  font-family: var(--font-en);
+  color: var(--color-text);
+  line-height: 136%;
+  white-space: normal;
+  position: absolute;
+  top: 96px;
+  width: 538px;
+}
+
+.ka-welcome-text p {
+  font-size: 18px;
+  line-height: 136%;
+  margin-bottom: var(--spacing-sm);
+}
+
+.typesquare-container {
+  position: absolute;
+  top: 50px;
+  width: 538px;
+  left: 524px;
+}
+
+.TypeSquare {
+  width: 476px;
+  min-height: 459px;
+  margin-left: 70px;
+  margin-top: 25px;
+}
+
+/* ============================================
+   Detail Page
+   ============================================ */
+
+/* Video Container */
+.container-typeface-video {
+  position: absolute;
+  width: 248px;
+  height: 248px;
+  top: 50px;
+}
+
+.video-container .video {
+  width: 248px;
+  height: 248px;
+}
+
+video {
+  width: 100%;
+}
+
+video[poster] {
+  width: 248px;
+  height: 248px;
+  margin-left: 6px;
+}
+
+.animation-controls {
+  margin-top: var(--spacing-md);
+  display: flex;
+  justify-content: center;
+  gap: var(--spacing-md);
+}
+
+h3#kanji {
+  position: absolute;
+  top: 10px;
+  margin-left: -1px;
+}
+
+/* Multimedia icons */
+.icon-step-left, .icon-play, .icon-pause, .icon-step-right {
+  font-family: var(--font-multimedia);
+  font-style: normal;
+  font-weight: normal;
+  font-size: 20px;
+  color: black;
+  cursor: pointer;
+}
+
+.icon-step-left:before { content: "\e008"; }
+.icon-play:before { content: "\e007"; }
+.icon-pause:before { content: "\e006"; }
+.icon-step-right:before { content: "\e005"; }
+
+.gray-out:hover {
+  color: gray;
+}
+
+/* Typeface Gallery */
+.ka-typefaces {
+  height: 248px;
+  width: 248px;
+  cursor: pointer;
+}
+
+.ka-typefaces img {
+  height: 220px;
+  width: 220px;
+  margin-left: 20px;
+  margin-top: 16px;
+}
+
+.ka-typeface-left,
+.ka-typeface-right {
+  color: black;
+  font-size: 20px;
+  font-family: var(--font-icons);
+  user-select: none;
+}
+
+.typeface-name {
+  text-align: center;
+  font-size: 15px;
+  min-width: 100px;
+}
+
+/* Meaning, Readings */
+h3.meaning, h3.strokes, h3.grade, h3.examples {
+  position: absolute;
+  top: 10px;
+}
+
+p.meaning, p.strokes, p.grade, div.examples {
+  top: 60px;
+  position: absolute;
+}
+
+p.strokes, p.kodansha, p.nelson, p.grade {
+  font-size: 16px;
+}
+
+h3.onyomi, h3.kodansha, h3.nelson {
+  top: 123px;
+  position: absolute;
+  margin-top: -8px;
+}
+
+p.onyomi, p.kodansha, p.nelson {
+  top: 142px;
+  position: absolute;
+}
+
+h3.kunyomi {
+  top: 194px;
+  position: absolute;
+  margin-top: -8px;
+}
+
+p.kunyomi {
+  top: 214px;
+  position: absolute;
+}
+
+/* Radical */
+h3.radical, h3.hint {
+  top: 273px;
+  position: absolute;
+  margin-top: -8px;
+}
+
+.radical-character {
+  top: 297px;
+  position: absolute;
+  width: 31px;
+  height: 32px;
+  margin-left: 2px;
+}
+
+.radical-stroke {
+  top: 335px;
+  position: absolute;
+  margin-left: 1px;
+  font-size: 16px;
+}
+
+img.radical-position {
+  top: 338px;
+  position: absolute;
+  margin-left: 21px;
+  height: 12px;
+  width: 12px;
+}
+
+div.radical-name {
+  top: 294px;
+  position: absolute;
+  left: 47px;
+}
+
+div.radical-meaning {
+  top: 315px;
+  position: absolute;
+  left: 47px;
+  white-space: normal;
+  width: 143px;
+}
+
+/* Radical Animation */
+.ka-rad-anim {
+  position: relative;
+  cursor: pointer;
+}
+
+.ka-rad-anim img {
+  cursor: pointer;
+  width: 64px;
+  height: 66px;
+  position: absolute;
+  top: 291px;
+  right: 1px;
+  transition: opacity 0.5s ease-in-out;
+  opacity: 0;
+}
+
+.ka-rad-anim img.opaque {
+  opacity: 1;
+}
+
+/* Strokes, Grade, References */
+h3.grade, p.grade, h3.nelson, p.nelson {
+  left: 131px;
+}
+
+div.hint {
+  position: absolute;
+  top: 294px;
+}
+
+.hint img {
+  max-width: 12px;
+  max-height: 12px;
+}
+
+/* Stroke Breakdown */
+.stroke-breakdown {
+  position: absolute;
+  width: 550px;
+  height: 120px;
+  margin-left: 24px;
+  top: 530px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-xs);
+}
+
+img.ka-breakdown {
+  height: 49px;
+  width: 49px;
+  cursor: pointer;
+}
+
+img.ka-breakdown:hover {
+  opacity: 0.7;
+}
+
+/* Examples */
+.example {
+  min-height: 39.5px;
+  width: 258px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+.example-ja {
+  flex: 1;
+}
+
+.example-japanese {
+  font-family: var(--font-jp);
+  font-size: 16px;
+}
+
+.example-audio {
+  flex-shrink: 0;
+}
+
+.audio-play {
+  font-size: 15px;
+}
+
+/* ============================================
+   Modals (HTML Dialog)
+   ============================================ */
+.help-modal {
+  border: none;
+  border-radius: 8px;
+  padding: 0;
+  max-width: 600px;
+  width: 90%;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.help-modal::backdrop {
+  background: rgba(0, 0, 0, 0.5);
+}
+
+.modal-content {
+  padding: var(--spacing-lg);
+  position: relative;
+}
+
+.modal-close {
+  position: absolute;
+  top: var(--spacing-sm);
+  right: var(--spacing-md);
+  font-size: 24px;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  background: none;
+  border: none;
+}
+
+.modal-close:hover {
+  color: var(--color-text);
+}
+
+.modal-content h2 {
+  margin-top: 0;
+  color: var(--color-secondary);
+  font-family: var(--font-en);
+}
+
+.modal-content h3 {
+  margin-top: var(--spacing-lg);
+  margin-bottom: var(--spacing-sm);
+}
+
+.help-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: var(--spacing-md) 0;
+}
+
+.help-table td {
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.help-table code {
+  background: var(--color-bg);
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-size: 0.9em;
+}
+
+.help-footer {
+  margin-top: var(--spacing-lg);
+  text-align: center;
+}
+
+/* Keyboard shortcuts */
+kbd {
+  color: var(--color-kbd-text);
+  background-color: var(--color-kbd-bg);
+  font-size: 12px;
+  padding: 2px 6px;
+  border-radius: 3px;
+}
+
+code {
+  font-size: 0.85em;
+  background: var(--color-bg);
+  padding: 2px 4px;
+  border-radius: 3px;
+}
+
+/* ============================================
+   Utility Classes
+   ============================================ */
+.hidden {
+  display: none;
+}
+
+.pointer {
+  cursor: pointer;
+}
+
+/* ============================================
+   Responsive (optional future enhancement)
+   ============================================ */
+@media (max-width: 1200px) {
+  .container {
+    width: 100%;
+    margin: 20px auto;
+  }
+}
