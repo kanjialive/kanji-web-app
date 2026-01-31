@@ -29,7 +29,7 @@
               hx-target="#search-results"
               hx-trigger="submit"
               hx-push-url="true"
-              @submit.prevent>
+              @submit.prevent="clearAdvancedState()">
           <input type="text"
                  name="q"
                  id="search-input"
@@ -144,6 +144,13 @@ document.addEventListener('alpine:init', () => {
       }
 
       htmx.ajax('GET', url, '#search-results');
+    },
+
+    clearAdvancedState() {
+      // Clear stored query string when doing a new basic search via form
+      // This ensures cycleMode uses the input value, not stale advanced params
+      this.queryString = '';
+      this.mode = 'kanji'; // Reset to default mode
     },
 
     scrollForward() {
