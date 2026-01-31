@@ -115,6 +115,54 @@ async function searchKanji(query: string): Promise<grouping.KanjiSearchResult[]>
 }
 
 /**
+ * Builds a flat array of kanji characters in display order for navigation.
+ * For grouped modes, extracts kanji from the nested structure.
+ */
+function buildResultsOrder(
+  results: grouping.KanjiSearchResult[],
+  mode: string,
+  kanjiStrokeGroups: grouping.StrokeGroup[],
+  radicalStrokeGroups: grouping.StrokeGroup[]
+): string[] {
+  if (mode === "ksort" && kanjiStrokeGroups.length > 0) {
+    // Extract from kanji stroke groups in display order
+    const order: string[] = [];
+    for (const group of kanjiStrokeGroups) {
+      for (const column of group.columns) {
+        for (const radical of column) {
+          for (const row of radical.rows) {
+            for (const kanji of row) {
+              order.push(kanji.ka_utf);
+            }
+          }
+        }
+      }
+    }
+    return order;
+  }
+
+  if (mode === "rsort" && radicalStrokeGroups.length > 0) {
+    // Extract from radical stroke groups in display order
+    const order: string[] = [];
+    for (const group of radicalStrokeGroups) {
+      for (const column of group.columns) {
+        for (const radical of column) {
+          for (const row of radical.rows) {
+            for (const kanji of row) {
+              order.push(kanji.ka_utf);
+            }
+          }
+        }
+      }
+    }
+    return order;
+  }
+
+  // Default: simple kanji mode - use original order
+  return results.map((k) => k.ka_utf);
+}
+
+/**
  * GET /htmx/search - Search page (full page or with results)
  */
 router.get("/search", async (req: Request, res: Response) => {
@@ -128,6 +176,7 @@ router.get("/search", async (req: Request, res: Response) => {
         query: "",
         mode: "help",
         results: [],
+        resultsOrder: [],
       });
     }
 
@@ -139,12 +188,21 @@ router.get("/search", async (req: Request, res: Response) => {
     const radicalStrokeGroups =
       mode === "rsort" ? grouping.groupByRadicalStrokes(results) : [];
 
+    // Build flat array of kanji in display order for navigation links
+    const resultsOrder = buildResultsOrder(
+      results,
+      mode,
+      kanjiStrokeGroups,
+      radicalStrokeGroups
+    );
+
     res.render("pages/search", {
       query,
       mode: results.length > 0 ? mode : "kanji",
       results,
       kanjiStrokeGroups,
       radicalStrokeGroups,
+      resultsOrder,
     });
   } catch (error) {
     console.error("Search error:", error);
@@ -152,6 +210,7 @@ router.get("/search", async (req: Request, res: Response) => {
       query,
       mode: "kanji",
       results: [],
+      resultsOrder: [],
       error: "An error occurred while searching.",
     });
   }
@@ -180,11 +239,21 @@ router.get("/partials/results", async (req: Request, res: Response) => {
     const radicalStrokeGroups =
       mode === "rsort" ? grouping.groupByRadicalStrokes(results) : [];
 
+    // Build flat array of kanji in display order for navigation links
+    const resultsOrder = buildResultsOrder(
+      results,
+      mode,
+      kanjiStrokeGroups,
+      radicalStrokeGroups
+    );
+
     res.render("partials/results", {
+      query,
       results,
       mode,
       kanjiStrokeGroups,
       radicalStrokeGroups,
+      resultsOrder,
     });
   } catch (error) {
     console.error("Search error:", error);
@@ -207,24 +276,35 @@ router.get("/:character", async (req: Request, res: Response) => {
         query: "",
         mode: "help",
         results: [],
+        resultsOrder: [],
         error: `Kanji "${character}" not found.`,
       });
     }
 
     const extendedDoc = extendKanjiWithAssets(doc);
 
-    // Get navigation context from session/query if available
-    const lastSearch = (req.query.from as string) || "";
-    const currentIndex = parseInt(req.query.index as string) || 0;
+    // Get navigation context from query params
+    const searchQuery = (req.query.q as string) || "";
+    const searchMode = (req.query.mode as string) || "kanji";
+    const currentIndex = parseInt(req.query.idx as string) || 0;
     const totalResults = parseInt(req.query.total as string) || 1;
+    const prevKanji = (req.query.prev as string) || null;
+    const nextKanji = (req.query.next as string) || null;
+
+    // Build the "back to search" URL
+    const lastSearch = searchQuery
+      ? `/htmx/search?q=${encodeURIComponent(searchQuery)}&mode=${searchMode}`
+      : "";
 
     res.render("pages/detail", {
       doc: extendedDoc,
       lastSearch,
+      searchQuery,
+      searchMode,
       currentIndex,
       totalResults,
-      prevKanji: null, // These would come from stored search context
-      nextKanji: null,
+      prevKanji,
+      nextKanji,
     });
   } catch (error) {
     console.error("Detail error:", error);
@@ -232,6 +312,7 @@ router.get("/:character", async (req: Request, res: Response) => {
       query: "",
       mode: "help",
       results: [],
+      resultsOrder: [],
       error: "An error occurred.",
     });
   }

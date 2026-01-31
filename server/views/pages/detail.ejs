@@ -40,23 +40,57 @@
     </div>
 
     <!-- Navigation -->
+    <%
+    // Build navigation URLs that preserve search context
+    const sq = typeof searchQuery !== 'undefined' ? searchQuery : '';
+    const sm = typeof searchMode !== 'undefined' ? searchMode : 'kanji';
+    const idx = typeof currentIndex !== 'undefined' ? currentIndex : 0;
+    const total = typeof totalResults !== 'undefined' ? totalResults : 1;
+    const prev = typeof prevKanji !== 'undefined' ? prevKanji : null;
+    const next = typeof nextKanji !== 'undefined' ? nextKanji : null;
+
+    // Current kanji character for building sibling nav URLs
+    const currentKanji = doc.ka_utf;
+
+    // Build prev URL - the prev kanji's prev would be 2 back, next would be current
+    let prevUrl = '';
+    if (prev) {
+      const prevIdx = idx - 1;
+      prevUrl = `/htmx/${encodeURIComponent(prev)}?idx=${prevIdx}&total=${total}&mode=${sm}`;
+      if (sq) prevUrl += `&q=${encodeURIComponent(sq)}`;
+      // prev's next is current kanji
+      prevUrl += `&next=${encodeURIComponent(currentKanji)}`;
+      // We don't know prev's prev without the full list, so omit it
+    }
+
+    // Build next URL - the next kanji's prev would be current, next would be 2 forward
+    let nextUrl = '';
+    if (next) {
+      const nextIdx = idx + 1;
+      nextUrl = `/htmx/${encodeURIComponent(next)}?idx=${nextIdx}&total=${total}&mode=${sm}`;
+      if (sq) nextUrl += `&q=${encodeURIComponent(sq)}`;
+      // next's prev is current kanji
+      nextUrl += `&prev=${encodeURIComponent(currentKanji)}`;
+      // We don't know next's next without the full list, so omit it
+    }
+    %>
     <div class="col2">
       <div class="row1">
         <div class="recordCounter">
-          <% if (typeof prevKanji !== 'undefined' && prevKanji) { %>
-            <a class="icon icon-left" href="/htmx/<%= encodeURIComponent(prevKanji) %>">&#12296;</a>
+          <% if (prev) { %>
+            <a class="icon icon-left" href="<%= prevUrl %>">&#12296;</a>
           <% } else { %>
             <span class="icon icon-left disabled">&#12296;</span>
           <% } %>
           <span class="search">
             <% if (typeof lastSearch !== 'undefined' && lastSearch) { %>
-              <a href="<%= lastSearch %>"><%= currentIndex + 1 %> of <%= totalResults %></a>
+              <a href="<%= lastSearch %>"><%= idx + 1 %> of <%= total %></a>
             <% } else { %>
               1 of 1
             <% } %>
           </span>
-          <% if (typeof nextKanji !== 'undefined' && nextKanji) { %>
-            <a class="icon icon-right" href="/htmx/<%= encodeURIComponent(nextKanji) %>">&#12297;</a>
+          <% if (next) { %>
+            <a class="icon icon-right" href="<%= nextUrl %>">&#12297;</a>
           <% } else { %>
             <span class="icon icon-right disabled">&#12297;</span>
           <% } %>

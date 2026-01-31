@@ -92,7 +92,7 @@
         x-ref="resultsContainer"
         @wheel="handleWheel($event)">
     <% if (typeof results !== 'undefined' && results.length > 0) { %>
-      <%- include('../partials/results', { results, mode, kanjiStrokeGroups, radicalStrokeGroups }) %>
+      <%- include('../partials/results', { results, mode, kanjiStrokeGroups, radicalStrokeGroups, query, resultsOrder }) %>
     <% } else if (typeof query !== 'undefined' && query) { %>
       <%- include('../partials/no-results') %>
     <% } else { %>

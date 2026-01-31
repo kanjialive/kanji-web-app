@@ -1,5 +1,18 @@
 <%
 const currentMode = typeof mode !== 'undefined' ? mode : 'kanji';
+const searchQuery = typeof query !== 'undefined' ? query : '';
+const order = typeof resultsOrder !== 'undefined' ? resultsOrder : [];
+
+// Helper to build detail URL with navigation context
+function buildDetailUrl(kanjiChar, index) {
+  const prev = index > 0 ? order[index - 1] : '';
+  const next = index < order.length - 1 ? order[index + 1] : '';
+  let url = `/htmx/${encodeURIComponent(kanjiChar)}?idx=${index}&total=${order.length}&mode=${currentMode}`;
+  if (searchQuery) url += `&q=${encodeURIComponent(searchQuery)}`;
+  if (prev) url += `&prev=${encodeURIComponent(prev)}`;
+  if (next) url += `&next=${encodeURIComponent(next)}`;
+  return url;
+}
 %>
 
 <% if (currentMode === 'kanji') { %>
@@ -13,7 +26,7 @@ const currentMode = typeof mode !== 'undefined' ? mode : 'kanji';
       </div>
       <p class="kanji">
         <% results.forEach((kanji, index) => { %>
-          <a href="/<%= encodeURIComponent(kanji.ka_utf) %>"
+          <a href="<%= buildDetailUrl(kanji.ka_utf, index) %>"
              id="<%= kanji.ka_id %>"
              class="ka"
              data-index="<%= index %>"><%= kanji.ka_utf %> </a>
@@ -24,6 +37,10 @@ const currentMode = typeof mode !== 'undefined' ? mode : 'kanji';
 
 <% } else if (currentMode === 'ksort' && typeof kanjiStrokeGroups !== 'undefined') { %>
   <!-- Kanji Stroke Groups -->
+  <%
+  // Build index map for grouped display order
+  let ksortIndex = 0;
+  %>
   <div class="scroller row search-results-container">
     <div class="search-results">
       <ul class="list-inline">
@@ -44,7 +61,7 @@ const currentMode = typeof mode !== 'undefined' ? mode : 'kanji';
                         <% radical.rows.forEach(row => { %>
                           <div class="grouped-row">
                             <% row.forEach(kanji => { %>
-                              <a href="/<%= encodeURIComponent(kanji.ka_utf) %>"
+                              <a href="<%= buildDetailUrl(kanji.ka_utf, ksortIndex++) %>"
                                  id="<%= kanji.ka_id %>"
                                  class="ka"
                                  data-index="<%= kanji.sortedIndex %>"><%= kanji.ka_utf %></a>
@@ -65,6 +82,10 @@ const currentMode = typeof mode !== 'undefined' ? mode : 'kanji';
 
 <% } else if (currentMode === 'rsort' && typeof radicalStrokeGroups !== 'undefined') { %>
   <!-- Radical Stroke Groups -->
+  <%
+  // Build index map for grouped display order
+  let rsortIndex = 0;
+  %>
   <div class="scroller row search-results-container">
     <div class="search-results">
       <ul class="list-inline">
@@ -85,7 +106,7 @@ const currentMode = typeof mode !== 'undefined' ? mode : 'kanji';
                         <% radical.rows.forEach(row => { %>
                           <div class="grouped-row">
                             <% row.forEach(kanji => { %>
-                              <a href="/<%= encodeURIComponent(kanji.ka_utf) %>"
+                              <a href="<%= buildDetailUrl(kanji.ka_utf, rsortIndex++) %>"
                                  id="<%= kanji.ka_id %>"
                                  class="ka"
                                  data-index="<%= kanji.sortedIndex %>"><%= kanji.ka_utf %></a>
