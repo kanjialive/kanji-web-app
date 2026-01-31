@@ -7,7 +7,7 @@
   "dependencies": {
     "express": "4.x",
     "express-prom-bundle": "^6.6.0",
-    "mongodb": "5.x",
+    "mongodb": "6.x",
     "prom-client": "^14.2.0"
   },
   "engines": {
