@@ -1,14 +1,29 @@
 <%
 const currentMode = typeof mode !== 'undefined' ? mode : 'kanji';
 const searchQuery = typeof query !== 'undefined' ? query : '';
+const origQueryString = typeof queryString !== 'undefined' ? queryString : '';
 const order = typeof resultsOrder !== 'undefined' ? resultsOrder : [];
 
 // Helper to build detail URL with navigation context
+// Preserves original search params (including advanced search) for back-navigation
 function buildDetailUrl(kanjiChar, index) {
   const prev = index > 0 ? order[index - 1] : '';
   const next = index < order.length - 1 ? order[index + 1] : '';
-  let url = `/htmx/${encodeURIComponent(kanjiChar)}?idx=${index}&total=${order.length}&mode=${currentMode}`;
-  if (searchQuery) url += `&q=${encodeURIComponent(searchQuery)}`;
+
+  // Start with base URL
+  let url = `/htmx/${encodeURIComponent(kanjiChar)}?idx=${index}&total=${order.length}`;
+
+  // Add original query params (preserves advanced search params)
+  if (origQueryString) {
+    // Remove leading ? and append params
+    const params = origQueryString.replace(/^\?/, '');
+    if (params) url += `&${params}`;
+  } else if (searchQuery) {
+    // Fallback to basic query
+    url += `&q=${encodeURIComponent(searchQuery)}&mode=${currentMode}`;
+  }
+
+  // Add navigation params
   if (prev) url += `&prev=${encodeURIComponent(prev)}`;
   if (next) url += `&next=${encodeURIComponent(next)}`;
   return url;

@@ -87,11 +87,53 @@ function extendKanjiWithAssets(doc: KanjiDocument): ExtendedKanjiDocument {
   } as ExtendedKanjiDocument;
 }
 
+// Advanced search parameter keys (from search.ts)
+const ADVANCED_KEYS = ["ks", "rs", "grade", "kanji", "kem", "rem", "on", "kun", "rpos", "rjn", "text", "list"];
+
 /**
- * Search for kanji and return results.
+ * Check if request has advanced search parameters.
  */
-async function searchKanji(query: string): Promise<grouping.KanjiSearchResult[]> {
-  const searchQuery = search.generateBasicQuery(query);
+function hasAdvancedParams(query: Record<string, any>): boolean {
+  return ADVANCED_KEYS.some((key) => key in query);
+}
+
+/**
+ * Build a display label for advanced search (for UI display).
+ */
+function buildAdvancedSearchLabel(query: Record<string, any>): string {
+  const parts: string[] = [];
+  if (query.on) parts.push(`on: ${query.on}`);
+  if (query.kun) parts.push(`kun: ${query.kun}`);
+  if (query.kem) parts.push(`meaning: ${query.kem}`);
+  if (query.grade) parts.push(`grade: ${query.grade}`);
+  if (query.ks) parts.push(`strokes: ${query.ks}`);
+  if (query.rs) parts.push(`rad strokes: ${query.rs}`);
+  if (query.rem) parts.push(`rad meaning: ${query.rem}`);
+  if (query.rjn) parts.push(`radical: ${query.rjn}`);
+  if (query.rpos) parts.push(`rad position: ${query.rpos}`);
+  if (query.kanji) parts.push(`kanji: ${query.kanji}`);
+  if (query.text || query.list) parts.push(`textbook: ${query.text || query.list}`);
+  return parts.join(", ") || "advanced search";
+}
+
+/**
+ * Search for kanji using basic or advanced query.
+ */
+async function searchKanji(
+  basicQuery: string,
+  advancedParams?: Record<string, string>
+): Promise<grouping.KanjiSearchResult[]> {
+  let searchQuery: Record<string, any>;
+
+  if (advancedParams && hasAdvancedParams(advancedParams)) {
+    // Use advanced search
+    searchQuery = search.parseAdvancedQuery(advancedParams as search.StringDict);
+  } else if (basicQuery) {
+    // Use basic search
+    searchQuery = search.generateBasicQuery(basicQuery);
+  } else {
+    return [];
+  }
 
   if (Object.keys(searchQuery).length === 0) {
     return [];
@@ -164,13 +206,20 @@ function buildResultsOrder(
 
 /**
  * GET /htmx/search - Search page (full page or with results)
+ * Supports both basic search (?q=...) and advanced search (?on=...&grade=...)
  */
 router.get("/search", async (req: Request, res: Response) => {
-  const query = (req.query.q as string) || "";
+  const basicQuery = (req.query.q as string) || "";
   const mode = (req.query.mode as string) || "kanji";
+  const isAdvanced = hasAdvancedParams(req.query as Record<string, any>);
+
+  // Build display query for UI
+  const displayQuery = isAdvanced
+    ? buildAdvancedSearchLabel(req.query as Record<string, any>)
+    : basicQuery;
 
   try {
-    if (!query) {
+    if (!basicQuery && !isAdvanced) {
       // No search query - show welcome page
       return res.render("pages/search", {
         query: "",
@@ -180,7 +229,10 @@ router.get("/search", async (req: Request, res: Response) => {
       });
     }
 
-    const results = await searchKanji(query);
+    const results = await searchKanji(
+      basicQuery,
+      isAdvanced ? (req.query as Record<string, string>) : undefined
+    );
 
     // Generate grouped results based on mode
     const kanjiStrokeGroups =
@@ -196,8 +248,12 @@ router.get("/search", async (req: Request, res: Response) => {
       radicalStrokeGroups
     );
 
+    // Preserve original query string for navigation links
+    const queryString = new URL(req.url, "http://localhost").search;
+
     res.render("pages/search", {
-      query,
+      query: displayQuery,
+      queryString,
       mode: results.length > 0 ? mode : "kanji",
       results,
       kanjiStrokeGroups,
@@ -207,7 +263,7 @@ router.get("/search", async (req: Request, res: Response) => {
   } catch (error) {
     console.error("Search error:", error);
     res.render("pages/search", {
-      query,
+      query: displayQuery,
       mode: "kanji",
       results: [],
       resultsOrder: [],
@@ -217,18 +273,32 @@ router.get("/search", async (req: Request, res: Response) => {
 });
 
 /**
+ * GET /htmx/search/advanced - Advanced search (redirects to /htmx/search with params)
+ */
+router.get("/search/advanced", async (req: Request, res: Response) => {
+  // Forward to main search route - it handles both basic and advanced
+  const queryString = new URL(req.url, "http://localhost").search;
+  res.redirect(`/htmx/search${queryString}`);
+});
+
+/**
  * GET /htmx/partials/results - HTMX partial for search results
+ * Supports both basic search (?q=...) and advanced search (?on=...&grade=...)
  */
 router.get("/partials/results", async (req: Request, res: Response) => {
-  const query = (req.query.q as string) || "";
+  const basicQuery = (req.query.q as string) || "";
   const mode = (req.query.mode as string) || "kanji";
+  const isAdvanced = hasAdvancedParams(req.query as Record<string, any>);
 
   try {
-    if (!query) {
+    if (!basicQuery && !isAdvanced) {
       return res.render("partials/welcome");
     }
 
-    const results = await searchKanji(query);
+    const results = await searchKanji(
+      basicQuery,
+      isAdvanced ? (req.query as Record<string, string>) : undefined
+    );
 
     if (results.length === 0) {
       return res.render("partials/no-results");
@@ -247,8 +317,12 @@ router.get("/partials/results", async (req: Request, res: Response) => {
       radicalStrokeGroups
     );
 
+    // Preserve original query string for navigation links
+    const queryString = new URL(req.url, "http://localhost").search;
+
     res.render("partials/results", {
-      query,
+      query: basicQuery,
+      queryString,
       results,
       mode,
       kanjiStrokeGroups,
@@ -291,16 +365,42 @@ router.get("/:character", async (req: Request, res: Response) => {
     const prevKanji = (req.query.prev as string) || null;
     const nextKanji = (req.query.next as string) || null;
 
-    // Build the "back to search" URL
-    const lastSearch = searchQuery
-      ? `/htmx/search?q=${encodeURIComponent(searchQuery)}&mode=${searchMode}`
-      : "";
+    // Check if this was an advanced search
+    const isAdvanced = hasAdvancedParams(req.query as Record<string, any>);
+
+    // Build the "back to search" URL - preserve all search params
+    let lastSearch = "";
+    if (searchQuery || isAdvanced) {
+      // Extract search-related params (exclude navigation params)
+      const searchParams = new URLSearchParams();
+      for (const [key, value] of Object.entries(req.query)) {
+        // Skip navigation-only params
+        if (["idx", "total", "prev", "next"].includes(key)) continue;
+        if (typeof value === "string") {
+          searchParams.set(key, value);
+        }
+      }
+      if (searchParams.toString()) {
+        lastSearch = `/htmx/search?${searchParams.toString()}`;
+      }
+    }
+
+    // Build query string for navigation (includes search params)
+    const navParams = new URLSearchParams();
+    for (const [key, value] of Object.entries(req.query)) {
+      if (["idx", "total", "prev", "next"].includes(key)) continue;
+      if (typeof value === "string") {
+        navParams.set(key, value);
+      }
+    }
+    const queryString = navParams.toString() ? `?${navParams.toString()}` : "";
 
     res.render("pages/detail", {
       doc: extendedDoc,
       lastSearch,
       searchQuery,
       searchMode,
+      queryString,
       currentIndex,
       totalResults,
       prevKanji,
