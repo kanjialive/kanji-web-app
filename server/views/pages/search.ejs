@@ -119,17 +119,31 @@ document.addEventListener('alpine:init', () => {
   Alpine.data('searchPage', () => ({
     mode: '<%= typeof mode !== "undefined" ? mode : "kanji" %>',
     modes: ['kanji', 'ksort', 'rsort'],
+    // Store original query string for advanced searches
+    queryString: '<%= typeof queryString !== "undefined" ? queryString.replace(/'/g, "\\'") : "" %>',
 
     cycleMode(direction) {
       const currentIndex = this.modes.indexOf(this.mode);
       const newIndex = (currentIndex + direction + this.modes.length) % this.modes.length;
       this.mode = this.modes[newIndex];
 
-      // Trigger HTMX request with new mode
+      // Build URL for HTMX request
+      let url = '/htmx/partials/results';
       const input = document.getElementById('search-input');
-      if (input.value) {
-        htmx.ajax('GET', '/htmx/partials/results?q=' + encodeURIComponent(input.value) + '&mode=' + this.mode, '#search-results');
+
+      if (this.queryString) {
+        // Advanced search - use stored query string, update mode
+        const params = new URLSearchParams(this.queryString);
+        params.set('mode', this.mode);
+        url += '?' + params.toString();
+      } else if (input.value) {
+        // Basic search - use input value
+        url += '?q=' + encodeURIComponent(input.value) + '&mode=' + this.mode;
+      } else {
+        return; // No search to cycle
       }
+
+      htmx.ajax('GET', url, '#search-results');
     },
 
     scrollForward() {
