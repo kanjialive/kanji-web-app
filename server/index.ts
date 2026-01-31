@@ -60,7 +60,20 @@ async function connectMongoDB() {
   }
 }
 
-app.use(express.static(__dirname));
+// Root route handler for HTMX mode (must be before static middleware)
+if (USE_HTMX) {
+  app.get("/", (req: Request, res: Response) => {
+    res.redirect("/htmx/search");
+  });
+}
+
+// Static files (CSS, JS, images, partials)
+// When USE_HTMX is true, don't serve index.html as default
+app.use(
+  express.static(__dirname, {
+    index: USE_HTMX ? false : "index.html",
+  })
+);
 
 // add the prometheus middleware to all routes
 app.use(
