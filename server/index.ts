@@ -21,22 +21,33 @@ const client = new MongoClient(MONGODB_URI, {
 });
 
 async function connectMongoDB() {
-  try {
-    await client.connect();
-    await client.db("kanjialive").command({ ping: 1 });
-    console.log("Successfully connected to MongoDB database for kanjialive!");
+  let connectionAttempts = 0;
+  const maxConnectionAttempts = 10;
+  while (connectionAttempts < maxConnectionAttempts) {
+    try {
+      await client.connect();
+      await client.db("kanjialive").command({ ping: 1 });
+      console.log("Successfully connected to MongoDB database for kanjialive!");
 
-    db = client.db("kanjialive");
-    public_api.init(db);
-    private_api.init(db);
+      db = client.db("kanjialive");
+      public_api.init(db);
+      private_api.init(db);
 
-    app.set("port", process.env.PORT || 5000);
+      app.set("port", process.env.PORT || 5000);
 
-    app.listen(app.get("port"), function () {
-      console.log("Node app is running at localhost:" + app.get("port"));
-    });
-  } catch (err) {
-    console.error(err);
+      app.listen(app.get("port"), function () {
+        console.log("Node app is running at localhost:" + app.get("port"));
+      });
+      break;
+    } catch (err) {
+      console.error(
+        `Error connecting to MongoDB database (attempt ${
+          connectionAttempts + 1
+        }/${maxConnectionAttempts}): ${err}`
+      );
+      connectionAttempts++;
+      await new Promise((resolve) => setTimeout(resolve, 5000));
+    }
   }
 }
 
