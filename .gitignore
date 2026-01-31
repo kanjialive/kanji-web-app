@@ -47,3 +47,7 @@ fabric.properties
 .env
 
 dist/
+
+offline/
+
+CLAUDE.md
