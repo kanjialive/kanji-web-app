@@ -155,14 +155,24 @@ document.addEventListener('alpine:init', () => {
     },
 
     currentGroup: 0,
+    _animFrame: null,
 
     _smoothScroll(el, target) {
+      if (this._animFrame) {
+        cancelAnimationFrame(this._animFrame);
+        this._animFrame = null;
+      }
+
+      var maxScroll = el.scrollWidth - el.offsetWidth;
+      target = Math.max(0, Math.min(target, maxScroll));
+
       var start = el.scrollLeft;
       var change = target - start;
-      if (change === 0) return;
+      if (Math.abs(change) < 1) return;
       var startTime = performance.now();
       var saved = el.style.scrollBehavior;
       el.style.scrollBehavior = 'auto';
+      var self = this;
 
       function ease(t) {
         return t < 0.5 ? 2 * t * t : 1 - 2 * (1 - t) * (1 - t);
@@ -171,11 +181,15 @@ document.addEventListener('alpine:init', () => {
       function step(now) {
         var t = Math.min((now - startTime) / 900, 1);
         el.scrollLeft = start + change * ease(t);
-        if (t < 1) requestAnimationFrame(step);
-        else el.style.scrollBehavior = saved;
+        if (t < 1) {
+          self._animFrame = requestAnimationFrame(step);
+        } else {
+          el.style.scrollBehavior = saved;
+          self._animFrame = null;
+        }
       }
 
-      requestAnimationFrame(step);
+      this._animFrame = requestAnimationFrame(step);
     },
 
     scrollForward() {
