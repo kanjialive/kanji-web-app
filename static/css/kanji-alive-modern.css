@@ -394,6 +394,10 @@ span.search {
   top: 23px;
   scroll-behavior: smooth;
   scrollbar-width: thin;
+  scrollbar-color: transparent transparent;
+}
+
+.scroller:hover {
   scrollbar-color: var(--color-text) transparent;
 }
 
@@ -406,8 +410,13 @@ span.search {
 }
 
 .scroller::-webkit-scrollbar-thumb {
-  background: var(--color-text);
+  background: transparent;
   border-radius: 3px;
+  transition: background 0.2s;
+}
+
+.scroller:hover::-webkit-scrollbar-thumb {
+  background: var(--color-text);
 }
 
 .search-results {
