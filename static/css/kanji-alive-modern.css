@@ -393,12 +393,6 @@ span.search {
   position: relative;
   top: 23px;
   scroll-behavior: smooth;
-  scrollbar-width: thin;
-  scrollbar-color: transparent transparent;
-}
-
-.scroller:hover {
-  scrollbar-color: var(--color-text) transparent;
 }
 
 .scroller::-webkit-scrollbar {
