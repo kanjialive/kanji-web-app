@@ -165,7 +165,7 @@ document.addEventListener('alpine:init', () => {
       el.style.scrollBehavior = 'auto';
 
       function ease(t) {
-        return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+        return t < 0.5 ? 2 * t * t : 1 - 2 * (1 - t) * (1 - t);
       }
 
       function step(now) {
