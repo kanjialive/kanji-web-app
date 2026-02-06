@@ -466,8 +466,8 @@ router.get("/:character", async (req: Request, res: Response) => {
       if (idx !== -1) {
         currentIndex = idx;
         totalResults = resultsOrder.length;
-        prevKanji = idx > 0 ? resultsOrder[idx - 1] : null;
-        nextKanji = idx < resultsOrder.length - 1 ? resultsOrder[idx + 1] : null;
+        prevKanji = resultsOrder[(idx - 1 + resultsOrder.length) % resultsOrder.length];
+        nextKanji = resultsOrder[(idx + 1) % resultsOrder.length];
       }
     }
 
