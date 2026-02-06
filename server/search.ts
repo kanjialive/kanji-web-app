@@ -29,19 +29,22 @@ export const parseAdvancedQuery = (query: StringDict): ParsedQuery => {
   const parsed_query: ParsedQuery = {};
 
   for (const key in numeric_keys) {
-    if (query.hasOwnProperty(key)) {
-      parsed_query[numeric_keys[key]] = parseInt(query[key]);
+    if (Object.prototype.hasOwnProperty.call(query, key)) {
+      const num = parseInt(query[key], 10);
+      if (!isNaN(num)) {
+        parsed_query[numeric_keys[key]] = num;
+      }
     }
   }
 
   for (const key in string_keys) {
-    if (query.hasOwnProperty(key)) {
+    if (Object.prototype.hasOwnProperty.call(query, key)) {
       parsed_query[string_keys[key]] = query[key];
     }
   }
 
   for (const key in array_keys) {
-    if (query.hasOwnProperty(key)) {
+    if (Object.prototype.hasOwnProperty.call(query, key)) {
       let array_key = array_keys[key];
       array_key += !/[a-zA-Z0-9]/.test(query[key]) ? "_ja_search" : "_search";
 
@@ -50,7 +53,7 @@ export const parseAdvancedQuery = (query: StringDict): ParsedQuery => {
   }
 
   for (const key in textbook_keys) {
-    if (query.hasOwnProperty(key)) {
+    if (Object.prototype.hasOwnProperty.call(query, key)) {
       const textbook_key = textbook_keys[key];
       const textbook_value = query[key];
 

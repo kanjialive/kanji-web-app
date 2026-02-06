@@ -13,11 +13,199 @@
   <script src="https://unpkg.com/htmx.org@2.0.4" defer></script>
   <script src="https://unpkg.com/alpinejs@3.14.8/dist/cdn.min.js" defer></script>
 
+  <!-- Alpine component registration (in head so it survives any HTMX body swaps) -->
+  <script>
+  document.addEventListener('alpine:init', () => {
+    Alpine.data('searchPage', () => {
+      var _animFrame = null;
+      return {
+      // Read page-specific data from data-* attributes on the container
+      mode: 'kanji',
+      modes: ['kanji', 'rsort', 'ksort'],
+      queryString: '',
+
+      cycleMode(direction) {
+        const currentIndex = this.modes.indexOf(this.mode);
+        const newIndex = (currentIndex + direction + this.modes.length) % this.modes.length;
+        this.mode = this.modes[newIndex];
+        this.currentGroup = 0;
+
+        // Build URL for HTMX request
+        let url = '/htmx/partials/results';
+        const input = document.getElementById('search-input');
+
+        if (this.queryString) {
+          // Advanced search - use stored query string, update mode
+          const params = new URLSearchParams(this.queryString);
+          params.set('mode', this.mode);
+          url += '?' + params.toString();
+        } else if (input.value) {
+          // Basic search - use input value
+          url += '?q=' + encodeURIComponent(input.value) + '&mode=' + this.mode;
+        } else {
+          return; // No search to cycle
+        }
+
+        htmx.ajax('GET', url, '#search-results');
+      },
+
+      clearAdvancedState() {
+        // Clear stored query string when doing a new basic search via form
+        // This ensures cycleMode uses the input value, not stale advanced params
+        this.queryString = '';
+        this.mode = 'kanji';
+        this.currentGroup = 0;
+      },
+
+      currentGroup: 0,
+      scrollbarVisible: false,
+
+      _updateScrollThumb() {
+        var scroller = this.$refs.resultsContainer?.querySelector('.scroller');
+        var thumb = this.$refs.scrollThumb;
+        if (!scroller || !thumb) return;
+        var sw = scroller.scrollWidth;
+        var ow = scroller.offsetWidth;
+        if (sw <= ow) { thumb.style.display = 'none'; return; }
+        thumb.style.display = '';
+        var thumbW = Math.max(30, (ow / sw) * ow);
+        var maxSL = sw - ow;
+        var sRatio = maxSL > 0 ? scroller.scrollLeft / maxSL : 0;
+        thumb.style.width = thumbW + 'px';
+        thumb.style.left = (sRatio * (ow - thumbW)) + 'px';
+      },
+
+      _smoothScroll(el, target) {
+        if (_animFrame) {
+          cancelAnimationFrame(_animFrame);
+          _animFrame = null;
+        }
+
+        var start = el.scrollLeft;
+        var change = Math.round(target - start);
+        if (!change) return;
+        var startTime = performance.now();
+        var saved = el.style.scrollBehavior;
+        el.style.scrollBehavior = 'auto';
+
+        function ease(t) {
+          return t < 0.5 ? 2 * t * t : 1 - 2 * (1 - t) * (1 - t);
+        }
+
+        function step(now) {
+          var t = Math.min((now - startTime) / 900, 1);
+          el.scrollLeft = start + Math.ceil(change * ease(t));
+          if (t < 1) {
+            _animFrame = requestAnimationFrame(step);
+          } else {
+            el.style.scrollBehavior = saved;
+            _animFrame = null;
+          }
+        }
+
+        _animFrame = requestAnimationFrame(step);
+      },
+
+      scrollForward() {
+        var scroller = this.$refs.resultsContainer?.querySelector('.scroller');
+        if (!scroller) return;
+
+        if (this.mode === 'kanji') {
+          this._smoothScroll(scroller, scroller.scrollLeft + scroller.offsetWidth);
+        } else {
+          var groups = scroller.querySelectorAll('.results-group');
+          if (groups.length === 0) return;
+          this.currentGroup = Math.min(groups.length - 1, this.currentGroup + 1);
+          this._smoothScroll(scroller, Math.max(0, groups[this.currentGroup].offsetLeft - 15));
+        }
+      },
+
+      scrollBackward() {
+        var scroller = this.$refs.resultsContainer?.querySelector('.scroller');
+        if (!scroller) return;
+
+        if (this.mode === 'kanji') {
+          this._smoothScroll(scroller, Math.max(0, scroller.scrollLeft - scroller.offsetWidth));
+        } else {
+          var groups = scroller.querySelectorAll('.results-group');
+          if (groups.length === 0) return;
+          this.currentGroup = Math.max(0, this.currentGroup - 1);
+          this._smoothScroll(scroller, Math.max(0, groups[this.currentGroup].offsetLeft - 15));
+        }
+      },
+
+      handleWheel(event) {
+        var scroller = this.$refs.resultsContainer?.querySelector('.scroller');
+        if (!scroller) return;
+        if (Math.abs(event.deltaY) > Math.abs(event.deltaX)) {
+          event.preventDefault();
+          scroller.scrollLeft += event.deltaY;
+        }
+      },
+
+      init() {
+        // Read page-specific state from data-* attributes
+        this.mode = this.$el.dataset.mode || 'kanji';
+        this.queryString = this.$el.dataset.querystring || '';
+
+        var self = this;
+
+        // Update custom scrollbar on scroll (capture phase catches child .scroller)
+        this._scrollHandler = function() { self._updateScrollThumb(); };
+        this.$refs.resultsContainer.addEventListener('scroll', this._scrollHandler, true);
+
+        // Update after HTMX swaps new results
+        this._settleHandler = function() { self._updateScrollThumb(); };
+        document.addEventListener('htmx:afterSettle', this._settleHandler);
+
+        // Initial update
+        this._updateScrollThumb();
+
+        // Keyboard shortcuts for arrow keys
+        this._keyHandler = (e) => {
+          if (e.target.tagName === 'INPUT') return;
+
+          switch(e.code) {
+            case 'ArrowUp':
+              e.preventDefault();
+              this.cycleMode(-1);
+              break;
+            case 'ArrowDown':
+              e.preventDefault();
+              this.cycleMode(1);
+              break;
+            case 'ArrowLeft':
+              this.scrollBackward();
+              break;
+            case 'ArrowRight':
+              this.scrollForward();
+              break;
+          }
+        };
+        document.addEventListener('keydown', this._keyHandler);
+      },
+
+      destroy() {
+        if (this._settleHandler) {
+          document.removeEventListener('htmx:afterSettle', this._settleHandler);
+        }
+        if (this._keyHandler) {
+          document.removeEventListener('keydown', this._keyHandler);
+        }
+        if (this._scrollHandler && this.$refs.resultsContainer) {
+          this.$refs.resultsContainer.removeEventListener('scroll', this._scrollHandler, true);
+        }
+      }
+    };
+    });
+  });
+  </script>
+
   <base href="/">
 </head>
 <body>
 
-<div class="container2" x-data="searchPage()">
+<div class="container2" x-data="searchPage()" data-mode="<%= typeof mode !== 'undefined' ? mode : 'kanji' %>" data-querystring="<%= typeof queryString !== 'undefined' ? queryString.replace(/"/g, '&quot;') : '' %>">
 
   <!-- Header Row -->
   <header class="header-row">
@@ -121,187 +309,6 @@
   <img src="https://media.kanjialive.com/img/fan_logo_104.jpg" alt="Kanji alive logo" loading="lazy"/>
 </div>
 
-<script>
-document.addEventListener('alpine:init', () => {
-  Alpine.data('searchPage', () => {
-    var _animFrame = null;
-    return {
-    mode: '<%= typeof mode !== "undefined" ? mode : "kanji" %>',
-    modes: ['kanji', 'rsort', 'ksort'],
-    // Store original query string for advanced searches
-    queryString: '<%= typeof queryString !== "undefined" ? queryString.replace(/'/g, "\\'") : "" %>',
-
-    cycleMode(direction) {
-      const currentIndex = this.modes.indexOf(this.mode);
-      const newIndex = (currentIndex + direction + this.modes.length) % this.modes.length;
-      this.mode = this.modes[newIndex];
-      this.currentGroup = 0;
-
-      // Build URL for HTMX request
-      let url = '/htmx/partials/results';
-      const input = document.getElementById('search-input');
-
-      if (this.queryString) {
-        // Advanced search - use stored query string, update mode
-        const params = new URLSearchParams(this.queryString);
-        params.set('mode', this.mode);
-        url += '?' + params.toString();
-      } else if (input.value) {
-        // Basic search - use input value
-        url += '?q=' + encodeURIComponent(input.value) + '&mode=' + this.mode;
-      } else {
-        return; // No search to cycle
-      }
-
-      htmx.ajax('GET', url, '#search-results');
-    },
-
-    clearAdvancedState() {
-      // Clear stored query string when doing a new basic search via form
-      // This ensures cycleMode uses the input value, not stale advanced params
-      this.queryString = '';
-      this.mode = 'kanji';
-      this.currentGroup = 0;
-    },
-
-    currentGroup: 0,
-    scrollbarVisible: false,
-
-    _updateScrollThumb() {
-      var scroller = this.$refs.resultsContainer?.querySelector('.scroller');
-      var thumb = this.$refs.scrollThumb;
-      if (!scroller || !thumb) return;
-      var sw = scroller.scrollWidth;
-      var ow = scroller.offsetWidth;
-      if (sw <= ow) { thumb.style.display = 'none'; return; }
-      thumb.style.display = '';
-      var thumbW = Math.max(30, (ow / sw) * ow);
-      var maxSL = sw - ow;
-      var sRatio = maxSL > 0 ? scroller.scrollLeft / maxSL : 0;
-      thumb.style.width = thumbW + 'px';
-      thumb.style.left = (sRatio * (ow - thumbW)) + 'px';
-    },
-
-    _smoothScroll(el, target) {
-      if (_animFrame) {
-        cancelAnimationFrame(_animFrame);
-        _animFrame = null;
-      }
-
-      var start = el.scrollLeft;
-      var change = Math.round(target - start);
-      if (!change) return;
-      var startTime = performance.now();
-      var saved = el.style.scrollBehavior;
-      el.style.scrollBehavior = 'auto';
-
-      function ease(t) {
-        return t < 0.5 ? 2 * t * t : 1 - 2 * (1 - t) * (1 - t);
-      }
-
-      function step(now) {
-        var t = Math.min((now - startTime) / 900, 1);
-        el.scrollLeft = start + Math.ceil(change * ease(t));
-        if (t < 1) {
-          _animFrame = requestAnimationFrame(step);
-        } else {
-          el.style.scrollBehavior = saved;
-          _animFrame = null;
-        }
-      }
-
-      _animFrame = requestAnimationFrame(step);
-    },
-
-    scrollForward() {
-      var scroller = this.$refs.resultsContainer?.querySelector('.scroller');
-      if (!scroller) return;
-
-      if (this.mode === 'kanji') {
-        this._smoothScroll(scroller, scroller.scrollLeft + scroller.offsetWidth);
-      } else {
-        var groups = scroller.querySelectorAll('.results-group');
-        if (groups.length === 0) return;
-        this.currentGroup = Math.min(groups.length - 1, this.currentGroup + 1);
-        this._smoothScroll(scroller, Math.max(0, groups[this.currentGroup].offsetLeft - 15));
-      }
-    },
-
-    scrollBackward() {
-      var scroller = this.$refs.resultsContainer?.querySelector('.scroller');
-      if (!scroller) return;
-
-      if (this.mode === 'kanji') {
-        this._smoothScroll(scroller, Math.max(0, scroller.scrollLeft - scroller.offsetWidth));
-      } else {
-        var groups = scroller.querySelectorAll('.results-group');
-        if (groups.length === 0) return;
-        this.currentGroup = Math.max(0, this.currentGroup - 1);
-        this._smoothScroll(scroller, Math.max(0, groups[this.currentGroup].offsetLeft - 15));
-      }
-    },
-
-    handleWheel(event) {
-      var scroller = this.$refs.resultsContainer?.querySelector('.scroller');
-      if (!scroller) return;
-      if (Math.abs(event.deltaY) > Math.abs(event.deltaX)) {
-        event.preventDefault();
-        scroller.scrollLeft += event.deltaY;
-      }
-    },
-
-    init() {
-      var self = this;
-
-      // Update custom scrollbar on scroll (capture phase catches child .scroller)
-      this.$refs.resultsContainer.addEventListener('scroll', function() {
-        self._updateScrollThumb();
-      }, true);
-
-      // Update after HTMX swaps new results
-      document.addEventListener('htmx:afterSettle', function() {
-        self._updateScrollThumb();
-      });
-
-      // Initial update
-      this._updateScrollThumb();
-
-      // Keyboard shortcuts for arrow keys
-      document.addEventListener('keydown', (e) => {
-        if (e.target.tagName === 'INPUT') return;
-
-        switch(e.code) {
-          case 'ArrowUp':
-            e.preventDefault();
-            this.cycleMode(-1);
-            break;
-          case 'ArrowDown':
-            e.preventDefault();
-            this.cycleMode(1);
-            break;
-          case 'ArrowLeft':
-            this.scrollBackward();
-            break;
-          case 'ArrowRight':
-            this.scrollForward();
-            break;
-        }
-      });
-    }
-  };
-  });
-});
-</script>
-
-<!-- Google Analytics -->
-<script>
-  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
-  ga('create', 'UA-35022736-2', 'auto');
-  ga('send', 'pageview');
-</script>
 
 </body>
 </html>

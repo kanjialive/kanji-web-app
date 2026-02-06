@@ -15,8 +15,17 @@ app.set("views", path.join(__dirname, "views"));
 // Feature flag for HTMX frontend (set USE_HTMX=true to enable)
 const USE_HTMX = process.env.USE_HTMX === "true";
 
-const MONGODB_URI = process.env.MONGODB_URI as string;
-const MASHAPE_SECRET = process.env.MASHAPE_SECRET as string;
+const MONGODB_URI = process.env.MONGODB_URI;
+const MASHAPE_SECRET = process.env.MASHAPE_SECRET;
+
+if (!MONGODB_URI) {
+  console.error("MONGODB_URI environment variable is required");
+  process.exit(1);
+}
+if (!MASHAPE_SECRET) {
+  console.error("MASHAPE_SECRET environment variable is required");
+  process.exit(1);
+}
 
 let db: any;
 
@@ -44,9 +53,19 @@ async function connectMongoDB() {
 
       app.set("port", process.env.PORT || 5000);
 
-      app.listen(app.get("port"), function () {
+      const server = app.listen(app.get("port"), function () {
         console.log("Node app is running at localhost:" + app.get("port"));
       });
+
+      const shutdown = async () => {
+        console.log("Shutting down gracefully...");
+        server.close();
+        await client.close();
+        process.exit(0);
+      };
+      process.on("SIGTERM", shutdown);
+      process.on("SIGINT", shutdown);
+
       break;
     } catch (err) {
       console.error(
@@ -67,13 +86,15 @@ if (USE_HTMX) {
   });
 }
 
-// Static files (CSS, JS, images, partials)
-// When USE_HTMX is true, don't serve index.html as default
-app.use(
-  express.static(__dirname, {
-    index: USE_HTMX ? false : "index.html",
-  })
-);
+// Static files — serve only intended directories, not the entire dist/ root
+app.use("/static", express.static(path.join(__dirname, "static")));
+app.use("/partials", express.static(path.join(__dirname, "partials")));
+if (!USE_HTMX) {
+  // AngularJS mode needs index.html served at root
+  app.get("/", (req: Request, res: Response) => {
+    res.sendFile("index.html", { root: __dirname });
+  });
+}
 
 // add the prometheus middleware to all routes
 app.use(
