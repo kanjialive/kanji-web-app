@@ -196,6 +196,7 @@ async function searchKanji(
         rad_order: 1,
       },
     })
+    .sort({ kstroke: 1, rad_stroke: 1, rad_order: 1 })
     .toArray();
 
   return results as unknown as grouping.KanjiSearchResult[];
