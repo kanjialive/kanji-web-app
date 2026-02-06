@@ -13,11 +13,167 @@
   <script src="https://unpkg.com/htmx.org@2.0.4" defer></script>
   <script src="https://unpkg.com/alpinejs@3.14.8/dist/cdn.min.js" defer></script>
 
-  <!-- HTMX ↔ Alpine.js bridge: tear down and reinitialize Alpine on body swaps -->
+  <!-- Alpine component + HTMX bridge (runs once, persists across boost swaps) -->
   <script>
-  document.addEventListener('htmx:beforeSwap', function() {
-    if (window.Alpine) Alpine.destroyTree(document.body);
+  // Register the detail page component once, before Alpine starts
+  document.addEventListener('alpine:init', function() {
+    Alpine.data('detailPage', () => ({
+      detailMode: 'video',
+      playing: false,
+      typeface: 'kyokasho',
+      typefaceIndex: 4,
+      typefaces: ['suzumushi', 'kanteiryu', 'hiragino', 'tensho', 'kyokasho', 'mincho', 'gothic', 'maru'],
+      typefaceDisplayNames: {
+        'suzumushi': 'Suzumushi',
+        'kanteiryu': 'Kanteiryu',
+        'hiragino': 'Gyosho',
+        'tensho': 'Tensho',
+        'kyokasho': 'Kyokashotai',
+        'mincho': 'Mincho',
+        'gothic': 'Gothic',
+        'maru': 'Maru'
+      },
+      radicalFrame: 0,
+      radicalAnimating: false,
+      stroketimes: [],
+
+      get typefaceDisplay() {
+        return this.typefaceDisplayNames[this.typeface] || this.typeface;
+      },
+
+      togglePlayPause() {
+        const video = this.$refs.video;
+        if (video.paused) {
+          video.play();
+          this.playing = true;
+        } else {
+          video.pause();
+          this.playing = false;
+        }
+      },
+
+      stepForward() {
+        const video = this.$refs.video;
+        const currentTime = video.currentTime;
+        for (let i = 0; i < this.stroketimes.length; i++) {
+          if (this.stroketimes[i] > currentTime + 0.01) {
+            this.seek(this.stroketimes[i]);
+            return;
+          }
+        }
+        this.seek(video.duration);
+      },
+
+      stepBackward() {
+        const video = this.$refs.video;
+        const currentTime = video.currentTime;
+        for (let i = this.stroketimes.length - 1; i >= 0; i--) {
+          if (this.stroketimes[i] < currentTime - 0.01) {
+            this.seek(this.stroketimes[i]);
+            return;
+          }
+        }
+      },
+
+      seek(time) {
+        const video = this.$refs.video;
+        video.pause();
+        this.playing = false;
+        video.currentTime = time;
+      },
+
+      nextTypeface() {
+        this.typefaceIndex = Math.min(this.typefaceIndex + 1, this.typefaces.length - 1);
+        this.typeface = this.typefaces[this.typefaceIndex];
+      },
+
+      previousTypeface() {
+        this.typefaceIndex = Math.max(this.typefaceIndex - 1, 0);
+        this.typeface = this.typefaces[this.typefaceIndex];
+      },
+
+      startRadicalAnimation() {
+        if (this.radicalAnimating) return;
+        this.radicalAnimating = true;
+        this.radicalFrame = 0;
+
+        let frame = 0;
+        const interval = setInterval(() => {
+          frame++;
+          if (frame > 2) {
+            clearInterval(interval);
+            this.radicalFrame = 0;
+            this.radicalAnimating = false;
+          } else {
+            this.radicalFrame = frame;
+          }
+        }, 500);
+      },
+
+      init() {
+        this.stroketimes = JSON.parse(this.$el.dataset.stroketimes || '[]');
+
+        if (window._detailKeydownHandler) {
+          document.removeEventListener('keydown', window._detailKeydownHandler);
+        }
+
+        this.$refs.video?.addEventListener('ended', () => {
+          this.playing = false;
+        });
+
+        const handler = (e) => {
+          if (e.target.tagName === 'INPUT') return;
+
+          switch(e.code) {
+            case 'Space':
+              e.preventDefault();
+              this.togglePlayPause();
+              break;
+            case 'ArrowUp':
+            case 'ArrowDown':
+              e.preventDefault();
+              this.detailMode = this.detailMode === 'video' ? 'typeface' : 'video';
+              break;
+            case 'ArrowLeft':
+              if (e.shiftKey) {
+                if (this.detailMode === 'typeface') {
+                  this.previousTypeface();
+                } else {
+                  this.stepBackward();
+                }
+              } else {
+                const prevLink = document.querySelector('.recordCounter a.icon-left');
+                if (prevLink) prevLink.click();
+              }
+              break;
+            case 'ArrowRight':
+              if (e.shiftKey) {
+                if (this.detailMode === 'typeface') {
+                  this.nextTypeface();
+                } else {
+                  this.stepForward();
+                }
+              } else {
+                const nextLink = document.querySelector('.recordCounter a.icon-right');
+                if (nextLink) nextLink.click();
+              }
+              break;
+          }
+        };
+        window._detailKeydownHandler = handler;
+        document.addEventListener('keydown', handler);
+      },
+
+      destroy() {
+        if (window._detailKeydownHandler) {
+          document.removeEventListener('keydown', window._detailKeydownHandler);
+          window._detailKeydownHandler = null;
+        }
+      }
+    }));
   });
+
+  // HTMX bridge: reinitialize Alpine after hx-boost body swaps
   document.addEventListener('htmx:afterSettle', function() {
     if (window.Alpine) Alpine.initTree(document.body);
   });
@@ -265,182 +421,6 @@ function playExampleAudio(src) {
   audio.src = src;
   audio.play();
 }
-</script>
-
-<script>
-(function() {
-  const componentDef = () => ({
-    detailMode: 'video',
-    playing: false,
-    typeface: 'kyokasho',
-    typefaceIndex: 4,
-    typefaces: ['suzumushi', 'kanteiryu', 'hiragino', 'tensho', 'kyokasho', 'mincho', 'gothic', 'maru'],
-    typefaceDisplayNames: {
-      'suzumushi': 'Suzumushi',
-      'kanteiryu': 'Kanteiryu',
-      'hiragino': 'Gyosho',
-      'tensho': 'Tensho',
-      'kyokasho': 'Kyokashotai',
-      'mincho': 'Mincho',
-      'gothic': 'Gothic',
-      'maru': 'Maru'
-    },
-    radicalFrame: 0,
-    radicalAnimating: false,
-    stroketimes: [],
-
-    get typefaceDisplay() {
-      return this.typefaceDisplayNames[this.typeface] || this.typeface;
-    },
-
-    togglePlayPause() {
-      const video = this.$refs.video;
-      if (video.paused) {
-        video.play();
-        this.playing = true;
-      } else {
-        video.pause();
-        this.playing = false;
-      }
-    },
-
-    stepForward() {
-      const video = this.$refs.video;
-      const currentTime = video.currentTime;
-      for (let i = 0; i < this.stroketimes.length; i++) {
-        if (this.stroketimes[i] > currentTime + 0.01) {
-          this.seek(this.stroketimes[i]);
-          return;
-        }
-      }
-      this.seek(video.duration);
-    },
-
-    stepBackward() {
-      const video = this.$refs.video;
-      const currentTime = video.currentTime;
-      for (let i = this.stroketimes.length - 1; i >= 0; i--) {
-        if (this.stroketimes[i] < currentTime - 0.01) {
-          this.seek(this.stroketimes[i]);
-          return;
-        }
-      }
-    },
-
-    seek(time) {
-      const video = this.$refs.video;
-      video.pause();
-      this.playing = false;
-      video.currentTime = time;
-    },
-
-    nextTypeface() {
-      this.typefaceIndex = Math.min(this.typefaceIndex + 1, this.typefaces.length - 1);
-      this.typeface = this.typefaces[this.typefaceIndex];
-    },
-
-    previousTypeface() {
-      this.typefaceIndex = Math.max(this.typefaceIndex - 1, 0);
-      this.typeface = this.typefaces[this.typefaceIndex];
-    },
-
-    startRadicalAnimation() {
-      if (this.radicalAnimating) return;
-      this.radicalAnimating = true;
-      this.radicalFrame = 0;
-
-      let frame = 0;
-      const interval = setInterval(() => {
-        frame++;
-        if (frame > 2) {
-          clearInterval(interval);
-          this.radicalFrame = 0;
-          this.radicalAnimating = false;
-        } else {
-          this.radicalFrame = frame;
-        }
-      }, 500);
-    },
-
-    init() {
-      // Read page-specific data from DOM (survives hx-boost swaps and history restores)
-      this.stroketimes = JSON.parse(this.$el.dataset.stroketimes || '[]');
-
-      // Clean up any stale keydown handler from a previous page
-      if (window._detailKeydownHandler) {
-        document.removeEventListener('keydown', window._detailKeydownHandler);
-      }
-
-      // Video ended handler
-      this.$refs.video?.addEventListener('ended', () => {
-        this.playing = false;
-      });
-
-      // Keyboard shortcuts
-      const handler = (e) => {
-        if (e.target.tagName === 'INPUT') return;
-
-        switch(e.code) {
-          case 'Space':
-            e.preventDefault();
-            this.togglePlayPause();
-            break;
-          case 'ArrowUp':
-          case 'ArrowDown':
-            e.preventDefault();
-            this.detailMode = this.detailMode === 'video' ? 'typeface' : 'video';
-            break;
-          case 'ArrowLeft':
-            if (e.shiftKey) {
-              if (this.detailMode === 'typeface') {
-                this.previousTypeface();
-              } else {
-                this.stepBackward();
-              }
-            } else {
-              const prevLink = document.querySelector('.recordCounter a.icon-left');
-              if (prevLink) prevLink.click();
-            }
-            break;
-          case 'ArrowRight':
-            if (e.shiftKey) {
-              if (this.detailMode === 'typeface') {
-                this.nextTypeface();
-              } else {
-                this.stepForward();
-              }
-            } else {
-              const nextLink = document.querySelector('.recordCounter a.icon-right');
-              if (nextLink) nextLink.click();
-            }
-            break;
-        }
-      };
-      window._detailKeydownHandler = handler;
-      document.addEventListener('keydown', handler);
-    },
-
-    destroy() {
-      if (window._detailKeydownHandler) {
-        document.removeEventListener('keydown', window._detailKeydownHandler);
-        window._detailKeydownHandler = null;
-      }
-    }
-  });
-
-  // Register with Alpine: directly if already loaded (hx-boost swap),
-  // otherwise wait for alpine:init (initial page load)
-  if (window.Alpine) {
-    Alpine.data('detailPage', componentDef);
-    // Initialize Alpine on the new DOM immediately after registration.
-    // Can't rely on HTMX events alone due to script execution timing issues.
-    Alpine.initTree(document.querySelector('[x-data]'));
-  } else {
-    document.addEventListener('alpine:init', () => {
-      Alpine.data('detailPage', componentDef);
-    });
-  }
-})();
 </script>
 
 <!-- Google Analytics -->
