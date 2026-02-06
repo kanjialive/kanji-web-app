@@ -156,17 +156,39 @@ document.addEventListener('alpine:init', () => {
 
     currentGroup: 0,
 
+    _smoothScroll(el, target) {
+      var start = el.scrollLeft;
+      var change = target - start;
+      if (change === 0) return;
+      var startTime = performance.now();
+      var saved = el.style.scrollBehavior;
+      el.style.scrollBehavior = 'auto';
+
+      function ease(t) {
+        return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+      }
+
+      function step(now) {
+        var t = Math.min((now - startTime) / 900, 1);
+        el.scrollLeft = start + change * ease(t);
+        if (t < 1) requestAnimationFrame(step);
+        else el.style.scrollBehavior = saved;
+      }
+
+      requestAnimationFrame(step);
+    },
+
     scrollForward() {
       var scroller = this.$refs.resultsContainer?.querySelector('.scroller');
       if (!scroller) return;
 
       if (this.mode === 'kanji') {
-        scroller.scrollBy({ left: scroller.offsetWidth, behavior: 'smooth' });
+        this._smoothScroll(scroller, scroller.scrollLeft + scroller.offsetWidth);
       } else {
         var groups = scroller.querySelectorAll('.results-group');
         if (groups.length === 0) return;
         this.currentGroup = Math.min(groups.length - 1, this.currentGroup + 1);
-        scroller.scrollTo({ left: Math.max(0, groups[this.currentGroup].offsetLeft - 15), behavior: 'smooth' });
+        this._smoothScroll(scroller, Math.max(0, groups[this.currentGroup].offsetLeft - 15));
       }
     },
 
@@ -175,12 +197,12 @@ document.addEventListener('alpine:init', () => {
       if (!scroller) return;
 
       if (this.mode === 'kanji') {
-        scroller.scrollBy({ left: -scroller.offsetWidth, behavior: 'smooth' });
+        this._smoothScroll(scroller, Math.max(0, scroller.scrollLeft - scroller.offsetWidth));
       } else {
         var groups = scroller.querySelectorAll('.results-group');
         if (groups.length === 0) return;
         this.currentGroup = Math.max(0, this.currentGroup - 1);
-        scroller.scrollTo({ left: Math.max(0, groups[this.currentGroup].offsetLeft - 15), behavior: 'smooth' });
+        this._smoothScroll(scroller, Math.max(0, groups[this.currentGroup].offsetLeft - 15));
       }
     },
 
