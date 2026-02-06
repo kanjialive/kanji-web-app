@@ -15,11 +15,11 @@
 
   <!-- HTMX ↔ Alpine.js bridge: tear down and reinitialize Alpine on body swaps -->
   <script>
-  document.addEventListener('htmx:beforeSwap', function(e) {
-    if (window.Alpine) Alpine.destroyTree(e.detail.target);
+  document.addEventListener('htmx:beforeSwap', function() {
+    if (window.Alpine) Alpine.destroyTree(document.body);
   });
-  document.addEventListener('htmx:afterSwap', function(e) {
-    if (window.Alpine) Alpine.initTree(e.detail.target);
+  document.addEventListener('htmx:afterSettle', function() {
+    if (window.Alpine) Alpine.initTree(document.body);
   });
   document.addEventListener('htmx:historyRestore', function() {
     if (window.Alpine) Alpine.initTree(document.body);
@@ -432,6 +432,9 @@ function playExampleAudio(src) {
   // otherwise wait for alpine:init (initial page load)
   if (window.Alpine) {
     Alpine.data('detailPage', componentDef);
+    // Initialize Alpine on the new DOM immediately after registration.
+    // Can't rely on HTMX events alone due to script execution timing issues.
+    Alpine.initTree(document.querySelector('[x-data]'));
   } else {
     document.addEventListener('alpine:init', () => {
       Alpine.data('detailPage', componentDef);
