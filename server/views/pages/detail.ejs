@@ -173,26 +173,37 @@
     }));
   });
 
-  // Cleanup old Alpine tree before HTMX replaces .container2
-  document.addEventListener('htmx:beforeSwap', function(e) {
-    if (window.Alpine && e.detail.target && e.detail.target.matches && e.detail.target.matches('.container2')) {
-      Alpine.destroyTree(e.detail.target);
-    }
-  });
-
-  // Reinitialize Alpine after swap and update page title
+  // HTMX bridge: reinitialize Alpine after any HTMX body swaps
   document.addEventListener('htmx:afterSettle', function() {
     if (window.Alpine) Alpine.initTree(document.body);
-    var c = document.querySelector('.container2');
-    if (c && c.dataset.title) document.title = c.dataset.title;
   });
   document.addEventListener('htmx:historyRestore', function() {
     if (window.Alpine) Alpine.initTree(document.body);
-    var c = document.querySelector('.container2');
-    if (c && c.dataset.title) document.title = c.dataset.title;
   });
 
-  // Example audio playback (in head so it survives HTMX swaps)
+  // Smooth prev/next navigation via fetch + DOM swap (bypasses HTMX entirely)
+  window.navigateKanji = async function(url, e) {
+    e.preventDefault();
+    try {
+      var r = await fetch(url);
+      var html = await r.text();
+      var doc = new DOMParser().parseFromString(html, 'text/html');
+      var nc = doc.querySelector('.container2');
+      if (!nc) throw new Error('missing container');
+      document.querySelector('.container2').replaceWith(nc);
+      history.pushState(null, '', url);
+      if (nc.dataset.title) document.title = nc.dataset.title;
+    } catch(err) {
+      window.location.href = url;
+    }
+  };
+
+  // Handle browser back/forward after pushState navigation
+  window.addEventListener('popstate', function() {
+    window.location.reload();
+  });
+
+  // Example audio playback (in head so it survives content swaps)
   window.playExampleAudio = function(src) {
     var audio = document.getElementById('example-audio');
     if (audio) { audio.src = src; audio.play(); }
@@ -295,12 +306,7 @@
     <div class="row1">
       <div class="recordCounter">
         <% if (prev) { %>
-          <a class="icon icon-left" href="<%= prevUrl %>"
-             hx-get="<%= prevUrl %>"
-             hx-select=".container2"
-             hx-target=".container2"
-             hx-swap="outerHTML"
-             hx-push-url="true">&#12296;</a>
+          <a class="icon icon-left" href="<%= prevUrl %>" onclick="navigateKanji(this.href, event)">&#12296;</a>
         <% } else { %>
           <span class="icon icon-left disabled">&#12296;</span>
         <% } %>
@@ -312,12 +318,7 @@
           <% } %>
         </span>
         <% if (next) { %>
-          <a class="icon icon-right" href="<%= nextUrl %>"
-             hx-get="<%= nextUrl %>"
-             hx-select=".container2"
-             hx-target=".container2"
-             hx-swap="outerHTML"
-             hx-push-url="true">&#12297;</a>
+          <a class="icon icon-right" href="<%= nextUrl %>" onclick="navigateKanji(this.href, event)">&#12297;</a>
         <% } else { %>
           <span class="icon icon-right disabled">&#12297;</span>
         <% } %>
