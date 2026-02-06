@@ -34,7 +34,7 @@
   --container-min-height: 658px;
   --col-width: 258px;
   --row-height: 32px;
-  --content-height: 545px;
+  --content-height: 445px;
 
   /* Spacing */
   --spacing-xs: 4px;
@@ -168,7 +168,7 @@ h3 {
    ============================================ */
 .col1, .col2, .col3, .col4 {
   width: var(--col-width);
-  min-height: 577px;
+  min-height: 477px;
   position: absolute;
 }
 
@@ -337,7 +337,7 @@ span.search {
 .border2 {
   position: absolute;
   width: 1103px;
-  margin-top: 564px;
+  margin-top: 464px;
 }
 
 .border3, .border4, .border5 {
@@ -356,7 +356,7 @@ span.search {
   position: absolute;
   width: 540px;
   margin-left: 25px;
-  top: 520px;
+  top: 420px;
 }
 
 /* ============================================
@@ -365,7 +365,7 @@ span.search {
 .version {
   position: absolute;
   width: 1103px;
-  margin-top: 579px;
+  margin-top: 479px;
   color: var(--color-text-muted);
 }
 
@@ -781,7 +781,7 @@ div.hint {
   width: 550px;
   height: 120px;
   margin-left: 24px;
-  top: 530px;
+  top: 430px;
   display: flex;
   flex-wrap: wrap;
   gap: var(--spacing-xs);

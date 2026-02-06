@@ -191,7 +191,7 @@
       var nc = doc.querySelector('.container2');
       if (!nc) throw new Error('missing container');
       document.querySelector('.container2').replaceWith(nc);
-      history.pushState(null, '', url);
+      history.pushState(null, '', url.replace(/\?.*$/, ''));
       if (nc.dataset.title) document.title = nc.dataset.title;
     } catch(err) {
       window.location.href = url;
