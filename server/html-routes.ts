@@ -440,6 +440,11 @@ router.get("/:character", async (req: Request, res: Response) => {
     // Check if this was an advanced search
     const isAdvanced = hasAdvancedParams(req.query as Record<string, any>);
 
+    // Build display query for search input (show colon syntax for advanced searches)
+    const displaySearchQuery = isAdvanced
+      ? buildAdvancedSearchInput(req.query as Record<string, any>)
+      : searchQuery;
+
     // Build the "back to search" URL - preserve all search params
     let lastSearch = "";
     if (searchQuery || isAdvanced) {
@@ -470,7 +475,7 @@ router.get("/:character", async (req: Request, res: Response) => {
     res.render("pages/detail", {
       doc: extendedDoc,
       lastSearch,
-      searchQuery,
+      searchQuery: displaySearchQuery,
       searchMode,
       queryString,
       currentIndex,
