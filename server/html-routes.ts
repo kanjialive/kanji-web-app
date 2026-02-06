@@ -98,23 +98,18 @@ function hasAdvancedParams(query: Record<string, any>): boolean {
 }
 
 /**
- * Build a display label for advanced search (for UI display).
- * Format: "on:shin" (no space after colon)
+ * Build the search input value for advanced search queries.
+ * Preserves the raw parameter keys so users see what they typed.
+ * e.g., { ks: "3", on: "shin" } → "ks:3 on:shin"
+ *
+ * Angular's equivalent was: query.replace(/=/g, ':').replace(/&/g, ' ')
  */
-function buildAdvancedSearchLabel(query: Record<string, any>): string {
+function buildAdvancedSearchInput(query: Record<string, any>): string {
   const parts: string[] = [];
-  if (query.on) parts.push(`on:${query.on}`);
-  if (query.kun) parts.push(`kun:${query.kun}`);
-  if (query.kem) parts.push(`meaning:${query.kem}`);
-  if (query.grade) parts.push(`grade:${query.grade}`);
-  if (query.ks) parts.push(`strokes:${query.ks}`);
-  if (query.rs) parts.push(`rad_strokes:${query.rs}`);
-  if (query.rem) parts.push(`rad_meaning:${query.rem}`);
-  if (query.rjn) parts.push(`radical:${query.rjn}`);
-  if (query.rpos) parts.push(`rad_position:${query.rpos}`);
-  if (query.kanji) parts.push(`kanji:${query.kanji}`);
-  if (query.text || query.list) parts.push(`textbook:${query.text || query.list}`);
-  return parts.join(", ") || "advanced search";
+  for (const key of ADVANCED_KEYS) {
+    if (query[key]) parts.push(`${key}:${query[key]}`);
+  }
+  return parts.join(" ");
 }
 
 /**
@@ -275,7 +270,7 @@ router.get("/search", async (req: Request, res: Response) => {
 
   // Build display query for UI
   const displayQuery = isAdvanced
-    ? buildAdvancedSearchLabel(req.query as Record<string, any>)
+    ? buildAdvancedSearchInput(req.query as Record<string, any>)
     : basicQuery;
 
   try {
