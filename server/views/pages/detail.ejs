@@ -217,11 +217,9 @@
       <div class="examples">
         <% doc.examples.forEach((example, index) => { %>
           <div class="example">
-            <div x-data="{ showTranslation: false }"
-                 @mouseenter="showTranslation = true"
-                 @mouseleave="showTranslation = false">
-              <div x-show="!showTranslation" class="example-ja example-japanese"><%- example.japanese %></div>
-              <div x-show="showTranslation" class="example-ja" x-cloak><%- example.english %></div>
+            <div class="example-text">
+              <div class="example-ja example-japanese"><%- example.japanese %></div>
+              <div class="example-ja example-english"><%- example.english %></div>
             </div>
             <div class="example-audio">
               <button class="icon-play audio-play ka-icon-gray pointer"

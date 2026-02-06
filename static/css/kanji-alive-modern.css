@@ -806,6 +806,27 @@ img.ka-breakdown:hover {
   justify-content: space-between;
 }
 
+.example-text {
+  display: grid;
+  flex: 1;
+}
+
+.example-text > div {
+  grid-area: 1 / 1;
+}
+
+.example-english {
+  opacity: 0;
+}
+
+.example-text:hover .example-japanese {
+  opacity: 0;
+}
+
+.example-text:hover .example-english {
+  opacity: 1;
+}
+
 .example-ja {
   flex: 1;
 }
