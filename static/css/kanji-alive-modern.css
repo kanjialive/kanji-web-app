@@ -411,7 +411,7 @@ span.search {
 .custom-scrollbar-thumb {
   position: absolute;
   height: 5px;
-  background: #333;
+  background: rgba(0, 0, 0, 0.6);
   border-radius: 3px;
 }
 
