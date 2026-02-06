@@ -280,7 +280,7 @@ h3 {
 
 .recordCounter .icon-left.disabled,
 .recordCounter .icon-right.disabled {
-  color: #999;
+  color: var(--color-primary);
   cursor: default;
 }
 
@@ -290,6 +290,7 @@ span.search {
   left: 8px;
   padding-top: 1px;
   text-align: center;
+  color: var(--color-primary);
 }
 
 /* ============================================
