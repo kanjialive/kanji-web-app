@@ -115,7 +115,9 @@
 
 <script>
 document.addEventListener('alpine:init', () => {
-  Alpine.data('searchPage', () => ({
+  Alpine.data('searchPage', () => {
+    var _animFrame = null;
+    return {
     mode: '<%= typeof mode !== "undefined" ? mode : "kanji" %>',
     modes: ['kanji', 'rsort', 'ksort'],
     // Store original query string for advanced searches
@@ -155,24 +157,19 @@ document.addEventListener('alpine:init', () => {
     },
 
     currentGroup: 0,
-    _animFrame: null,
 
     _smoothScroll(el, target) {
-      if (this._animFrame) {
-        cancelAnimationFrame(this._animFrame);
-        this._animFrame = null;
+      if (_animFrame) {
+        cancelAnimationFrame(_animFrame);
+        _animFrame = null;
       }
 
-      var maxScroll = el.scrollWidth - el.offsetWidth;
-      target = Math.max(0, Math.min(target, maxScroll));
-
       var start = el.scrollLeft;
-      var change = target - start;
-      if (Math.abs(change) < 1) return;
+      var change = Math.round(target - start);
+      if (!change) return;
       var startTime = performance.now();
       var saved = el.style.scrollBehavior;
       el.style.scrollBehavior = 'auto';
-      var self = this;
 
       function ease(t) {
         return t < 0.5 ? 2 * t * t : 1 - 2 * (1 - t) * (1 - t);
@@ -180,16 +177,16 @@ document.addEventListener('alpine:init', () => {
 
       function step(now) {
         var t = Math.min((now - startTime) / 900, 1);
-        el.scrollLeft = start + change * ease(t);
+        el.scrollLeft = start + Math.ceil(change * ease(t));
         if (t < 1) {
-          self._animFrame = requestAnimationFrame(step);
+          _animFrame = requestAnimationFrame(step);
         } else {
           el.style.scrollBehavior = saved;
-          self._animFrame = null;
+          _animFrame = null;
         }
       }
 
-      this._animFrame = requestAnimationFrame(step);
+      _animFrame = requestAnimationFrame(step);
     },
 
     scrollForward() {
@@ -252,7 +249,8 @@ document.addEventListener('alpine:init', () => {
         }
       });
     }
-  }));
+  };
+  });
 });
 </script>
 
