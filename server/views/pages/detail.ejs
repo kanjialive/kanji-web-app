@@ -267,7 +267,7 @@
       <img class="ka-breakdown"
            src="<%= stroke %>"
            alt="Stroke <%= index + 1 %>"
-           @mouseover="seek(<%= doc.stroketimes[index + 1] || 0 %>)">
+           @mouseover="detailMode === 'video' && seek(<%= doc.stroketimes[index + 1] || 0 %>)">
     <% }); %>
   </div>
 
@@ -294,7 +294,7 @@ document.addEventListener('alpine:init', () => {
     detailMode: 'video',
     playing: false,
     typeface: 'mincho',
-    typefaceIndex: 4,
+    typefaceIndex: 6,
     typefaces: ['suzumushi', 'kanteiryu', 'shino', 'tensho', 'kyokasho', 'maru', 'mincho', 'gothic', 'hiragino'],
     typefaceDisplayNames: {
       'suzumushi': 'Suzumushi',
@@ -310,6 +310,8 @@ document.addEventListener('alpine:init', () => {
     radicalFrame: 0,
     radicalAnimating: false,
     stroketimes: <%= JSON.stringify(doc.stroketimes) %>,
+    prevUrl: <%- JSON.stringify(prevUrl || '') %>,
+    nextUrl: <%- JSON.stringify(nextUrl || '') %>,
 
     get typefaceDisplay() {
       return this.typefaceDisplayNames[this.typeface] || this.typeface;
@@ -329,29 +331,31 @@ document.addEventListener('alpine:init', () => {
     stepForward() {
       const video = this.$refs.video;
       const currentTime = video.currentTime;
-      // Find next stroke time
       for (let i = 0; i < this.stroketimes.length; i++) {
         if (this.stroketimes[i] > currentTime + 0.01) {
-          video.currentTime = this.stroketimes[i];
-          break;
+          this.seek(this.stroketimes[i]);
+          return;
         }
       }
+      this.seek(video.duration);
     },
 
     stepBackward() {
       const video = this.$refs.video;
       const currentTime = video.currentTime;
-      // Find previous stroke time
       for (let i = this.stroketimes.length - 1; i >= 0; i--) {
         if (this.stroketimes[i] < currentTime - 0.01) {
-          video.currentTime = this.stroketimes[i];
-          break;
+          this.seek(this.stroketimes[i]);
+          return;
         }
       }
     },
 
     seek(time) {
-      this.$refs.video.currentTime = time;
+      const video = this.$refs.video;
+      video.pause();
+      this.playing = false;
+      video.currentTime = time;
     },
 
     nextTypeface() {
@@ -403,14 +407,31 @@ document.addEventListener('alpine:init', () => {
             e.preventDefault();
             this.togglePlayPause();
             break;
+          case 'ArrowUp':
+          case 'ArrowDown':
+            e.preventDefault();
+            this.detailMode = this.detailMode === 'video' ? 'typeface' : 'video';
+            break;
           case 'ArrowLeft':
             if (e.shiftKey) {
-              this.stepBackward();
+              if (this.detailMode === 'typeface') {
+                this.previousTypeface();
+              } else {
+                this.stepBackward();
+              }
+            } else if (this.prevUrl) {
+              window.location.href = this.prevUrl;
             }
             break;
           case 'ArrowRight':
             if (e.shiftKey) {
-              this.stepForward();
+              if (this.detailMode === 'typeface') {
+                this.nextTypeface();
+              } else {
+                this.stepForward();
+              }
+            } else if (this.nextUrl) {
+              window.location.href = this.nextUrl;
             }
             break;
         }

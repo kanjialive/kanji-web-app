@@ -118,6 +118,55 @@ function buildAdvancedSearchLabel(query: Record<string, any>): string {
 }
 
 /**
+ * Parses colon-delimited advanced search syntax from a basic query string.
+ * e.g., "on:shin grade:3" → { on: "shin", grade: "3" }
+ * Returns null if the query doesn't contain recognized advanced keys.
+ *
+ * Ported from the Angular parseQuery() function in search-controller.js
+ * and detail-controller.js, which converted user-typed colon syntax
+ * into structured URL parameters.
+ */
+function parseColonSyntax(query: string): Record<string, string> | null {
+  if (!query.includes(":")) return null;
+
+  const result: Record<string, string> = {};
+  let searchingForKey = true;
+  let lastSpaceIndex = -1;
+  let lastColonIndex = -1;
+  let key: string | null = null;
+
+  for (let i = 0; i < query.length; i++) {
+    if (searchingForKey) {
+      if (query.charAt(i) === ":") {
+        if (lastColonIndex !== -1 && key !== null) {
+          result[key] = query.substring(lastColonIndex + 1, lastSpaceIndex);
+        }
+        key = query.substring(lastSpaceIndex + 1, i).toLowerCase();
+        searchingForKey = false;
+        lastColonIndex = i;
+      } else if (query.charAt(i) === " ") {
+        lastSpaceIndex = i;
+      }
+    } else {
+      if (query.charAt(i) === " ") {
+        lastSpaceIndex = i;
+        searchingForKey = true;
+      }
+    }
+  }
+
+  if (lastColonIndex !== -1 && key !== null) {
+    result[key] = query.substring(lastColonIndex + 1);
+  }
+
+  // Only treat as advanced if at least one recognized key was found
+  const hasAdvancedKey = Object.keys(result).some((k) =>
+    ADVANCED_KEYS.includes(k)
+  );
+  return hasAdvancedKey ? result : null;
+}
+
+/**
  * Search for kanji using basic or advanced query.
  */
 async function searchKanji(
@@ -214,6 +263,16 @@ router.get("/search", async (req: Request, res: Response) => {
   const mode = (req.query.mode as string) || "kanji";
   const isAdvanced = hasAdvancedParams(req.query as Record<string, any>);
 
+  // Parse colon syntax in basic query (e.g., "on:shin grade:3") → redirect
+  if (basicQuery && !isAdvanced) {
+    const parsed = parseColonSyntax(basicQuery);
+    if (parsed) {
+      const params = new URLSearchParams(parsed);
+      if (mode !== "kanji") params.set("mode", mode);
+      return res.redirect(`/htmx/search?${params.toString()}`);
+    }
+  }
+
   // Build display query for UI
   const displayQuery = isAdvanced
     ? buildAdvancedSearchLabel(req.query as Record<string, any>)
@@ -287,19 +346,38 @@ router.get("/search/advanced", async (req: Request, res: Response) => {
  * Supports both basic search (?q=...) and advanced search (?on=...&grade=...)
  */
 router.get("/partials/results", async (req: Request, res: Response) => {
-  const basicQuery = (req.query.q as string) || "";
+  let basicQuery = (req.query.q as string) || "";
   const mode = (req.query.mode as string) || "kanji";
-  const isAdvanced = hasAdvancedParams(req.query as Record<string, any>);
+  let isAdvanced = hasAdvancedParams(req.query as Record<string, any>);
+  let effectiveAdvancedParams: Record<string, string> | undefined;
+
+  // Parse colon syntax in basic query (e.g., "on:shin grade:3") → redirect
+  if (basicQuery && !isAdvanced) {
+    const parsed = parseColonSyntax(basicQuery);
+    if (parsed) {
+      const params = new URLSearchParams(parsed);
+      if (mode !== "kanji") params.set("mode", mode);
+      res.setHeader("HX-Redirect", `/htmx/search?${params.toString()}`);
+      return res.send("");
+    }
+  }
+
+  if (isAdvanced) {
+    effectiveAdvancedParams = req.query as Record<string, string>;
+  }
+
+  // Set HX-Push-Url so browser shows the full-page URL, not the partial endpoint
+  const queryString = new URL(req.url, "http://localhost").search;
+  const pushUrl =
+    basicQuery || isAdvanced ? "/htmx/search" + queryString : "/htmx/search";
+  res.setHeader("HX-Push-Url", pushUrl);
 
   try {
     if (!basicQuery && !isAdvanced) {
       return res.render("partials/welcome");
     }
 
-    const results = await searchKanji(
-      basicQuery,
-      isAdvanced ? (req.query as Record<string, string>) : undefined
-    );
+    const results = await searchKanji(basicQuery, effectiveAdvancedParams);
 
     if (results.length === 0) {
       return res.render("partials/no-results");
@@ -317,9 +395,6 @@ router.get("/partials/results", async (req: Request, res: Response) => {
       kanjiStrokeGroups,
       radicalStrokeGroups
     );
-
-    // Preserve original query string for navigation links
-    const queryString = new URL(req.url, "http://localhost").search;
 
     res.render("partials/results", {
       query: basicQuery,

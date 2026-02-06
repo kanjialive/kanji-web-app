@@ -28,7 +28,6 @@
               hx-get="/htmx/partials/results"
               hx-target="#search-results"
               hx-trigger="submit"
-              hx-push-url="true"
               @submit.prevent="clearAdvancedState()">
           <input type="text"
                  name="q"
@@ -118,7 +117,7 @@
 document.addEventListener('alpine:init', () => {
   Alpine.data('searchPage', () => ({
     mode: '<%= typeof mode !== "undefined" ? mode : "kanji" %>',
-    modes: ['kanji', 'ksort', 'rsort'],
+    modes: ['kanji', 'rsort', 'ksort'],
     // Store original query string for advanced searches
     queryString: '<%= typeof queryString !== "undefined" ? queryString.replace(/'/g, "\\'") : "" %>',
 
