@@ -173,20 +173,37 @@
     }));
   });
 
-  // HTMX bridge: reinitialize Alpine after hx-boost body swaps
+  // Cleanup old Alpine tree before HTMX replaces .container2
+  document.addEventListener('htmx:beforeSwap', function(e) {
+    if (window.Alpine && e.detail.target && e.detail.target.matches && e.detail.target.matches('.container2')) {
+      Alpine.destroyTree(e.detail.target);
+    }
+  });
+
+  // Reinitialize Alpine after swap and update page title
   document.addEventListener('htmx:afterSettle', function() {
     if (window.Alpine) Alpine.initTree(document.body);
+    var c = document.querySelector('.container2');
+    if (c && c.dataset.title) document.title = c.dataset.title;
   });
   document.addEventListener('htmx:historyRestore', function() {
     if (window.Alpine) Alpine.initTree(document.body);
+    var c = document.querySelector('.container2');
+    if (c && c.dataset.title) document.title = c.dataset.title;
   });
+
+  // Example audio playback (in head so it survives HTMX swaps)
+  window.playExampleAudio = function(src) {
+    var audio = document.getElementById('example-audio');
+    if (audio) { audio.src = src; audio.play(); }
+  };
   </script>
 
   <base href="/">
 </head>
 <body>
 
-<div class="container2" x-data="detailPage()" data-stroketimes='<%= JSON.stringify(doc.stroketimes) %>'>
+<div class="container2" x-data="detailPage()" data-stroketimes='<%= JSON.stringify(doc.stroketimes) %>' data-title="<%= doc.ka_utf %> - <%= doc.meaning %> - Kanji alive">
 
   <%
   // Navigation context (computed server-side from search results)
@@ -278,7 +295,12 @@
     <div class="row1">
       <div class="recordCounter">
         <% if (prev) { %>
-          <a class="icon icon-left" href="<%= prevUrl %>" hx-boost="true">&#12296;</a>
+          <a class="icon icon-left" href="<%= prevUrl %>"
+             hx-get="<%= prevUrl %>"
+             hx-select=".container2"
+             hx-target=".container2"
+             hx-swap="outerHTML"
+             hx-push-url="true">&#12296;</a>
         <% } else { %>
           <span class="icon icon-left disabled">&#12296;</span>
         <% } %>
@@ -290,7 +312,12 @@
           <% } %>
         </span>
         <% if (next) { %>
-          <a class="icon icon-right" href="<%= nextUrl %>" hx-boost="true">&#12297;</a>
+          <a class="icon icon-right" href="<%= nextUrl %>"
+             hx-get="<%= nextUrl %>"
+             hx-select=".container2"
+             hx-target=".container2"
+             hx-swap="outerHTML"
+             hx-push-url="true">&#12297;</a>
         <% } else { %>
           <span class="icon icon-right disabled">&#12297;</span>
         <% } %>
@@ -415,13 +442,6 @@
 <!-- Audio element for examples -->
 <audio id="example-audio" preload="none" style="display: none;"></audio>
 
-<script>
-function playExampleAudio(src) {
-  var audio = document.getElementById('example-audio');
-  audio.src = src;
-  audio.play();
-}
-</script>
 
 <!-- Google Analytics -->
 <script>
