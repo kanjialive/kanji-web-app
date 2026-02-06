@@ -157,40 +157,39 @@ document.addEventListener('alpine:init', () => {
     currentGroup: 0,
 
     scrollForward() {
-      var container = this.$refs.resultsContainer;
-      if (!container) return;
+      var scroller = this.$refs.resultsContainer?.querySelector('.scroller');
+      if (!scroller) return;
 
       if (this.mode === 'kanji') {
-        // Page-width scroll for basic view
-        container.scrollBy({ left: container.offsetWidth, behavior: 'smooth' });
+        scroller.scrollBy({ left: scroller.offsetWidth, behavior: 'smooth' });
       } else {
-        // Group-based scroll for sorted views
-        var groups = container.querySelectorAll('.results-group');
+        var groups = scroller.querySelectorAll('.results-group');
         if (groups.length === 0) return;
         this.currentGroup = Math.min(groups.length - 1, this.currentGroup + 1);
-        container.scrollTo({ left: Math.max(0, groups[this.currentGroup].offsetLeft - 15), behavior: 'smooth' });
+        scroller.scrollTo({ left: Math.max(0, groups[this.currentGroup].offsetLeft - 15), behavior: 'smooth' });
       }
     },
 
     scrollBackward() {
-      var container = this.$refs.resultsContainer;
-      if (!container) return;
+      var scroller = this.$refs.resultsContainer?.querySelector('.scroller');
+      if (!scroller) return;
 
       if (this.mode === 'kanji') {
-        container.scrollBy({ left: -container.offsetWidth, behavior: 'smooth' });
+        scroller.scrollBy({ left: -scroller.offsetWidth, behavior: 'smooth' });
       } else {
-        var groups = container.querySelectorAll('.results-group');
+        var groups = scroller.querySelectorAll('.results-group');
         if (groups.length === 0) return;
         this.currentGroup = Math.max(0, this.currentGroup - 1);
-        container.scrollTo({ left: Math.max(0, groups[this.currentGroup].offsetLeft - 15), behavior: 'smooth' });
+        scroller.scrollTo({ left: Math.max(0, groups[this.currentGroup].offsetLeft - 15), behavior: 'smooth' });
       }
     },
 
     handleWheel(event) {
-      // Convert vertical scroll to horizontal
+      var scroller = this.$refs.resultsContainer?.querySelector('.scroller');
+      if (!scroller) return;
       if (Math.abs(event.deltaY) > Math.abs(event.deltaX)) {
         event.preventDefault();
-        this.$refs.resultsContainer.scrollLeft += event.deltaY;
+        scroller.scrollLeft += event.deltaY;
       }
     },
 
