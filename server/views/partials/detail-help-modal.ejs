@@ -1,35 +1,59 @@
 <div class="modal-content">
   <button class="modal-close" @click="$refs.helpDialog.close()" aria-label="Close">&times;</button>
 
-  <h2>Kanji Detail Quick Reference</h2>
+  <h2>Quick Reference</h2>
 
-  <h3>Video Controls</h3>
-  <ul>
-    <li>Click video to switch to typeface view</li>
-    <li>Click typeface to switch back to video</li>
-    <li>Use controls to play, pause, or step through strokes</li>
-  </ul>
-
-  <h3>Stroke Breakdown</h3>
-  <p>Hover over individual stroke images at the bottom to jump to that point in the animation.</p>
-
-  <h3>Examples</h3>
-  <ul>
-    <li>Hover over examples to see English translation</li>
-    <li>Click play button to hear pronunciation</li>
-  </ul>
-
-  <h3>Radical Animation</h3>
-  <p>Click the radical highlight area to see how the radical appears within the kanji.</p>
-
-  <h3>Keyboard Shortcuts</h3>
-  <table class="help-table">
-    <tr><td><kbd>Space</kbd></td><td>Play/Pause video</td></tr>
-    <tr><td><kbd>Shift</kbd> + <kbd>&larr;</kbd></td><td>Previous stroke</td></tr>
-    <tr><td><kbd>Shift</kbd> + <kbd>&rarr;</kbd></td><td>Next stroke</td></tr>
-  </table>
-
-  <p class="help-footer">
-    <a href="https://kanjialive.com/user-guide" target="_blank" rel="noopener">Full User Guide</a>
+  <p>Please see our
+    <a href="http://kanjialive.com/user-guide/" target="_blank" rel="noopener">User Guide</a> for detailed explanations of all of <em>Kanji alive's</em> features or watch our
+    <a href="http://www.youtube.com/kanjialive/" target="_blank" rel="noopener">short demonstration videos</a>. If you are having technical difficulties, please refer to our
+    <a href="http://kanjialive.com/troubleshooting" target="_blank" rel="noopener">Troubleshooting</a> page.
   </p>
+  <p>詳細は、メーニューの「日本語」内にある使用説明とトラブルシューティングをご参照ください。</p>
+
+  <h3>Navigation</h3>
+  <table class="help-table">
+    <tr>
+      <td>Next/Previous kanji</td>
+      <td>Use the <kbd>&larr;</kbd> and <kbd>&rarr;</kbd> keys or click on the left and right single pointed brackets in the top navigation bar</td>
+    </tr>
+    <tr>
+      <td>Toggle kanji animation/typeface</td>
+      <td>Use the <kbd>&uarr;</kbd> or <kbd>&darr;</kbd> keys or click on the large image of the kanji.</td>
+    </tr>
+    <tr>
+      <td>Next/Previous typeface</td>
+      <td>Use the <kbd>Shift</kbd> + <kbd>&larr;</kbd> and <kbd>Shift</kbd> + <kbd>&rarr;</kbd> keys or click on the left and right single pointed brackets next to the name of the typeface</td>
+    </tr>
+    <tr>
+      <td>Return to Search</td>
+      <td>Click on the text of the current search term on the far left of the navigation bar</td>
+    </tr>
+  </table>
+  <p>
+    Note: The order in which kanji appear in the detail view when selecting the next or previous kanji is dependant on the sort mode previously chosen in the search view.
+  </p>
+
+  <h3>Other Interactive Elements</h3>
+  <table class="help-table">
+    <tr>
+      <td>Play/Pause kanji animation</td>
+      <td>Use the <kbd>spacebar</kbd> or click on the play/pause icon in the center of the kanji animation controls.</td>
+    </tr>
+    <tr>
+      <td>Next/Previous stroke</td>
+      <td>Use the <kbd>Shift</kbd> + <kbd>&larr;</kbd> or <kbd>Shift</kbd> + <kbd>&rarr;</kbd> keys, click the previous and next stroke icons on each side of the play/pause icon or move your mouse cursor over the stroke breakdown images.</td>
+    </tr>
+    <tr>
+      <td>Radical animation</td>
+      <td>Click on the image on the far right of the radical field to view an animation illustrating the radical's historical derivation.</td>
+    </tr>
+    <tr>
+      <td>Examples</td>
+      <td>Move your mouse cursor over a Japanese word in the Examples field to reveal its English meaning. Click on the play icon to the right of each example to hear its pronunciation.</td>
+    </tr>
+    <tr>
+      <td>Example sentences</td>
+      <td>Click on the phrase to view the online dictionary entry for the target kanji in <a href="http://www.kenkyusha.co.jp/modules/08_luminous/" target="_blank" rel="noopener">Kenkyusha's Luminous Dictionary</a>.</td>
+    </tr>
+  </table>
 </div>
