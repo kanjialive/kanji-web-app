@@ -226,7 +226,7 @@
             </div>
             <div class="example-audio">
               <button class="icon-play audio-play ka-icon-gray pointer"
-                      @click="playAudio('<%= example.mp3 %>')"
+                      onclick="playExampleAudio('<%= example.mp3 %>')"
                       aria-label="Play audio"></button>
             </div>
           </div>
@@ -266,6 +266,14 @@
 
 <!-- Audio element for examples -->
 <audio id="example-audio" preload="none" style="display: none;"></audio>
+
+<script>
+function playExampleAudio(src) {
+  var audio = document.getElementById('example-audio');
+  audio.src = src;
+  audio.play();
+}
+</script>
 
 <script>
 document.addEventListener('alpine:init', () => {
@@ -363,12 +371,6 @@ document.addEventListener('alpine:init', () => {
           this.radicalFrame = frame;
         }
       }, 500);
-    },
-
-    playAudio(src) {
-      const audio = document.getElementById('example-audio');
-      audio.src = src;
-      audio.play();
     },
 
     init() {
