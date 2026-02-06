@@ -13,11 +13,24 @@
   <script src="https://unpkg.com/htmx.org@2.0.4" defer></script>
   <script src="https://unpkg.com/alpinejs@3.14.8/dist/cdn.min.js" defer></script>
 
+  <!-- HTMX ↔ Alpine.js bridge: tear down and reinitialize Alpine on body swaps -->
+  <script>
+  document.addEventListener('htmx:beforeSwap', function(e) {
+    if (window.Alpine) Alpine.destroyTree(e.detail.target);
+  });
+  document.addEventListener('htmx:afterSwap', function(e) {
+    if (window.Alpine) Alpine.initTree(e.detail.target);
+  });
+  document.addEventListener('htmx:historyRestore', function() {
+    if (window.Alpine) Alpine.initTree(document.body);
+  });
+  </script>
+
   <base href="/">
 </head>
 <body>
 
-<div class="container2" x-data="detailPage()">
+<div class="container2" x-data="detailPage()" data-stroketimes='<%= JSON.stringify(doc.stroketimes) %>'>
 
   <%
   // Navigation context (computed server-side from search results)
@@ -109,7 +122,7 @@
     <div class="row1">
       <div class="recordCounter">
         <% if (prev) { %>
-          <a class="icon icon-left" href="<%= prevUrl %>">&#12296;</a>
+          <a class="icon icon-left" href="<%= prevUrl %>" hx-boost="true">&#12296;</a>
         <% } else { %>
           <span class="icon icon-left disabled">&#12296;</span>
         <% } %>
@@ -121,7 +134,7 @@
           <% } %>
         </span>
         <% if (next) { %>
-          <a class="icon icon-right" href="<%= nextUrl %>">&#12297;</a>
+          <a class="icon icon-right" href="<%= nextUrl %>" hx-boost="true">&#12297;</a>
         <% } else { %>
           <span class="icon icon-right disabled">&#12297;</span>
         <% } %>
@@ -255,8 +268,8 @@ function playExampleAudio(src) {
 </script>
 
 <script>
-document.addEventListener('alpine:init', () => {
-  Alpine.data('detailPage', () => ({
+(function() {
+  const componentDef = () => ({
     detailMode: 'video',
     playing: false,
     typeface: 'kyokasho',
@@ -274,9 +287,7 @@ document.addEventListener('alpine:init', () => {
     },
     radicalFrame: 0,
     radicalAnimating: false,
-    stroketimes: <%= JSON.stringify(doc.stroketimes) %>,
-    prevUrl: <%- JSON.stringify(prevUrl || '') %>,
-    nextUrl: <%- JSON.stringify(nextUrl || '') %>,
+    stroketimes: [],
 
     get typefaceDisplay() {
       return this.typefaceDisplayNames[this.typeface] || this.typeface;
@@ -352,13 +363,21 @@ document.addEventListener('alpine:init', () => {
     },
 
     init() {
+      // Read page-specific data from DOM (survives hx-boost swaps and history restores)
+      this.stroketimes = JSON.parse(this.$el.dataset.stroketimes || '[]');
+
+      // Clean up any stale keydown handler from a previous page
+      if (window._detailKeydownHandler) {
+        document.removeEventListener('keydown', window._detailKeydownHandler);
+      }
+
       // Video ended handler
       this.$refs.video?.addEventListener('ended', () => {
         this.playing = false;
       });
 
       // Keyboard shortcuts
-      document.addEventListener('keydown', (e) => {
+      const handler = (e) => {
         if (e.target.tagName === 'INPUT') return;
 
         switch(e.code) {
@@ -378,8 +397,9 @@ document.addEventListener('alpine:init', () => {
               } else {
                 this.stepBackward();
               }
-            } else if (this.prevUrl) {
-              window.location.href = this.prevUrl;
+            } else {
+              const prevLink = document.querySelector('.recordCounter a.icon-left');
+              if (prevLink) prevLink.click();
             }
             break;
           case 'ArrowRight':
@@ -389,15 +409,35 @@ document.addEventListener('alpine:init', () => {
               } else {
                 this.stepForward();
               }
-            } else if (this.nextUrl) {
-              window.location.href = this.nextUrl;
+            } else {
+              const nextLink = document.querySelector('.recordCounter a.icon-right');
+              if (nextLink) nextLink.click();
             }
             break;
         }
-      });
+      };
+      window._detailKeydownHandler = handler;
+      document.addEventListener('keydown', handler);
+    },
+
+    destroy() {
+      if (window._detailKeydownHandler) {
+        document.removeEventListener('keydown', window._detailKeydownHandler);
+        window._detailKeydownHandler = null;
+      }
     }
-  }));
-});
+  });
+
+  // Register with Alpine: directly if already loaded (hx-boost swap),
+  // otherwise wait for alpine:init (initial page load)
+  if (window.Alpine) {
+    Alpine.data('detailPage', componentDef);
+  } else {
+    document.addEventListener('alpine:init', () => {
+      Alpine.data('detailPage', componentDef);
+    });
+  }
+})();
 </script>
 
 <!-- Google Analytics -->
