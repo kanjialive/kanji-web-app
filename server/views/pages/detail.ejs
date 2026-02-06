@@ -85,7 +85,6 @@
         <!-- Typeface Mode -->
         <div id="ka-typeface-container" x-show="detailMode === 'typeface'" x-cloak>
           <div @click="detailMode = 'video'" class="ka-typefaces">
-            <img x-show="typeface === 'shino'" src="<%= doc.shino_source %>" alt="Shino typeface">
             <img x-show="typeface === 'tensho'" src="<%= doc.tensho_source %>" alt="Tensho typeface">
             <img x-show="typeface === 'kyokasho'" src="<%= doc.kyokasho_source %>" alt="Kyokasho typeface">
             <img x-show="typeface === 'maru'" src="<%= doc.maru_source %>" alt="Maru typeface">
@@ -261,13 +260,12 @@ document.addEventListener('alpine:init', () => {
     detailMode: 'video',
     playing: false,
     typeface: 'kyokasho',
-    typefaceIndex: 5,
-    typefaces: ['suzumushi', 'kanteiryu', 'hiragino', 'shino', 'tensho', 'kyokasho', 'mincho', 'gothic', 'maru'],
+    typefaceIndex: 4,
+    typefaces: ['suzumushi', 'kanteiryu', 'hiragino', 'tensho', 'kyokasho', 'mincho', 'gothic', 'maru'],
     typefaceDisplayNames: {
       'suzumushi': 'Suzumushi',
       'kanteiryu': 'Kanteiryu',
       'hiragino': 'Gyosho',
-      'shino': 'Shino',
       'tensho': 'Tensho',
       'kyokasho': 'Kyokashotai',
       'mincho': 'Mincho',
