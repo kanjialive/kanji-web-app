@@ -20,37 +20,20 @@
 <div class="container2" x-data="detailPage()">
 
   <%
-  // Build navigation URLs that preserve search context (including advanced search)
+  // Navigation context (computed server-side from search results)
   const idx = typeof currentIndex !== 'undefined' ? currentIndex : 0;
   const total = typeof totalResults !== 'undefined' ? totalResults : 1;
   const prev = typeof prevKanji !== 'undefined' ? prevKanji : null;
   const next = typeof nextKanji !== 'undefined' ? nextKanji : null;
   const qs = typeof queryString !== 'undefined' ? queryString : '';
 
-  // Current kanji character for building sibling nav URLs
-  const currentKanji = doc.ka_utf;
-
-  // Build prev URL - preserves all search params via queryString
-  let prevUrl = '';
-  if (prev) {
-    const prevIdx = idx - 1;
-    prevUrl = `/htmx/${encodeURIComponent(prev)}?idx=${prevIdx}&total=${total}`;
-    // Add original search params (q, mode, or advanced params like on, grade, etc.)
-    if (qs) prevUrl += `&${qs.replace(/^\?/, '')}`;
-    // prev's next is current kanji
-    prevUrl += `&next=${encodeURIComponent(currentKanji)}`;
-  }
-
-  // Build next URL - preserves all search params via queryString
-  let nextUrl = '';
-  if (next) {
-    const nextIdx = idx + 1;
-    nextUrl = `/htmx/${encodeURIComponent(next)}?idx=${nextIdx}&total=${total}`;
-    // Add original search params
-    if (qs) nextUrl += `&${qs.replace(/^\?/, '')}`;
-    // next's prev is current kanji
-    nextUrl += `&prev=${encodeURIComponent(currentKanji)}`;
-  }
+  // Build nav URLs — just kanji + search params (server computes neighbors)
+  const prevUrl = prev
+    ? `/htmx/${encodeURIComponent(prev)}${qs}`
+    : '';
+  const nextUrl = next
+    ? `/htmx/${encodeURIComponent(next)}${qs}`
+    : '';
   %>
 
   <!-- Column 1: Search Form + Video/Typeface -->

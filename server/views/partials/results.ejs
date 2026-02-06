@@ -1,32 +1,10 @@
 <%
 const currentMode = typeof mode !== 'undefined' ? mode : 'kanji';
-const searchQuery = typeof query !== 'undefined' ? query : '';
 const origQueryString = typeof queryString !== 'undefined' ? queryString : '';
-const order = typeof resultsOrder !== 'undefined' ? resultsOrder : [];
 
-// Helper to build detail URL with navigation context
-// Preserves original search params (including advanced search) for back-navigation
-function buildDetailUrl(kanjiChar, index) {
-  const prev = index > 0 ? order[index - 1] : '';
-  const next = index < order.length - 1 ? order[index + 1] : '';
-
-  // Start with base URL
-  let url = `/htmx/${encodeURIComponent(kanjiChar)}?idx=${index}&total=${order.length}`;
-
-  // Add original query params (preserves advanced search params)
-  if (origQueryString) {
-    // Remove leading ? and append params
-    const params = origQueryString.replace(/^\?/, '');
-    if (params) url += `&${params}`;
-  } else if (searchQuery) {
-    // Fallback to basic query
-    url += `&q=${encodeURIComponent(searchQuery)}&mode=${currentMode}`;
-  }
-
-  // Add navigation params
-  if (prev) url += `&prev=${encodeURIComponent(prev)}`;
-  if (next) url += `&next=${encodeURIComponent(next)}`;
-  return url;
+// Detail URL: just kanji + search params (server computes neighbors from search results)
+function buildDetailUrl(kanjiChar) {
+  return `/htmx/${encodeURIComponent(kanjiChar)}${origQueryString}`;
 }
 %>
 
@@ -41,10 +19,9 @@ function buildDetailUrl(kanjiChar, index) {
       </div>
       <p class="kanji">
         <% results.forEach((kanji, index) => { %>
-          <a href="<%= buildDetailUrl(kanji.ka_utf, index) %>"
+          <a href="<%= buildDetailUrl(kanji.ka_utf) %>"
              id="<%= kanji.ka_id %>"
-             class="ka"
-             data-index="<%= index %>"><%= kanji.ka_utf %> </a>
+             class="ka"><%= kanji.ka_utf %> </a>
         <% }); %>
       </p>
     </div>
@@ -52,10 +29,6 @@ function buildDetailUrl(kanjiChar, index) {
 
 <% } else if (currentMode === 'ksort' && typeof kanjiStrokeGroups !== 'undefined') { %>
   <!-- Kanji Stroke Groups -->
-  <%
-  // Build index map for grouped display order
-  let ksortIndex = 0;
-  %>
   <div class="scroller row search-results-container">
     <div class="search-results">
       <ul class="list-inline">
@@ -76,10 +49,9 @@ function buildDetailUrl(kanjiChar, index) {
                         <% radical.rows.forEach(row => { %>
                           <div class="grouped-row">
                             <% row.forEach(kanji => { %>
-                              <a href="<%= buildDetailUrl(kanji.ka_utf, ksortIndex++) %>"
+                              <a href="<%= buildDetailUrl(kanji.ka_utf) %>"
                                  id="<%= kanji.ka_id %>"
-                                 class="ka"
-                                 data-index="<%= kanji.sortedIndex %>"><%= kanji.ka_utf %></a>
+                                 class="ka"><%= kanji.ka_utf %></a>
                             <% }); %>
                           </div>
                         <% }); %>
@@ -97,10 +69,6 @@ function buildDetailUrl(kanjiChar, index) {
 
 <% } else if (currentMode === 'rsort' && typeof radicalStrokeGroups !== 'undefined') { %>
   <!-- Radical Stroke Groups -->
-  <%
-  // Build index map for grouped display order
-  let rsortIndex = 0;
-  %>
   <div class="scroller row search-results-container">
     <div class="search-results">
       <ul class="list-inline">
@@ -121,10 +89,9 @@ function buildDetailUrl(kanjiChar, index) {
                         <% radical.rows.forEach(row => { %>
                           <div class="grouped-row">
                             <% row.forEach(kanji => { %>
-                              <a href="<%= buildDetailUrl(kanji.ka_utf, rsortIndex++) %>"
+                              <a href="<%= buildDetailUrl(kanji.ka_utf) %>"
                                  id="<%= kanji.ka_id %>"
-                                 class="ka"
-                                 data-index="<%= kanji.sortedIndex %>"><%= kanji.ka_utf %></a>
+                                 class="ka"><%= kanji.ka_utf %></a>
                             <% }); %>
                           </div>
                         <% }); %>

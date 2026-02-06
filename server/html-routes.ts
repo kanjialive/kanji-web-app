@@ -429,15 +429,9 @@ router.get("/:character", async (req: Request, res: Response) => {
 
     const extendedDoc = extendKanjiWithAssets(doc);
 
-    // Get navigation context from query params
+    // Get search context from query params
     const searchQuery = (req.query.q as string) || "";
     const searchMode = (req.query.mode as string) || "kanji";
-    const currentIndex = parseInt(req.query.idx as string) || 0;
-    const totalResults = parseInt(req.query.total as string) || 1;
-    const prevKanji = (req.query.prev as string) || null;
-    const nextKanji = (req.query.next as string) || null;
-
-    // Check if this was an advanced search
     const isAdvanced = hasAdvancedParams(req.query as Record<string, any>);
 
     // Build display query for search input (show colon syntax for advanced searches)
@@ -445,32 +439,52 @@ router.get("/:character", async (req: Request, res: Response) => {
       ? buildAdvancedSearchInput(req.query as Record<string, any>)
       : searchQuery;
 
-    // Build the "back to search" URL - preserve all search params
-    let lastSearch = "";
+    // Compute navigation from search results (re-run the search to find neighbors)
+    let currentIndex = 0;
+    let totalResults = 1;
+    let prevKanji: string | null = null;
+    let nextKanji: string | null = null;
+
     if (searchQuery || isAdvanced) {
-      // Extract search-related params (exclude navigation params)
-      const searchParams = new URLSearchParams();
-      for (const [key, value] of Object.entries(req.query)) {
-        // Skip navigation-only params
-        if (["idx", "total", "prev", "next"].includes(key)) continue;
-        if (typeof value === "string") {
-          searchParams.set(key, value);
-        }
-      }
-      if (searchParams.toString()) {
-        lastSearch = `/htmx/search?${searchParams.toString()}`;
+      const results = await searchKanji(
+        searchQuery,
+        isAdvanced ? (req.query as Record<string, string>) : undefined
+      );
+
+      const kanjiStrokeGroups =
+        searchMode === "ksort" ? grouping.groupByKanjiStrokes(results) : [];
+      const radicalStrokeGroups =
+        searchMode === "rsort" ? grouping.groupByRadicalStrokes(results) : [];
+      const resultsOrder = buildResultsOrder(
+        results,
+        searchMode,
+        kanjiStrokeGroups,
+        radicalStrokeGroups
+      );
+
+      const idx = resultsOrder.indexOf(character);
+      if (idx !== -1) {
+        currentIndex = idx;
+        totalResults = resultsOrder.length;
+        prevKanji = idx > 0 ? resultsOrder[idx - 1] : null;
+        nextKanji = idx < resultsOrder.length - 1 ? resultsOrder[idx + 1] : null;
       }
     }
 
-    // Build query string for navigation (includes search params)
-    const navParams = new URLSearchParams();
+    // Build query string for navigation (search params only, no nav params)
+    const searchParams = new URLSearchParams();
     for (const [key, value] of Object.entries(req.query)) {
       if (["idx", "total", "prev", "next"].includes(key)) continue;
       if (typeof value === "string") {
-        navParams.set(key, value);
+        searchParams.set(key, value);
       }
     }
-    const queryString = navParams.toString() ? `?${navParams.toString()}` : "";
+    const queryString = searchParams.toString()
+      ? `?${searchParams.toString()}`
+      : "";
+
+    // Build "back to search" URL
+    const lastSearch = queryString ? `/htmx/search${queryString}` : "";
 
     res.render("pages/detail", {
       doc: extendedDoc,
