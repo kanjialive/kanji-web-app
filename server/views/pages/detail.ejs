@@ -216,11 +216,10 @@
       <h3 class="examples">Examples</h3>
       <div class="examples">
         <% doc.examples.forEach((example, index) => { %>
-          <div class="example"
-               x-data="{ showTranslation: false }"
-               @mouseenter="showTranslation = true"
-               @mouseleave="showTranslation = false">
-            <div class="example-text">
+          <div class="example">
+            <div x-data="{ showTranslation: false }"
+                 @mouseenter="showTranslation = true"
+                 @mouseleave="showTranslation = false">
               <div x-show="!showTranslation" class="example-ja example-japanese"><%- example.japanese %></div>
               <div x-show="showTranslation" class="example-ja" x-cloak><%- example.english %></div>
             </div>
