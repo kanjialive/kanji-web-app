@@ -125,6 +125,7 @@ document.addEventListener('alpine:init', () => {
       const currentIndex = this.modes.indexOf(this.mode);
       const newIndex = (currentIndex + direction + this.modes.length) % this.modes.length;
       this.mode = this.modes[newIndex];
+      this.currentGroup = 0;
 
       // Build URL for HTMX request
       let url = '/htmx/partials/results';
@@ -149,15 +150,40 @@ document.addEventListener('alpine:init', () => {
       // Clear stored query string when doing a new basic search via form
       // This ensures cycleMode uses the input value, not stale advanced params
       this.queryString = '';
-      this.mode = 'kanji'; // Reset to default mode
+      this.mode = 'kanji';
+      this.currentGroup = 0;
     },
 
+    currentGroup: 0,
+
     scrollForward() {
-      this.$refs.resultsContainer?.scrollBy({ left: 300, behavior: 'smooth' });
+      var container = this.$refs.resultsContainer;
+      if (!container) return;
+
+      if (this.mode === 'kanji') {
+        // Page-width scroll for basic view
+        container.scrollBy({ left: container.offsetWidth, behavior: 'smooth' });
+      } else {
+        // Group-based scroll for sorted views
+        var groups = container.querySelectorAll('.results-group');
+        if (groups.length === 0) return;
+        this.currentGroup = Math.min(groups.length - 1, this.currentGroup + 1);
+        container.scrollTo({ left: Math.max(0, groups[this.currentGroup].offsetLeft - 15), behavior: 'smooth' });
+      }
     },
 
     scrollBackward() {
-      this.$refs.resultsContainer?.scrollBy({ left: -300, behavior: 'smooth' });
+      var container = this.$refs.resultsContainer;
+      if (!container) return;
+
+      if (this.mode === 'kanji') {
+        container.scrollBy({ left: -container.offsetWidth, behavior: 'smooth' });
+      } else {
+        var groups = container.querySelectorAll('.results-group');
+        if (groups.length === 0) return;
+        this.currentGroup = Math.max(0, this.currentGroup - 1);
+        container.scrollTo({ left: Math.max(0, groups[this.currentGroup].offsetLeft - 15), behavior: 'smooth' });
+      }
     },
 
     handleWheel(event) {
