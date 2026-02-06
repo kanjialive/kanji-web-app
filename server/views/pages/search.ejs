@@ -89,7 +89,9 @@
   <main id="search-results"
         class="row3 scrollbar-wrapper"
         x-ref="resultsContainer"
-        @wheel="handleWheel($event)">
+        @wheel="handleWheel($event)"
+        @mouseenter="scrollbarVisible = true"
+        @mouseleave="scrollbarVisible = false">
     <% if (typeof results !== 'undefined' && results.length > 0) { %>
       <%- include('../partials/results', { results, mode, kanjiStrokeGroups, radicalStrokeGroups, query, resultsOrder }) %>
     <% } else if (typeof query !== 'undefined' && query) { %>
@@ -97,6 +99,12 @@
     <% } else { %>
       <%- include('../partials/welcome') %>
     <% } %>
+    <div class="custom-scrollbar-track"
+         x-show="scrollbarVisible"
+         x-transition:enter="sb-fade-in"
+         x-transition:leave="sb-fade-out">
+      <div class="custom-scrollbar-thumb" x-ref="scrollThumb"></div>
+    </div>
   </main>
 
   <!-- Help Modal -->
@@ -157,6 +165,22 @@ document.addEventListener('alpine:init', () => {
     },
 
     currentGroup: 0,
+    scrollbarVisible: false,
+
+    _updateScrollThumb() {
+      var scroller = this.$refs.resultsContainer?.querySelector('.scroller');
+      var thumb = this.$refs.scrollThumb;
+      if (!scroller || !thumb) return;
+      var sw = scroller.scrollWidth;
+      var ow = scroller.offsetWidth;
+      if (sw <= ow) { thumb.style.display = 'none'; return; }
+      thumb.style.display = '';
+      var thumbW = Math.max(30, (ow / sw) * ow);
+      var maxSL = sw - ow;
+      var sRatio = maxSL > 0 ? scroller.scrollLeft / maxSL : 0;
+      thumb.style.width = thumbW + 'px';
+      thumb.style.left = (sRatio * (ow - thumbW)) + 'px';
+    },
 
     _smoothScroll(el, target) {
       if (_animFrame) {
@@ -227,6 +251,21 @@ document.addEventListener('alpine:init', () => {
     },
 
     init() {
+      var self = this;
+
+      // Update custom scrollbar on scroll (capture phase catches child .scroller)
+      this.$refs.resultsContainer.addEventListener('scroll', function() {
+        self._updateScrollThumb();
+      }, true);
+
+      // Update after HTMX swaps new results
+      document.addEventListener('htmx:afterSettle', function() {
+        self._updateScrollThumb();
+      });
+
+      // Initial update
+      this._updateScrollThumb();
+
       // Keyboard shortcuts for arrow keys
       document.addEventListener('keydown', (e) => {
         if (e.target.tagName === 'INPUT') return;

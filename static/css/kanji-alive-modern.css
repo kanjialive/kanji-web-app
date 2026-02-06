@@ -392,25 +392,35 @@ span.search {
   overflow-y: hidden;
   position: relative;
   top: 23px;
-  scroll-behavior: smooth;
+  scrollbar-width: none;
 }
 
 .scroller::-webkit-scrollbar {
+  display: none;
+}
+
+/* Custom scrollbar (replaces native) */
+.custom-scrollbar-track {
+  position: absolute;
+  bottom: 6px;
+  left: 0;
+  right: 0;
   height: 5px;
 }
 
-.scroller::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.scroller::-webkit-scrollbar-thumb {
-  background: transparent;
+.custom-scrollbar-thumb {
+  position: absolute;
+  height: 5px;
+  background: #333;
   border-radius: 3px;
-  transition: background 0.2s;
 }
 
-.scroller:hover::-webkit-scrollbar-thumb {
-  background: var(--color-text);
+.sb-fade-in {
+  transition: opacity 0.2s ease;
+}
+
+.sb-fade-out {
+  transition: opacity 0.2s ease;
 }
 
 .search-results {
