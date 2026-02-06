@@ -280,7 +280,7 @@ h3 {
 
 .recordCounter .icon-left.disabled,
 .recordCounter .icon-right.disabled {
-  color: var(--color-border);
+  color: #999;
   cursor: default;
 }
 
