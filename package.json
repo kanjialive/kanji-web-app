@@ -18,7 +18,7 @@
   "scripts": {
     "tsc": "./node_modules/typescript/bin/tsc",
     "build": "tsc && npm run copyfiles",
-    "dev": "ts-node index.ts",
+    "dev": "ts-node server/index.ts",
     "copyfiles": "copyfiles 'index.html' 'static/**/*' 'partials/**/*' dist/ && cp -r server/views dist/",
     "postinstall": "npm run build",
     "start": "node dist/index.js"
