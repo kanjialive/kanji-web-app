@@ -770,7 +770,9 @@ h3#kanji {
   user-select: none;
   padding: 0;
   position: absolute;
-  top: 261px;
+  /* legacy <a> is top:261; our <button> lays out its glyph 4.3px higher,
+     so compensate to land the glyph box at production's y=390.2 */
+  top: 265.3px;
 }
 
 .ka-typeface-left {
