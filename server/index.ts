@@ -161,14 +161,28 @@ app.all("/*", function (req: Request, res: Response) {
     if (path === "/" || path === "") {
       return res.redirect("/htmx/search");
     }
-    // For kanji character paths, redirect to /htmx/:character
-    if (path.length <= 4 && !path.includes(".")) {
-      return res.redirect(`/htmx${path}`);
+    // Advanced search keeps its query string (must be checked before /search/)
+    if (path === "/search/advanced") {
+      const qIndex = req.originalUrl.indexOf("?");
+      const qs = qIndex >= 0 ? req.originalUrl.slice(qIndex) : "";
+      return res.redirect(`/htmx/search/advanced${qs}`);
     }
     // For search paths, redirect to /htmx/search
     if (path.startsWith("/search/")) {
-      const query = path.replace("/search/", "");
+      const query = decodeURIComponent(path.replace("/search/", ""));
       return res.redirect(`/htmx/search?q=${encodeURIComponent(query)}`);
+    }
+    // For kanji character paths, redirect to /htmx/:character
+    // (req.path is percent-encoded, so decode before the length check —
+    // "/分" arrives as "/%E5%88%86")
+    let decodedPath = path;
+    try {
+      decodedPath = decodeURIComponent(path);
+    } catch {
+      // malformed escape sequence — fall through to the SPA
+    }
+    if (decodedPath.length <= 4 && !decodedPath.includes(".")) {
+      return res.redirect(`/htmx${path}`);
     }
   }
 
