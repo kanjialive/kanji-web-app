@@ -231,9 +231,12 @@ h3 {
   user-select: none;
 }
 
-/* UA button padding shifted the Info label 6px right of production's <a> */
-.row1 button {
+/* UA button padding shifted the Info label 6px right of production's <a>;
+   the +2px matches the Safari button-baseline offset (see .sort-button) */
+.info-button {
   padding: 0;
+  position: relative;
+  top: 2px;
 }
 
 .row2 {
