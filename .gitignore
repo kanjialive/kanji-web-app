@@ -57,12 +57,16 @@ dist/
 # assistant's working notes and must never reach the public github remote.
 CLAUDE.md
 
-# offline/ and plans/ untracked (maintainer decision 2026-07-11): internal
-# analyses, session logs, and security reviews carrying file:line locations for
-# unfixed issues. Previously tracked deliberately "so the roadmap survives
-# outside a single machine"; that is now outweighed by the disclosure risk on
-# the public github remote. NOTE: files already committed under offline/ and
-# plans/ are still in the index and in history — ignoring them does not untrack
-# or remove them. `git rm -r --cached` + a history scrub are separate steps.
+# offline/, plans/ and migration.md untracked (maintainer decision 2026-07-11):
+# internal analyses, session logs, migration plans, and security reviews
+# carrying file:line locations for unfixed issues. Previously tracked
+# deliberately "so the roadmap survives outside a single machine"; that is now
+# outweighed by the disclosure risk on the public github remote. All three were
+# also scrubbed from history with git-filter-repo — none had ever reached the
+# public remote (github/heroku sit at 1d1e444, which never contained them).
+#
+# NOTE: .gitignore does NOT untrack an already-committed path. Adding notes to a
+# new location? `git rm -r --cached` it too, or it ships.
 offline/
 plans/
+migration.md
