@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { generateBasicQuery, parseAdvancedQuery } from "./search";
+import { generateBasicQuery, parseAdvancedQuery, StringDict } from "./search";
 
 test("generateBasicQuery builds an $or over the four search fields", () => {
   assert.deepEqual(generateBasicQuery("a"), {
@@ -51,10 +51,20 @@ test("parseAdvancedQuery returns an empty object for empty input", () => {
 });
 
 // Injection guards (plans/002): Express's qs parser can deliver operator objects
-// (e.g. ?kanji[$ne]=x). Non-string operands must be dropped, never embedded in
-// the Mongo filter. Cast to `any` to simulate the runtime object past StringDict.
+// (e.g. ?kanji[$ne]=x). Non-string operands must be dropped, never embedded in the
+// Mongo filter. The `as unknown as StringDict` casts deliberately push a non-string
+// operand past the parameter type to simulate that runtime shape.
 test("parseAdvancedQuery ignores operator-object operands (injection guard)", () => {
-  assert.deepEqual(parseAdvancedQuery({ kanji: { $ne: "x" } } as any), {});
-  assert.deepEqual(parseAdvancedQuery({ on: { $regex: ".*" } } as any), {});
-  assert.deepEqual(parseAdvancedQuery({ text: { $gt: "" } } as any), {});
+  assert.deepEqual(
+    parseAdvancedQuery({ kanji: { $ne: "x" } } as unknown as StringDict),
+    {}
+  );
+  assert.deepEqual(
+    parseAdvancedQuery({ on: { $regex: ".*" } } as unknown as StringDict),
+    {}
+  );
+  assert.deepEqual(
+    parseAdvancedQuery({ text: { $gt: "" } } as unknown as StringDict),
+    {}
+  );
 });

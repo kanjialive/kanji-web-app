@@ -15,8 +15,4 @@ jobs:
       - run: npm ci
       - run: npm run typecheck
       - run: npm test --if-present
-      # Lint is advisory for now: the existing code has a backlog of style
-      # findings (var/const, unused vars, explicit any). Kept non-blocking so
-      # CI reports them without failing the build; tighten once burned down.
       - run: npm run lint --if-present
-        continue-on-error: true

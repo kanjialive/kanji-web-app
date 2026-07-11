@@ -1,11 +1,11 @@
-import { MongoClient, ServerApiVersion } from "mongodb";
+import { MongoClient, ServerApiVersion, Db } from "mongodb";
 import path from "path";
 import express, { Request, Response, NextFunction } from "express";
+import promBundle from "express-prom-bundle";
 import * as private_api from "./private-api";
 import * as public_api from "./public-api";
 import * as html_routes from "./html-routes";
 
-const promBundle = require("express-prom-bundle");
 const app = express();
 
 // Configure EJS as the view engine
@@ -27,7 +27,7 @@ if (!MASHAPE_SECRET) {
   process.exit(1);
 }
 
-let db: any;
+let db: Db;
 
 const client = new MongoClient(MONGODB_URI, {
   serverApi: {

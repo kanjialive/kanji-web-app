@@ -4,7 +4,7 @@
  */
 
 import { Router, Request, Response } from "express";
-import { Db, Collection } from "mongodb";
+import { Db, Collection, Filter } from "mongodb";
 import * as search from "./search";
 import * as grouping from "./grouping";
 import { KanjiDocument } from "./types";
@@ -24,7 +24,7 @@ const ADVANCED_KEYS = ["ks", "rs", "grade", "kanji", "kem", "rem", "on", "kun", 
 /**
  * Check if request has advanced search parameters.
  */
-function hasAdvancedParams(query: Record<string, any>): boolean {
+function hasAdvancedParams(query: Record<string, unknown>): boolean {
   return ADVANCED_KEYS.some((key) => key in query);
 }
 
@@ -35,7 +35,7 @@ function hasAdvancedParams(query: Record<string, any>): boolean {
  *
  * Angular's equivalent was: query.replace(/=/g, ':').replace(/&/g, ' ')
  */
-function buildAdvancedSearchInput(query: Record<string, any>): string {
+function buildAdvancedSearchInput(query: Record<string, unknown>): string {
   const parts: string[] = [];
   for (const key of ADVANCED_KEYS) {
     if (query[key]) parts.push(`${key}:${query[key]}`);
@@ -99,7 +99,7 @@ async function searchKanji(
   basicQuery: string,
   advancedParams?: Record<string, string>
 ): Promise<grouping.KanjiSearchResult[]> {
-  let searchQuery: Record<string, any>;
+  let searchQuery: Record<string, unknown>;
 
   if (advancedParams && hasAdvancedParams(advancedParams)) {
     // Use advanced search
@@ -117,7 +117,7 @@ async function searchKanji(
 
   const collection: Collection<KanjiDocument> = db.collection("kanji");
   const results = await collection
-    .find(searchQuery, {
+    .find(searchQuery as Filter<KanjiDocument>, {
       projection: {
         ka_id: 1,
         ka_utf: 1,
@@ -188,7 +188,7 @@ function buildResultsOrder(
 router.get("/search", async (req: Request, res: Response) => {
   const basicQuery = (req.query.q as string) || "";
   const mode = (req.query.mode as string) || "kanji";
-  const isAdvanced = hasAdvancedParams(req.query as Record<string, any>);
+  const isAdvanced = hasAdvancedParams(req.query as Record<string, unknown>);
 
   // Parse colon syntax in basic query (e.g., "on:shin grade:3") → redirect
   if (basicQuery && !isAdvanced) {
@@ -202,7 +202,7 @@ router.get("/search", async (req: Request, res: Response) => {
 
   // Build display query for UI
   const displayQuery = isAdvanced
-    ? buildAdvancedSearchInput(req.query as Record<string, any>)
+    ? buildAdvancedSearchInput(req.query as Record<string, unknown>)
     : basicQuery;
 
   try {
@@ -273,9 +273,9 @@ router.get("/search/advanced", async (req: Request, res: Response) => {
  * Supports both basic search (?q=...) and advanced search (?on=...&grade=...)
  */
 router.get("/partials/results", async (req: Request, res: Response) => {
-  let basicQuery = (req.query.q as string) || "";
+  const basicQuery = (req.query.q as string) || "";
   const mode = (req.query.mode as string) || "kanji";
-  let isAdvanced = hasAdvancedParams(req.query as Record<string, any>);
+  const isAdvanced = hasAdvancedParams(req.query as Record<string, unknown>);
   let effectiveAdvancedParams: Record<string, string> | undefined;
 
   // Parse colon syntax in basic query (e.g., "on:shin grade:3") → redirect
@@ -363,11 +363,11 @@ router.get("/:character", async (req: Request, res: Response) => {
     // Get search context from query params
     const searchQuery = (req.query.q as string) || "";
     const searchMode = (req.query.mode as string) || "kanji";
-    const isAdvanced = hasAdvancedParams(req.query as Record<string, any>);
+    const isAdvanced = hasAdvancedParams(req.query as Record<string, unknown>);
 
     // Build display query for search input (show colon syntax for advanced searches)
     const displaySearchQuery = isAdvanced
-      ? buildAdvancedSearchInput(req.query as Record<string, any>)
+      ? buildAdvancedSearchInput(req.query as Record<string, unknown>)
       : searchQuery;
 
     // Compute navigation from search results (re-run the search to find neighbors)

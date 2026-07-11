@@ -14,9 +14,11 @@ const getKanjiWithObject = async (obj: object, req: Request, res: Response) => {
   try {
     const collection: Collection<KanjiDocument> = db.collection("kanji");
     const result: KanjiDocument | null = await collection.findOne(obj);
-    result
-      ? res.send(extendKanjiWithAssets(result))
-      : res.send({ Error: "No kanji found." });
+    if (result) {
+      res.send(extendKanjiWithAssets(result));
+    } else {
+      res.send({ Error: "No kanji found." });
+    }
   } catch (error) {
     console.error(error);
     res.send({ Error: "No kanji found." });
@@ -53,7 +55,11 @@ const getSearchResultsWithQuery = async (
           },
         })
         .toArray();
-      results ? res.send(results) : res.send({ error: "No kanji found." });
+      if (results) {
+        res.send(results);
+      } else {
+        res.send({ error: "No kanji found." });
+      }
     } catch (error) {
       console.error(error);
       res.send({ error: "No kanji found." });
@@ -62,7 +68,7 @@ const getSearchResultsWithQuery = async (
 };
 
 export const advancedSearch = async (
-  req: Request<any, any, any, search.StringDict>,
+  req: Request<Record<string, string>, unknown, unknown, search.StringDict>,
   res: Response
 ) => {
   const basic = req.query.basic;

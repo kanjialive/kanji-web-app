@@ -1,5 +1,5 @@
 interface ParsedQuery {
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 export interface StringDict {

@@ -52,13 +52,13 @@ const getSearchResultsWithQuery = async (
       }));
       res.send(structured_results);
     }
-  } catch (error) {
+  } catch {
     res.send({ error: "No kanji found." });
   }
 };
 
 export const advancedSearch = async (
-  req: Request<any, any, any, search.StringDict>,
+  req: Request<Record<string, string>, unknown, unknown, search.StringDict>,
   res: Response
 ) => {
   const query = search.parseAdvancedQuery(req.query);
@@ -76,10 +76,12 @@ export const getKanjiWithCharacter = async (req: Request, res: Response) => {
     const result: KanjiDocument | null = await collection.findOne({
       ka_utf: req.params.character,
     });
-    result
-      ? res.send(extendKanjiWithAssets(result))
-      : res.send({ error: "No kanji found." });
-  } catch (error) {
+    if (result) {
+      res.send(extendKanjiWithAssets(result));
+    } else {
+      res.send({ error: "No kanji found." });
+    }
+  } catch {
     res.send({ error: "No kanji found." });
   }
 };
@@ -96,7 +98,7 @@ export const getAllKanji = async (req: Request, res: Response) => {
       );
       res.send(structured_results);
     }
-  } catch (error) {
+  } catch {
     res.send({ error: "No kanji found." });
   }
 };
@@ -104,7 +106,6 @@ export const getAllKanji = async (req: Request, res: Response) => {
 const animation_path = "https://media.kanjialive.com/kanji_animations/";
 const rad_anim_path = "https://media.kanjialive.com/rad_frames/";
 const strokes_path = "https://media.kanjialive.com/kanji_strokes/";
-const typeface_path = "https://media.kanjialive.com/ka_typefaces/";
 const rad_char_path = "https://media.kanjialive.com/radical_character/";
 const examples_path = "https://media.kanjialive.com/examples_audio/";
 const rad_position_path = "https://media.kanjialive.com/rad_positions/";
@@ -112,10 +113,7 @@ const rad_position_path = "https://media.kanjialive.com/rad_positions/";
 export function extendKanjiWithAssets(
   doc: KanjiDocument
 ): SimpleExtendedKanjiDocument {
-  let id = "000000" + doc.ka_id.split("_")[1];
-  var paddedID = id.substring(id.length - 4);
-
-  let stroke_images = [];
+  const stroke_images: string[] = [];
 
   for (let i = 1; i <= doc.kstroke; i++) {
     stroke_images.push(strokes_path + doc.kname + "_" + i + ".svg");
@@ -159,9 +157,9 @@ export function extendKanjiWithAssets(
   //};
 
   /// setup radical
-  var rad_position_file = "";
+  let rad_position_file = "";
   if (doc.rad_position.length > 0) {
-    var rad_positions = doc.rad_position.split(",");
+    const rad_positions = doc.rad_position.split(",");
     rad_position_file = rad_positions[rad_positions.length - 1].trim();
     rad_position_file = rad_position_path + rad_position_file + ".svg";
   }
@@ -190,14 +188,14 @@ export function extendKanjiWithAssets(
   };
 
   /// setup references
-  var references = {
+  const references = {
     grade: doc.grade,
     kodansha: doc.dick,
     classic_nelson: doc.dicn,
   };
 
   /// setup examples
-  var alpha = [
+  const alpha = [
     "a",
     "b",
     "c",
@@ -225,9 +223,9 @@ export function extendKanjiWithAssets(
     "y",
     "z",
   ];
-  var examples: Example[] = [];
+  const examples: Example[] = [];
 
-  for (var i = 0; i < doc.examples.length; i++) {
+  for (let i = 0; i < doc.examples.length; i++) {
     const example: Example = {
       japanese: doc.examples[i][0],
       meaning: { english: doc.examples[i][1] },
