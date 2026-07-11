@@ -153,6 +153,8 @@ h3 {
   width: var(--container-width);
   min-height: var(--container-min-height);
   margin: 55px auto;
+  padding: 0 15px;
+  display: flow-root;
   background-color: var(--color-bg-white);
   box-shadow: 0 3px 6px rgba(100, 100, 100, 0.3);
 }
@@ -623,6 +625,7 @@ video[poster] {
 h3#kanji {
   position: absolute;
   top: 10px;
+  margin-top: 20px;
   margin-left: -1px;
 }
 
@@ -677,6 +680,7 @@ h3#kanji {
 h3.meaning, h3.strokes, h3.grade, h3.examples {
   position: absolute;
   top: 10px;
+  margin-top: 20px;
 }
 
 p.meaning, p.strokes, p.grade, div.examples {
