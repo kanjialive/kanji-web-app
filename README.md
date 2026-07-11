@@ -11,6 +11,21 @@ This project is a Japanese kanji learning web application [https://app.kanjialiv
   2. Angular controllers for search, detail, and documentation views
   3. Custom media handling for kanji stroke animations and audio
 
+### Environment setup
+
+Copy `.env.example` to `.env` and fill in the values:
+
+```bash
+cp .env.example .env
+```
+
+`MONGODB_URI` and `MASHAPE_SECRET` are required — the server exits on startup if
+either is missing. `PORT` (default 5000) and `USE_HTMX` are optional.
+
+The project does not use `dotenv`: `.env` is read by `docker-compose` (via
+`env_file`). To run the server directly with `npm run dev` or `npm start`, export
+the variables into your shell first (e.g. `export $(grep -v '^#' .env | xargs)`).
+
 ### Developer API and data
 
 Our [data and media](https://github.com/kanjialive/data-media) repository includes all of the language data and media files created for _Kanji alive_. We expected that these files will primarily interest instructors and students who want to re-use them for teaching and learning. Developers may prefer instead to make use of our free, [public API](https://rapidapi.com/KanjiAlive/api/learn-to-read-and-write-japanese-kanji) ([docs](https://app.kanjialive.com/api/docs/)) to the _Kanji alive_ web application. 
