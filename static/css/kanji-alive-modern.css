@@ -433,16 +433,12 @@ span.search {
 /* ============================================
    Version
    ============================================ */
+/* No font-size override — production's version text inherits the body's 15px */
 .version {
   position: absolute;
   width: 1103px;
   top: 579px;
   color: var(--color-text-muted);
-}
-
-.version p {
-  margin: 0;
-  font-size: 14px;
 }
 
 /* ============================================
