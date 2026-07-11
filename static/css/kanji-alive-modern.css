@@ -339,6 +339,13 @@ h3 {
   top: 0;
 }
 
+/* The search header renders the chevrons as <button>s (detail uses <a>s);
+   Safari lays a button's glyph 1.9px lower within the same box */
+.recordCounter button.icon-left,
+.recordCounter button.icon-right {
+  top: -1.9px;
+}
+
 .recordCounter .icon-left.disabled,
 .recordCounter .icon-right.disabled {
   color: var(--color-primary);
