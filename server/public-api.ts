@@ -35,24 +35,21 @@ const getSearchResultsWithQuery = async (
       })
       .toArray();
 
-    if (!results) {
-      res.send({ error: "No kanji found." });
-    } else {
-      const structured_results = results.map((doc) => ({
-        kanji: {
-          //'id':doc['ka_id'],
-          character: doc["ka_utf"],
-          stroke: doc["kstroke"],
-        },
-        radical: {
-          character: doc["rad_utf"],
-          stroke: doc["rad_stroke"],
-          order: doc["rad_order"],
-        },
-      }));
-      res.send(structured_results);
-    }
-  } catch {
+    const structured_results = results.map((doc) => ({
+      kanji: {
+        //'id':doc['ka_id'],
+        character: doc["ka_utf"],
+        stroke: doc["kstroke"],
+      },
+      radical: {
+        character: doc["rad_utf"],
+        stroke: doc["rad_stroke"],
+        order: doc["rad_order"],
+      },
+    }));
+    res.send(structured_results);
+  } catch (error) {
+    console.error(error);
     res.send({ error: "No kanji found." });
   }
 };
@@ -81,7 +78,8 @@ export const getKanjiWithCharacter = async (req: Request, res: Response) => {
     } else {
       res.send({ error: "No kanji found." });
     }
-  } catch {
+  } catch (error) {
+    console.error(error);
     res.send({ error: "No kanji found." });
   }
 };
@@ -90,15 +88,12 @@ export const getAllKanji = async (req: Request, res: Response) => {
   try {
     const collection: Collection<KanjiDocument> = db.collection("kanji");
     const results: KanjiDocument[] = await collection.find({}).toArray();
-    if (!results) {
-      res.send({ error: "No kanji found." });
-    } else {
-      const structured_results = results.map((doc) =>
-        extendKanjiWithAssets(doc)
-      );
-      res.send(structured_results);
-    }
-  } catch {
+    const structured_results = results.map((doc) =>
+      extendKanjiWithAssets(doc)
+    );
+    res.send(structured_results);
+  } catch (error) {
+    console.error(error);
     res.send({ error: "No kanji found." });
   }
 };

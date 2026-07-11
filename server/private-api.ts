@@ -17,11 +17,11 @@ const getKanjiWithObject = async (obj: object, req: Request, res: Response) => {
     if (result) {
       res.send(extendKanjiWithAssets(result));
     } else {
-      res.send({ Error: "No kanji found." });
+      res.status(404).send({ error: "No kanji found." });
     }
   } catch (error) {
     console.error(error);
-    res.send({ Error: "No kanji found." });
+    res.status(500).send({ error: "An error occurred." });
   }
 };
 
@@ -55,14 +55,10 @@ const getSearchResultsWithQuery = async (
           },
         })
         .toArray();
-      if (results) {
-        res.send(results);
-      } else {
-        res.send({ error: "No kanji found." });
-      }
+      res.send(results);
     } catch (error) {
       console.error(error);
-      res.send({ error: "No kanji found." });
+      res.status(500).send({ error: "An error occurred." });
     }
   }
 };
