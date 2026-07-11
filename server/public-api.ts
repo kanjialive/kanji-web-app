@@ -8,6 +8,14 @@ import {
   KanjiDocument,
   Radical,
 } from "./types";
+import {
+  examplesAudioBase,
+  animationPath,
+  radAnimPath,
+  strokesPath,
+  radCharPath,
+  radPositionPath,
+} from "./kanji-assets";
 
 let db: Db;
 
@@ -98,20 +106,13 @@ export const getAllKanji = async (req: Request, res: Response) => {
   }
 };
 
-const animation_path = "https://media.kanjialive.com/kanji_animations/";
-const rad_anim_path = "https://media.kanjialive.com/rad_frames/";
-const strokes_path = "https://media.kanjialive.com/kanji_strokes/";
-const rad_char_path = "https://media.kanjialive.com/radical_character/";
-const examples_path = "https://media.kanjialive.com/examples_audio/";
-const rad_position_path = "https://media.kanjialive.com/rad_positions/";
-
 export function extendKanjiWithAssets(
   doc: KanjiDocument
 ): SimpleExtendedKanjiDocument {
   const stroke_images: string[] = [];
 
   for (let i = 1; i <= doc.kstroke; i++) {
-    stroke_images.push(strokes_path + doc.kname + "_" + i + ".svg");
+    stroke_images.push(strokesPath + "/" + doc.kname + "_" + i + ".svg");
   }
 
   /// setup kanji
@@ -134,9 +135,9 @@ export function extendKanjiWithAssets(
       hiragana: doc.kunyomi_ka_display,
     },
     video: {
-      poster: strokes_path + doc.kname + "_" + doc.kstroke + ".svg",
-      mp4: animation_path + "kanji_mp4/" + doc.kname + "_00.mp4",
-      webm: animation_path + "kanji_webm/" + doc.kname + "_00.webm",
+      poster: strokesPath + "/" + doc.kname + "_" + doc.kstroke + ".svg",
+      mp4: animationPath + "/kanji_mp4/" + doc.kname + "_00.mp4",
+      webm: animationPath + "/kanji_webm/" + doc.kname + "_00.webm",
     },
   };
 
@@ -156,13 +157,13 @@ export function extendKanjiWithAssets(
   if (doc.rad_position.length > 0) {
     const rad_positions = doc.rad_position.split(",");
     rad_position_file = rad_positions[rad_positions.length - 1].trim();
-    rad_position_file = rad_position_path + rad_position_file + ".svg";
+    rad_position_file = radPositionPath + "/" + rad_position_file + ".svg";
   }
 
   const radical: Radical = {
     character: doc.rad_utf,
     strokes: doc.rad_stroke,
-    image: rad_char_path + doc.rad_name_file + ".svg",
+    image: radCharPath + "/" + doc.rad_name_file + ".svg",
     position: {
       hiragana: doc.rad_position_ja,
       romaji: doc.rad_position,
@@ -176,9 +177,9 @@ export function extendKanjiWithAssets(
       english: doc.rad_meaning,
     },
     animation: [
-      rad_anim_path + doc.rad_name_file + "0.svg",
-      rad_anim_path + doc.rad_name_file + "1.svg",
-      rad_anim_path + doc.rad_name_file + "2.svg",
+      radAnimPath + "/" + doc.rad_name_file + "0.svg",
+      radAnimPath + "/" + doc.rad_name_file + "1.svg",
+      radAnimPath + "/" + doc.rad_name_file + "2.svg",
     ],
   };
 
@@ -226,18 +227,33 @@ export function extendKanjiWithAssets(
       meaning: { english: doc.examples[i][1] },
       audio: {
         opus:
-          examples_path +
-          "audio-opus/" +
+          examplesAudioBase +
+          "/audio-opus/" +
           doc.kname +
           "_06_" +
           alpha[i] +
           ".opus",
         aac:
-          examples_path + "audio-aac/" + doc.kname + "_06_" + alpha[i] + ".aac",
+          examplesAudioBase +
+          "/audio-aac/" +
+          doc.kname +
+          "_06_" +
+          alpha[i] +
+          ".aac",
         ogg:
-          examples_path + "audio-ogg/" + doc.kname + "_06_" + alpha[i] + ".ogg",
+          examplesAudioBase +
+          "/audio-ogg/" +
+          doc.kname +
+          "_06_" +
+          alpha[i] +
+          ".ogg",
         mp3:
-          examples_path + "audio-mp3/" + doc.kname + "_06_" + alpha[i] + ".mp3",
+          examplesAudioBase +
+          "/audio-mp3/" +
+          doc.kname +
+          "_06_" +
+          alpha[i] +
+          ".mp3",
       },
     };
     examples.push(example);
