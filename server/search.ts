@@ -39,25 +39,29 @@ export const parseAdvancedQuery = (query: StringDict): ParsedQuery => {
 
   for (const key in string_keys) {
     if (Object.prototype.hasOwnProperty.call(query, key)) {
-      parsed_query[string_keys[key]] = query[key];
+      if (typeof query[key] === "string") {
+        parsed_query[string_keys[key]] = query[key];
+      }
     }
   }
 
   for (const key in array_keys) {
     if (Object.prototype.hasOwnProperty.call(query, key)) {
-      let array_key = array_keys[key];
-      array_key += !/[a-zA-Z0-9]/.test(query[key]) ? "_ja_search" : "_search";
+      if (typeof query[key] === "string") {
+        let array_key = array_keys[key];
+        array_key += !/[a-zA-Z0-9]/.test(query[key]) ? "_ja_search" : "_search";
 
-      parsed_query[array_key] = { $in: [query[key]] };
+        parsed_query[array_key] = { $in: [query[key]] };
+      }
     }
   }
 
   for (const key in textbook_keys) {
     if (Object.prototype.hasOwnProperty.call(query, key)) {
-      const textbook_key = textbook_keys[key];
       const textbook_value = query[key];
-
-      parsed_query[textbook_key] = { $in: [textbook_value] };
+      if (typeof textbook_value === "string") {
+        parsed_query[textbook_keys[key]] = { $in: [textbook_value] };
+      }
     }
   }
 

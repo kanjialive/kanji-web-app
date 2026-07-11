@@ -65,9 +65,10 @@ export const advancedSearch = async (
   req: Request<any, any, any, search.StringDict>,
   res: Response
 ) => {
+  const basic = req.query.basic;
   const query =
-    req.query.basic !== undefined
-      ? search.generateBasicQuery(req.query.basic)
+    typeof basic === "string"
+      ? search.generateBasicQuery(basic)
       : search.parseAdvancedQuery(req.query);
   await getSearchResultsWithQuery(query, req, res);
 };

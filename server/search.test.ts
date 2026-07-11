@@ -49,3 +49,12 @@ test("parseAdvancedQuery maps textbook key to textbook_search", () => {
 test("parseAdvancedQuery returns an empty object for empty input", () => {
   assert.deepEqual(parseAdvancedQuery({}), {});
 });
+
+// Injection guards (plans/002): Express's qs parser can deliver operator objects
+// (e.g. ?kanji[$ne]=x). Non-string operands must be dropped, never embedded in
+// the Mongo filter. Cast to `any` to simulate the runtime object past StringDict.
+test("parseAdvancedQuery ignores operator-object operands (injection guard)", () => {
+  assert.deepEqual(parseAdvancedQuery({ kanji: { $ne: "x" } } as any), {});
+  assert.deepEqual(parseAdvancedQuery({ on: { $regex: ".*" } } as any), {});
+  assert.deepEqual(parseAdvancedQuery({ text: { $gt: "" } } as any), {});
+});
