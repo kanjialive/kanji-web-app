@@ -231,6 +231,11 @@ h3 {
   user-select: none;
 }
 
+/* UA button padding shifted the Info label 6px right of production's <a> */
+.row1 button {
+  padding: 0;
+}
+
 .row2 {
   position: absolute;
   top: var(--row-height);
@@ -287,6 +292,10 @@ h3 {
   font-family: var(--font-en);
   font-size: 17px;
   color: var(--color-primary);
+  /* Safari places a <button>'s baseline higher than production's inline <a>;
+     +2px puts the glyph box at production's y (56.6 rel .container) */
+  position: relative;
+  top: 2px;
 }
 
 /* ============================================
@@ -310,15 +319,20 @@ h3 {
   color: var(--color-primary);
 }
 
+/* Chevron glyph boxes are lifted so the bracket TIP (glyph vertical center)
+   sits at the search box's mid-height (y=63 rel .container) — intentionally
+   3.3px above the legacy app, which the maintainer flagged as slightly low */
 .recordCounter .icon-left {
   margin-left: -10px;
+  position: relative;
+  top: -5.2px;
 }
 
 .recordCounter .icon-right {
   position: absolute;
   height: 25px;
   left: 121px;
-  top: 0;
+  top: -5.2px;
 }
 
 .recordCounter .icon-left.disabled,
