@@ -22,6 +22,11 @@
   --color-kbd-bg: #f9f2f4;        /* keyboard shortcut background */
 
   /* Fonts */
+  /* --font-base is the legacy body stack: EN then JP faces, generic LAST.
+     Never build a stack as var(--font-en), var(--font-jp) — the generic
+     sans-serif inside --font-en makes every family after it unreachable,
+     so Japanese text silently falls back to the system font. */
+  --font-base: 'SourceSansPro-Regular', 'Yu Gothic Medium', 'mplus-1m-light', 'ヒラギノ角ゴ Pro W3', 'Hiragino Kaku Gothic Pro', 'メイリオ', 'Meiryo', sans-serif;
   --font-jp: 'Yu Gothic Medium', 'mplus-1m-light', 'Hiragino Kaku Gothic Pro', 'Meiryo', sans-serif;
   --font-en: 'SourceSansPro-Regular', sans-serif;
   --font-en-italic: 'SourceSansPro-It', 'SourceSansPro-Regular', sans-serif;
@@ -106,11 +111,25 @@ html {
 }
 
 body {
-  font-family: var(--font-en), var(--font-jp);
+  font-family: var(--font-base);
   background-color: var(--color-bg-dark);
+  color: #333; /* Bootstrap body color — production text is #333, not black */
   font-size: 15px;
   margin: 0;
   line-height: 1.42857143; /* Bootstrap's default — row pitch and text metrics depend on it */
+}
+
+/* Production antialiases ONLY these (legacy kanji-alive.css); body text renders
+   with default smoothing and therefore reads slightly heavier */
+h3,
+.ka-welcome-title,
+.ka-welcome-text,
+.ka-welcome-text p,
+.ka-results-h1,
+.ka-results-h3,
+.kanji,
+.ka-radical,
+a.ka {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -147,6 +166,7 @@ button {
 h3 {
   font-family: var(--font-en);
   font-size: 17px;
+  font-weight: 500; /* Bootstrap heading weight — UA default 700 renders too bold */
   color: var(--color-secondary);
   margin: 0;
   line-height: 1.1; /* Bootstrap heading metric — keeps glyph baselines aligned */
@@ -244,7 +264,7 @@ h3 {
   padding: var(--spacing-xs) 0 1px 10px;
   height: 32px;
   width: 220px;
-  font-family: var(--font-en), var(--font-jp);
+  font-family: var(--font-base);
   font-size: 17px;
 }
 
@@ -633,6 +653,10 @@ a.ka:active {
 
 video {
   width: 100%;
+  /* Visually a no-op, but keeps Safari from promoting the playing video to a
+     hardware overlay plane, which can draw 1px seams at the plane edges
+     (visible on screen yet absent from screenshots/screen recordings) */
+  clip-path: inset(0);
 }
 
 video[poster] {
@@ -641,11 +665,33 @@ video[poster] {
   margin-left: 6px;
 }
 
+/* Legacy pins the three video-control icons absolutely (left 63/122/175 within
+   the column) rather than flex-centering them */
 .animation-controls {
-  margin-top: var(--spacing-md);
-  display: flex;
-  justify-content: center;
-  gap: var(--spacing-md);
+  margin-top: 16px;
+}
+
+.animation-controls button {
+  padding: 0;
+}
+
+.animation-controls .icon-step-left {
+  position: absolute;
+  left: 63px;
+  width: 20px;
+}
+
+.animation-controls .icon-play,
+.animation-controls .icon-pause {
+  position: absolute;
+  left: 122px;
+  width: 20px;
+}
+
+.animation-controls .icon-step-right {
+  position: absolute;
+  left: 175px;
+  width: 20px;
 }
 
 h3#kanji {
@@ -660,6 +706,7 @@ h3#kanji {
   font-family: var(--font-multimedia);
   font-style: normal;
   font-weight: normal;
+  line-height: normal;
   font-size: 20px;
   color: black;
   cursor: pointer;
@@ -895,66 +942,85 @@ img.ka-breakdown:hover {
 /* ============================================
    Modals (HTML Dialog)
    ============================================ */
+/* Geometry and chrome measured from production's Bootstrap modal */
 .help-modal {
-  border: none;
-  border-radius: 8px;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  border-radius: 6px;
   padding: 0;
-  max-width: 600px;
-  width: 90%;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  width: 600px;
+  margin: 30px auto auto;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+  color: #333;
 }
 
 .help-modal::backdrop {
   background: rgba(0, 0, 0, 0.5);
 }
 
+.help-modal a {
+  color: #337ab7; /* Bootstrap link blue — production modal links keep it */
+}
+
 .modal-content {
-  padding: var(--spacing-lg);
   position: relative;
 }
 
+.modal-header {
+  padding: 15px;
+  border-bottom: 1px solid #e5e5e5;
+}
+
+.modal-body {
+  padding: 15px;
+}
+
 .modal-close {
-  position: absolute;
-  top: var(--spacing-sm);
-  right: var(--spacing-md);
-  font-size: 24px;
-  color: var(--color-text-muted);
+  float: right;
+  font-size: 21px;
+  font-weight: 700;
+  line-height: 21px;
+  margin: -2px 0 0;
+  padding: 0;
+  color: #000;
+  text-shadow: 0 1px 0 #fff;
+  opacity: 0.2;
   cursor: pointer;
   background: none;
   border: none;
 }
 
 .modal-close:hover {
-  color: var(--color-text);
+  opacity: 0.5;
 }
 
-.modal-content h2 {
-  margin-top: 0;
+.modal-header h2 {
+  margin: 20px 0 10px;
+  font-size: 17px;
+  font-weight: 500;
+  line-height: 1.1;
   color: var(--color-secondary);
   font-family: var(--font-en);
 }
 
-.modal-content h3 {
-  margin-top: var(--spacing-lg);
-  margin-bottom: var(--spacing-sm);
+/* Section headings render like production's red h4s */
+.modal-body h3 {
+  margin: 10px 0;
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--color-primary);
 }
 
 .help-table {
   width: 100%;
+  border: 1px solid #ddd;
   border-collapse: collapse;
-  margin: var(--spacing-md) 0;
+  margin-bottom: 10px;
 }
 
 .help-table td {
-  padding: var(--spacing-xs) var(--spacing-sm);
-  border-bottom: 1px solid var(--color-border);
-}
-
-.help-table code {
-  background: var(--color-bg);
-  padding: 2px 6px;
-  border-radius: 3px;
-  font-size: 0.9em;
+  padding: 5px;
+  border: 1px solid #ddd;
+  vertical-align: top;
 }
 
 .help-footer {
@@ -962,13 +1028,15 @@ img.ka-breakdown:hover {
   text-align: center;
 }
 
-/* Keyboard shortcuts */
+/* Keyboard shortcuts / advanced-search keys (production styles these like code) */
 kbd {
   color: var(--color-kbd-text);
   background-color: var(--color-kbd-bg);
+  font-family: Menlo, Monaco, Consolas, "Courier New", monospace;
   font-size: 12px;
-  padding: 2px 6px;
+  padding: 2px 4px;
   border-radius: 3px;
+  box-shadow: inset 0 -1px 0 rgba(0, 0, 0, 0.25);
 }
 
 code {

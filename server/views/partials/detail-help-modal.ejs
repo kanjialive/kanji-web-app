@@ -1,7 +1,9 @@
 <div class="modal-content">
-  <button class="modal-close" @click="$refs.helpDialog.close()" aria-label="Close">&times;</button>
-
-  <h2>Quick Reference</h2>
+  <div class="modal-header">
+    <button class="modal-close" @click="$refs.helpDialog.close()" aria-label="Close">&times;</button>
+    <h2>Quick Reference</h2>
+  </div>
+  <div class="modal-body">
 
   <p>Please see our
     <a href="http://kanjialive.com/user-guide/" target="_blank" rel="noopener">User Guide</a> for detailed explanations of all of <em>Kanji alive's</em> features or watch our
@@ -52,4 +54,5 @@
       <td>Move your mouse cursor over a Japanese word in the Examples field to reveal its English meaning. Click on the play icon to the right of each example to hear its pronunciation.</td>
     </tr>
   </table>
+  </div>
 </div>

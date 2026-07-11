@@ -1,7 +1,9 @@
 <div class="modal-content">
-  <button class="modal-close" @click="$refs.helpDialog.close()" aria-label="Close">&times;</button>
-
-  <h2>Quick Reference</h2>
+  <div class="modal-header">
+    <button class="modal-close" @click="$refs.helpDialog.close()" aria-label="Close">&times;</button>
+    <h2>Quick Reference</h2>
+  </div>
+  <div class="modal-body">
 
   <p>Please see our
     <a href="http://kanjialive.com/user-guide/" target="_blank" rel="noopener">User Guide</a> for detailed explanations of all of <em>Kanji alive's</em> features or watch our
@@ -155,4 +157,5 @@
       <td>Click on a kanji to view its details</td>
     </tr>
   </table>
+  </div>
 </div>
