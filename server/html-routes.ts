@@ -116,7 +116,10 @@ async function searchKanji(
   }
 
   const collection: Collection<KanjiDocument> = db.collection("kanji");
-  const results = await collection
+  // No Mongo sort: the Angular app fetches the API's natural collection order
+  // and stable-sorts client-side (orderBy keeps ties in fetch order), so a
+  // Mongo sort breaks ties differently. Replicate: fetch natural, stable-sort.
+  const results = (await collection
     .find(searchQuery as Filter<KanjiDocument>, {
       projection: {
         ka_id: 1,
@@ -127,10 +130,16 @@ async function searchKanji(
         rad_order: 1,
       },
     })
-    .sort({ kstroke: 1, rad_stroke: 1, rad_order: 1 })
-    .toArray();
+    .toArray()) as unknown as grouping.KanjiSearchResult[];
 
-  return results as unknown as grouping.KanjiSearchResult[];
+  results.sort(
+    (a, b) =>
+      a.kstroke - b.kstroke ||
+      a.rad_stroke - b.rad_stroke ||
+      a.rad_order - b.rad_order
+  );
+
+  return results;
 }
 
 /**
