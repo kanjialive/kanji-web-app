@@ -138,6 +138,10 @@ button {
   border: none;
   cursor: pointer;
   color: inherit;
+  /* Legacy CSS put user-select:none on every nav control; WebKit can paint a
+     stray caret/selection sliver when selectable button text is clicked */
+  -webkit-user-select: none;
+  user-select: none;
 }
 
 h3 {
