@@ -140,12 +140,15 @@ p {
   margin: 0 0 10px;
 }
 
+/* Bootstrap link colors — production content links (welcome, modals) are blue;
+   nav/header links get rust from the more specific .row1 rules */
 a {
-  color: var(--color-primary);
+  color: #337ab7;
   text-decoration: none;
 }
 
 a:hover {
+  color: #23527c;
   cursor: pointer;
   text-decoration: none;
 }
@@ -1039,11 +1042,14 @@ kbd {
   box-shadow: inset 0 -1px 0 rgba(0, 0, 0, 0.25);
 }
 
+/* Bootstrap code chip — red on pink, monospace */
 code {
-  font-size: 0.85em;
-  background: var(--color-bg);
+  font-family: Menlo, Monaco, Consolas, "Courier New", monospace;
+  font-size: 90%;
+  color: var(--color-kbd-text);
+  background-color: var(--color-kbd-bg);
   padding: 2px 4px;
-  border-radius: 3px;
+  border-radius: 4px;
 }
 
 /* ============================================
