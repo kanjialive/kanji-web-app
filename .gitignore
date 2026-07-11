@@ -44,11 +44,15 @@ crashlytics.properties
 crashlytics-build.properties
 fabric.properties
 
+# Secrets — never commit
 .env
 
+# Build output
 dist/
 
-offline/
+# macOS
+.DS_Store
 
-CLAUDE.md
-migration.md
+# Project docs (migration.md, plans/, offline/, CLAUDE.md) are tracked in the
+# private repo. They contain no secrets — the RapidAPI key formerly in
+# offline/API_CONTRADICTION_ANALYSIS.md has been replaced with $RAPIDAPI_KEY.
