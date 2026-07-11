@@ -324,20 +324,19 @@ h3 {
 
 /* Both chevrons are absolutely positioned: line-box baseline placement of
    inline <button>s varies between the search and detail headers (±1.9px),
-   absolute positioning is deterministic. top:-3.3px lifts the glyph center
-   to y=63 rel .container = the search box's mid-height, so the bracket TIP
-   sits on the midline — intentionally 3.3px above the legacy app, which the
-   maintainer flagged as slightly low. */
+   absolute positioning is deterministic. top:0 puts the glyph box at the
+   legacy app's y=56.3 rel .container (a tip-at-search-box-midline variant
+   was tried and rejected — it read as too high next to the counter text). */
 .recordCounter .icon-left {
   position: absolute;
   left: -10px;
-  top: -3.3px;
+  top: 0;
 }
 
 .recordCounter .icon-right {
   position: absolute;
   left: 121px;
-  top: -3.3px;
+  top: 0;
 }
 
 .recordCounter .icon-left.disabled,

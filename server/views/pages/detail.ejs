@@ -314,7 +314,9 @@
           <% if (typeof lastSearch !== 'undefined' && lastSearch) { %>
             <a href="<%= lastSearch %>"><%= idx + 1 %> of <%= total %></a>
           <% } else { %>
-            1 of 1
+            <%# production always renders the counter as a link (falls back to a
+                single-kanji search) — the .row1 a rule gives it 17px rust %>
+            <a href="/htmx/search?q=<%= encodeURIComponent(doc.ka_utf) %>">1 of 1</a>
           <% } %>
         </span>
         <% if (next) { %>
