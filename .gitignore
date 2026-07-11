@@ -53,6 +53,9 @@ dist/
 # macOS
 .DS_Store
 
-# Project docs (migration.md, plans/, offline/, CLAUDE.md) are tracked in the
-# private repo. They contain no secrets — the RapidAPI key formerly in
+# Project docs (migration.md, plans/, offline/) are tracked in the private
+# repo. They contain no secrets — the RapidAPI key formerly in
 # offline/API_CONTRADICTION_ANALYSIS.md has been replaced with $RAPIDAPI_KEY.
+# CLAUDE.md stays untracked (maintainer decision 2026-07-11): it is the
+# assistant's working notes and must never reach the public github remote.
+CLAUDE.md
