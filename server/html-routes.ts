@@ -52,7 +52,7 @@ function buildAdvancedSearchInput(query: Record<string, any>): string {
  * and detail-controller.js, which converted user-typed colon syntax
  * into structured URL parameters.
  */
-function parseColonSyntax(query: string): Record<string, string> | null {
+export function parseColonSyntax(query: string): Record<string, string> | null {
   if (!query.includes(":")) return null;
 
   const result: Record<string, string> = {};

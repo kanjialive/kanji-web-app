@@ -17,6 +17,7 @@
   },
   "scripts": {
     "tsc": "./node_modules/typescript/bin/tsc",
+    "test": "node --require ts-node/register --test 'server/**/*.test.ts'",
     "build": "tsc && npm run copyfiles",
     "dev": "ts-node server/index.ts",
     "copyfiles": "copyfiles 'index.html' 'static/**/*' 'partials/**/*' dist/ && cp -r server/views dist/",
