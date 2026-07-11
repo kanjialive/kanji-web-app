@@ -250,7 +250,7 @@ h3 {
   position: absolute;
   top: var(--row-height);
   width: 100%;
-  min-height: var(--content-height);
+  min-height: 545px; /* legacy value — the scrollbar track anchors to its bottom */
 }
 
 /* ============================================
@@ -322,20 +322,22 @@ h3 {
   color: var(--color-primary);
 }
 
-/* Chevron glyph boxes are lifted so the bracket TIP (glyph vertical center)
-   sits at the search box's mid-height (y=63 rel .container) — intentionally
-   3.3px above the legacy app, which the maintainer flagged as slightly low */
+/* Both chevrons are absolutely positioned: line-box baseline placement of
+   inline <button>s varies between the search and detail headers (±1.9px),
+   absolute positioning is deterministic. top:-3.3px lifts the glyph center
+   to y=63 rel .container = the search box's mid-height, so the bracket TIP
+   sits on the midline — intentionally 3.3px above the legacy app, which the
+   maintainer flagged as slightly low. */
 .recordCounter .icon-left {
-  margin-left: -10px;
-  position: relative;
-  top: -5.2px;
+  position: absolute;
+  left: -10px;
+  top: -3.3px;
 }
 
 .recordCounter .icon-right {
   position: absolute;
-  height: 25px;
   left: 121px;
-  top: -5.2px;
+  top: -3.3px;
 }
 
 .recordCounter .icon-left.disabled,
@@ -461,28 +463,31 @@ span.search {
   display: none;
 }
 
-/* Custom scrollbar (replaces native) */
+/* Custom scrollbar (replaces perfect-scrollbar). Visibility is pure CSS —
+   fade in on container hover like production (rail opacity .6) — because
+   Alpine x-show + class transitions proved unreliable inside the HTMX swap
+   target. The thumb is draggable via the searchPage component. */
 .custom-scrollbar-track {
   position: absolute;
-  bottom: 6px;
+  bottom: 8px;
   left: 0;
   right: 0;
   height: 5px;
+  opacity: 0;
+  transition: opacity 0.2s linear;
+}
+
+.scrollbar-wrapper:hover .custom-scrollbar-track,
+.custom-scrollbar-track.sb-dragging {
+  opacity: 0.6;
 }
 
 .custom-scrollbar-thumb {
   position: absolute;
   height: 5px;
-  background: rgb(102, 102, 102);
+  background: #000; /* legacy overrides perfect-scrollbar's thumb to black */
   border-radius: 3px;
-}
-
-.sb-fade-in {
-  transition: opacity 0.2s ease;
-}
-
-.sb-fade-out {
-  transition: opacity 0.2s ease;
+  cursor: pointer;
 }
 
 .search-results {
@@ -755,18 +760,34 @@ h3#kanji {
   margin-top: 16px;
 }
 
+/* Legacy positions the typeface controls absolutely within
+   .container-typeface-video, centered under the 248px glyph */
 .ka-typeface-left,
 .ka-typeface-right {
   color: black;
   font-size: 20px;
   font-family: var(--font-icons);
   user-select: none;
+  padding: 0;
+  position: absolute;
+  top: 261px;
+}
+
+.ka-typeface-left {
+  left: 53px;
+}
+
+.ka-typeface-right {
+  right: 43px;
 }
 
 .typeface-name {
+  position: absolute;
+  width: 112px;
+  left: 75px;
+  top: 265px;
   text-align: center;
   font-size: 15px;
-  min-width: 100px;
 }
 
 /* Meaning, Readings */
@@ -1080,12 +1101,6 @@ code {
   cursor: pointer;
 }
 
-/* ============================================
-   Responsive (optional future enhancement)
-   ============================================ */
-@media (max-width: 1200px) {
-  .container {
-    width: 100%;
-    margin: 20px auto;
-  }
-}
+/* No responsive rules: the legacy app renders a fixed 1188px sheet at every
+   window size (html overflow-x:hidden clips), and reflowing the container
+   changed how the sheet's box-shadow presents at narrow windows */

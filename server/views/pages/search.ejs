@@ -58,7 +58,6 @@
       },
 
       currentGroup: 0,
-      scrollbarVisible: false,
 
       _updateScrollThumb() {
         var scroller = this.$refs.resultsContainer?.querySelector('.scroller');
@@ -141,6 +140,32 @@
           event.preventDefault();
           scroller.scrollLeft += event.deltaY;
         }
+      },
+
+      startThumbDrag(event) {
+        event.preventDefault();
+        var scroller = this.$refs.resultsContainer?.querySelector('.scroller');
+        var thumb = this.$refs.scrollThumb;
+        var track = this.$refs.scrollTrack;
+        if (!scroller || !thumb) return;
+        var startX = event.clientX;
+        var startScrollLeft = scroller.scrollLeft;
+        var maxThumbTravel = scroller.offsetWidth - thumb.offsetWidth;
+        var maxScroll = scroller.scrollWidth - scroller.offsetWidth;
+        if (maxThumbTravel <= 0 || maxScroll <= 0) return;
+        // Imperative class toggle keeps the bar visible while the cursor is
+        // outside the wrapper mid-drag (CSS :hover alone would fade it)
+        if (track) track.classList.add('sb-dragging');
+        var onMove = function (ev) {
+          scroller.scrollLeft = startScrollLeft + (ev.clientX - startX) * (maxScroll / maxThumbTravel);
+        };
+        var onUp = function () {
+          document.removeEventListener('mousemove', onMove);
+          document.removeEventListener('mouseup', onUp);
+          if (track) track.classList.remove('sb-dragging');
+        };
+        document.addEventListener('mousemove', onMove);
+        document.addEventListener('mouseup', onUp);
       },
 
       init() {
@@ -277,9 +302,7 @@
   <main id="search-results"
         class="row3 scrollbar-wrapper"
         x-ref="resultsContainer"
-        @wheel="handleWheel($event)"
-        @mouseenter="scrollbarVisible = true"
-        @mouseleave="scrollbarVisible = false">
+        @wheel="handleWheel($event)">
     <% if (typeof results !== 'undefined' && results.length > 0) { %>
       <%- include('../partials/results', { results, mode, kanjiStrokeGroups, radicalStrokeGroups, query, resultsOrder }) %>
     <% } else if (typeof query !== 'undefined' && query) { %>
@@ -287,11 +310,8 @@
     <% } else { %>
       <%- include('../partials/welcome') %>
     <% } %>
-    <div class="custom-scrollbar-track"
-         x-show="scrollbarVisible"
-         x-transition:enter="sb-fade-in"
-         x-transition:leave="sb-fade-out">
-      <div class="custom-scrollbar-thumb" x-ref="scrollThumb"></div>
+    <div class="custom-scrollbar-track" x-ref="scrollTrack">
+      <div class="custom-scrollbar-thumb" x-ref="scrollThumb" @mousedown="startThumbDrag($event)"></div>
     </div>
   </main>
 
