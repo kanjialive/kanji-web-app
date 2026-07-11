@@ -227,17 +227,17 @@
 
   // Build nav URLs — just kanji + search params (server computes neighbors)
   const prevUrl = prev
-    ? `/htmx/${encodeURIComponent(prev)}${qs}`
+    ? `/${encodeURIComponent(prev)}${qs}`
     : '';
   const nextUrl = next
-    ? `/htmx/${encodeURIComponent(next)}${qs}`
+    ? `/${encodeURIComponent(next)}${qs}`
     : '';
   %>
 
   <!-- Column 1: Search Form + Video/Typeface -->
   <div class="col1">
     <div class="row1">
-      <form class="search-form" action="/htmx/search" method="get">
+      <form class="search-form" action="/search" method="get">
         <input type="text"
                name="q"
                id="search-input"
@@ -316,7 +316,7 @@
           <% } else { %>
             <%# production always renders the counter as a link (falls back to a
                 single-kanji search) — the .row1 a rule gives it 17px rust %>
-            <a href="/htmx/search?q=<%= encodeURIComponent(doc.ka_utf) %>">1 of 1</a>
+            <a href="/search?q=<%= encodeURIComponent(doc.ka_utf) %>">1 of 1</a>
           <% } %>
         </span>
         <% if (next) { %>

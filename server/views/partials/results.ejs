@@ -4,7 +4,7 @@ const origQueryString = typeof queryString !== 'undefined' ? queryString : '';
 
 // Detail URL: just kanji + search params (server computes neighbors from search results)
 function buildDetailUrl(kanjiChar) {
-  return `/htmx/${encodeURIComponent(kanjiChar)}${origQueryString}`;
+  return `/${encodeURIComponent(kanjiChar)}${origQueryString}`;
 }
 %>
 

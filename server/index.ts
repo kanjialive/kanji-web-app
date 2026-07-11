@@ -82,7 +82,7 @@ async function connectMongoDB() {
 // Root route handler for HTMX mode (must be before static middleware)
 if (USE_HTMX) {
   app.get("/", (req: Request, res: Response) => {
-    res.redirect("/htmx/search");
+    res.redirect("/search");
   });
 }
 
@@ -147,16 +147,37 @@ app.get(
   public_api.getKanjiWithCharacter
 );
 
-// HTMX routes (when USE_HTMX=true or ?htmx=true query param)
-app.use("/htmx", html_routes.router);
+// HTMX routes.
+// USE_HTMX=true: the EJS frontend is served at the SAME canonical URLs as the
+// AngularJS app (/search, /search/advanced, /search/:term, /:character) so
+// bookmarked and shared production links keep their exact shape. Legacy /htmx
+// page URLs 302 to their canonical form; only the XHR partial endpoint
+// (/htmx/partials/*) is still served under the prefix — it never appears in
+// the address bar.
+// USE_HTMX unset (Angular mode): the HTMX frontend stays reachable at /htmx
+// for testing, incl. the ?htmx=true escape hatch below.
+if (USE_HTMX) {
+  app.use("/htmx", (req: Request, res: Response, next: NextFunction) => {
+    if (req.path.startsWith("/partials/")) return next();
+    const canonical = req.originalUrl.replace(/^\/htmx/, "") || "/";
+    res.redirect(canonical);
+  });
+  app.use("/htmx", html_routes.router);
+  app.use("/", html_routes.router);
+} else {
+  app.use("/htmx", html_routes.router);
+}
 
 // Catch-all route: serve HTMX or AngularJS based on feature flag
 app.all("/*", function (req: Request, res: Response) {
-  // Check for ?htmx=true query param to allow testing
-  const useHtmx = USE_HTMX || req.query.htmx === "true";
+  if (USE_HTMX) {
+    // Canonical HTMX routes are mounted above; whatever falls through is an
+    // unknown path — Angular's router used redirectTo:'/search' for those
+    return res.redirect("/search");
+  }
 
-  if (useHtmx) {
-    // For HTMX mode, redirect root to /htmx/search
+  // Angular mode with ?htmx=true: per-request testing escape hatch
+  if (req.query.htmx === "true") {
     const path = req.path;
     if (path === "/" || path === "") {
       return res.redirect("/htmx/search");

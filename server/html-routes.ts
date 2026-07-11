@@ -191,11 +191,22 @@ function buildResultsOrder(
 }
 
 /**
- * GET /htmx/search - Search page (full page or with results)
- * Supports both basic search (?q=...) and advanced search (?on=...&grade=...)
+ * Search page (full page or with results). Served at the same URL shapes as
+ * the AngularJS app so production bookmarks keep working unchanged:
+ *   GET /search                    - welcome, or basic (?q=...) / advanced
+ *                                    (?on=...&grade=...) search
+ *   GET /search/advanced?...       - advanced search (renders directly; the
+ *                                    URL stays in the address bar like Angular)
+ *   GET /search/:search            - basic search with the term in the path
+ * (Also mounted under /htmx for the Angular-mode testing alias; redirects
+ * below use req.baseUrl so they stay within whichever mount handled them.)
  */
-router.get("/search", async (req: Request, res: Response) => {
-  const basicQuery = (req.query.q as string) || "";
+async function renderSearchPage(
+  req: Request,
+  res: Response,
+  basicOverride?: string
+) {
+  const basicQuery = basicOverride ?? ((req.query.q as string) || "");
   const mode = (req.query.mode as string) || "kanji";
   const isAdvanced = hasAdvancedParams(req.query as Record<string, unknown>);
 
@@ -205,7 +216,7 @@ router.get("/search", async (req: Request, res: Response) => {
     if (parsed) {
       const params = new URLSearchParams(parsed);
       if (mode !== "kanji") params.set("mode", mode);
-      return res.redirect(`/htmx/search?${params.toString()}`);
+      return res.redirect(`${req.baseUrl}/search?${params.toString()}`);
     }
   }
 
@@ -244,8 +255,11 @@ router.get("/search", async (req: Request, res: Response) => {
       radicalStrokeGroups
     );
 
-    // Preserve original query string for navigation links
-    const queryString = new URL(req.url, "http://localhost").search;
+    // Preserve original query string for navigation links; the path-based
+    // variant (/search/:search) has no query string, so synthesize one
+    const queryString = basicOverride
+      ? `?q=${encodeURIComponent(basicOverride)}`
+      : new URL(req.url, "http://localhost").search;
 
     res.render("pages/search", {
       query: displayQuery,
@@ -266,16 +280,20 @@ router.get("/search", async (req: Request, res: Response) => {
       error: "An error occurred while searching.",
     });
   }
-});
+}
 
-/**
- * GET /htmx/search/advanced - Advanced search (redirects to /htmx/search with params)
- */
-router.get("/search/advanced", async (req: Request, res: Response) => {
-  // Forward to main search route - it handles both basic and advanced
-  const queryString = new URL(req.url, "http://localhost").search;
-  res.redirect(`/htmx/search${queryString}`);
-});
+router.get("/search", (req: Request, res: Response) =>
+  renderSearchPage(req, res)
+);
+
+// Must be registered before /search/:search so "advanced" isn't treated as a term
+router.get("/search/advanced", (req: Request, res: Response) =>
+  renderSearchPage(req, res)
+);
+
+router.get("/search/:search", (req: Request, res: Response) =>
+  renderSearchPage(req, res, req.params.search)
+);
 
 /**
  * GET /htmx/partials/results - HTMX partial for search results
@@ -293,7 +311,7 @@ router.get("/partials/results", async (req: Request, res: Response) => {
     if (parsed) {
       const params = new URLSearchParams(parsed);
       if (mode !== "kanji") params.set("mode", mode);
-      res.setHeader("HX-Redirect", `/htmx/search?${params.toString()}`);
+      res.setHeader("HX-Redirect", `/search?${params.toString()}`);
       return res.send("");
     }
   }
@@ -305,7 +323,7 @@ router.get("/partials/results", async (req: Request, res: Response) => {
   // Set HX-Push-Url so browser shows the full-page URL, not the partial endpoint
   const queryString = new URL(req.url, "http://localhost").search;
   const pushUrl =
-    basicQuery || isAdvanced ? "/htmx/search" + queryString : "/htmx/search";
+    basicQuery || isAdvanced ? "/search" + queryString : "/search";
   res.setHeader("HX-Push-Url", pushUrl);
 
   try {
@@ -348,10 +366,21 @@ router.get("/partials/results", async (req: Request, res: Response) => {
 });
 
 /**
- * GET /htmx/:character - Kanji detail page
+ * GET /:character - Kanji detail page (canonical, same URL as the Angular app;
+ * also served under the /htmx testing alias)
  */
-router.get("/:character", async (req: Request, res: Response) => {
-  const character = decodeURIComponent(req.params.character);
+router.get("/:character", async (req: Request, res: Response, next) => {
+  // Mounted at the app root this matches any single path segment — pass
+  // file-ish or long paths (favicon.ico, robots.txt, …) to the fallback
+  let character: string;
+  try {
+    character = decodeURIComponent(req.params.character);
+  } catch {
+    return next();
+  }
+  if (character.includes(".") || character.length > 4) {
+    return next();
+  }
 
   try {
     const collection: Collection<KanjiDocument> = db.collection("kanji");
@@ -424,7 +453,7 @@ router.get("/:character", async (req: Request, res: Response) => {
       : "";
 
     // Build "back to search" URL
-    const lastSearch = queryString ? `/htmx/search${queryString}` : "";
+    const lastSearch = queryString ? `/search${queryString}` : "";
 
     res.render("pages/detail", {
       doc: extendedDoc,
