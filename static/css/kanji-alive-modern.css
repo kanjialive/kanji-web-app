@@ -110,9 +110,15 @@ body {
   background-color: var(--color-bg-dark);
   font-size: 15px;
   margin: 0;
-  line-height: 1.5;
+  line-height: 1.42857143; /* Bootstrap's default — row pitch and text metrics depend on it */
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+/* Bootstrap reset the UA's font-sized paragraph margins; absolute `top` values
+   throughout this sheet assume margin-top is 0 */
+p {
+  margin: 0 0 10px;
 }
 
 a {
@@ -139,6 +145,7 @@ h3 {
   font-size: 17px;
   color: var(--color-secondary);
   margin: 0;
+  line-height: 1.1; /* Bootstrap heading metric — keeps glyph baselines aligned */
 }
 
 /* Hide Alpine.js elements until initialized */
@@ -214,13 +221,14 @@ h3 {
 /* ============================================
    Search Form
    ============================================ */
+/* NOT position:relative — .search-button's top/left are measured from .row1,
+   like production (a relative form puts the icon 5px too low) */
 .search-form {
   width: 100%;
   background: var(--color-bg);
   margin-top: -5px;
   display: flex;
   align-items: center;
-  position: relative;
 }
 
 .search-bar {
@@ -257,12 +265,16 @@ h3 {
 /* ============================================
    Record Counter / Navigation
    ============================================ */
+/* Inline layout (not flex): chevron glyphs baseline-align exactly like the
+   legacy <a> icons; buttons must shed their UA padding to match */
 .recordCounter {
   width: 128px;
   height: 25px;
   position: relative;
-  display: flex;
-  align-items: center;
+}
+
+.recordCounter button {
+  padding: 0;
 }
 
 .recordCounter .icon-left,
@@ -277,7 +289,9 @@ h3 {
 
 .recordCounter .icon-right {
   position: absolute;
-  right: 0;
+  height: 25px;
+  left: 121px;
+  top: 0;
 }
 
 .recordCounter .icon-left.disabled,
@@ -335,13 +349,15 @@ span.search {
 .border1 {
   position: absolute;
   width: 1103px;
-  margin-top: 50px;
+  top: 50px;
 }
 
+/* Pinned with `top` (not margin-top off the static position) so the line lands
+   at the same place on both pages regardless of preceding in-flow content */
 .border2 {
   position: absolute;
   width: 1103px;
-  margin-top: 464px;
+  top: 564px;
 }
 
 .border3, .border4, .border5 {
@@ -359,8 +375,7 @@ span.search {
 .border7 {
   position: absolute;
   width: 540px;
-  margin-left: 25px;
-  top: 420px;
+  top: 423px;
 }
 
 /* ============================================
@@ -369,7 +384,7 @@ span.search {
 .version {
   position: absolute;
   width: 1103px;
-  margin-top: 479px;
+  top: 579px;
   color: var(--color-text-muted);
 }
 
@@ -497,8 +512,10 @@ a.ka:active {
 }
 
 /* Grouped results (stroke sorting) */
+/* margin:0 kills the UA <ul> top margin that pushed all groups 15px down/right;
+   production groups are flush (spacing lives inside .grouped-column) */
 .list-inline {
-  margin-left: 15px;
+  margin: 0;
   padding: 0;
   list-style: none;
   display: flex;
@@ -512,7 +529,6 @@ a.ka:active {
   position: relative;
   display: inline-block;
   vertical-align: top;
-  margin-right: 30px;
 }
 
 .grouped-results {
@@ -524,6 +540,12 @@ a.ka:active {
   width: 258px;
   margin-right: 25px;
   display: inline-table;
+}
+
+/* font-size:0 collapses the whitespace text nodes between links (EJS emits
+   them; Angular's ng-repeat didn't) so the kanji pitch is exactly 37px */
+.grouped-row {
+  font-size: 0;
 }
 
 .grouped-row > a.ka {
@@ -795,20 +817,23 @@ div.hint {
 }
 
 /* Stroke Breakdown */
+/* Production geometry: box at x=39/y=475 rel .container, images touching
+   (49px pitch), 5px top / 10px bottom margin per image sets the wrap pitch */
 .stroke-breakdown {
   position: absolute;
   width: 550px;
   height: 120px;
-  margin-left: 24px;
-  top: 430px;
+  margin-left: -1px;
+  top: 433px;
   display: flex;
   flex-wrap: wrap;
-  gap: var(--spacing-xs);
+  align-content: flex-start;
 }
 
 img.ka-breakdown {
   height: 49px;
   width: 49px;
+  margin: 5px 0 10px;
   cursor: pointer;
 }
 

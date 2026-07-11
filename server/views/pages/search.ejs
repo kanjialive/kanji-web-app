@@ -116,7 +116,7 @@
           var groups = scroller.querySelectorAll('.results-group');
           if (groups.length === 0) return;
           this.currentGroup = Math.min(groups.length - 1, this.currentGroup + 1);
-          this._smoothScroll(scroller, Math.max(0, groups[this.currentGroup].offsetLeft - 15));
+          this._smoothScroll(scroller, Math.max(0, groups[this.currentGroup].offsetLeft));
         }
       },
 
@@ -130,7 +130,7 @@
           var groups = scroller.querySelectorAll('.results-group');
           if (groups.length === 0) return;
           this.currentGroup = Math.max(0, this.currentGroup - 1);
-          this._smoothScroll(scroller, Math.max(0, groups[this.currentGroup].offsetLeft - 15));
+          this._smoothScroll(scroller, Math.max(0, groups[this.currentGroup].offsetLeft));
         }
       },
 
