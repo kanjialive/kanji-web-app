@@ -1104,6 +1104,40 @@ code {
 }
 
 /* ============================================
+   Keyboard focus
+   ============================================ */
+/* Production's controls are href-less <a>s (partials/search.html:15), which are
+   unfocusable — no browser ever drew a focus ring on them, and Tab skipped them
+   entirely. The EJS port uses real <button>s, which ARE focusable. That is an
+   improvement (the controls are now keyboard-reachable), but it means they
+   inherit the user-agent focus ring: a heavy black double-rectangle on
+   Chromium/Windows, a faint blue glow on macOS. Hence "only broken in Edge".
+
+   Applied to every button and link, not a hand-picked list: an indicator that
+   shows on some controls and not others is worse than none, because a keyboard
+   user learns to trust it and then it silently vanishes.
+
+   `outline` is painted outside the box model and cannot shift layout, so the
+   0px geometric parity with production is preserved.
+
+   NOT applied to .search-bar: a text input matches :focus-visible even on a
+   mouse click (per spec), so it would sprout a ring on every click — and it
+   already shows a caret. Its `outline: none` above stands. */
+button:focus:not(:focus-visible),
+a:focus:not(:focus-visible),
+dialog:focus:not(:focus-visible) {
+  outline: none;
+}
+
+button:focus-visible,
+a:focus-visible,
+dialog:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+/* ============================================
    Utility Classes
    ============================================ */
 .hidden {

@@ -14,6 +14,8 @@
        break backwards compatibility, so it keeps working regardless of upstream. -->
   <script src="/static/js/libs/alpinejs-3.15.12.min.js" defer></script>
 
+  <%- include('../partials/focus-ring') %>
+
   <!-- Results loading. Replaces HTMX, which was only ever doing this one job.
        Kept in <head> so it survives content swaps. -->
   <script>
