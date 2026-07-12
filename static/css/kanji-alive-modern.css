@@ -266,25 +266,42 @@ h3 {
   align-items: center;
 }
 
-/* DELIBERATE 1.5px DEPARTURE FROM PRODUCTION (maintainer's call).
-   Production pads 4px top / 1px bottom on a 32px border-box field. WebKit
-   centres the 17px line box in the *content* box, so that 3px asymmetry left
-   9px of space above the line and 6px below — dropping the text, and with it
-   the caret, 1.5px below the field's optical centre. Symmetric padding centres
-   it (7.5px / 7.5px). The caret still descends 4px below the baseline: it spans
-   the font's ascent-to-descent em box and nothing in CSS can change that
-   (caret-shape is unimplemented; only caret-color ships). */
+/* THE CARET LOOKS SLIGHTLY LOW HERE. That is known, it was investigated, and the
+   fix was REJECTED — don't "fix" it again.
+
+   The field is 32px border-box; WebKit centres the 17px line box in the *content*
+   box, so production's 4px/1px padding leaves 9px of space above the line and 6px
+   below, putting the text — and the caret with it — 1.5px below the field's
+   optical centre. Symmetric padding does centre it (7.5/7.5), and we shipped that
+   to staging; but it lifts the TEXT by the same 1.5px, because a caret and the
+   glyphs share one line box and cannot move independently. The maintainer looked at
+   it and preferred production's text position (2026-07-12). So: 4px/1px stays, and
+   the caret stays 1.5px low. That is the trade, not an oversight.
+
+   Not fixable at all, so don't try: the caret's offset from the glyphs (it spans the
+   font's ascent→descent em box, so it MUST fall 4px below the baseline) and its gap
+   to the previous letter (that glyph's side bearing). CSS ships only `caret-color`;
+   `caret-shape`/`caret-animation` are CSS.supports()-false in Safari. */
 .search-bar {
   border: 0;
   outline: none;
   background-color: var(--color-bg);
   box-shadow: none;
   color: var(--color-primary);
-  padding: 2px 0 2px 10px;
+  padding: 4px 0 1px 10px;
   height: 32px;
   width: 220px;
   font-family: var(--font-base);
   font-size: 17px;
+  /* Pinned, not inherited, and NOT production's value — a zero-visual-change pin.
+     WebKit's UA sheet gives form controls `line-height: normal` (= 17px here); they
+     do NOT inherit body's 1.42857143. Production computes 24.285715px on this input
+     only because Bootstrap adds `input,button,select,textarea{line-height:inherit}`,
+     which this sheet has no equivalent of — and it makes no visual difference, since
+     WebKit's centring absorbs it (that is why text parity measured 0px anyway).
+     17px === what this already computed to, so pinning it changes nothing; it just
+     stops the metrics riding on a UA default. */
+  line-height: 17px;
 }
 
 .search-button {
