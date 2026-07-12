@@ -270,14 +270,18 @@ async function renderSearchPage(
       radicalStrokeGroups,
       resultsOrder,
     });
-  } catch (error) {
-    console.error("Search error:", error);
-    res.render("pages/search", {
+  } catch (err) {
+    // Fail LOUDLY. Returning 200 with an empty result set makes a database
+    // outage indistinguishable from a valid zero-match search, so nothing
+    // alerts and nobody finds out. A 5xx is visible to uptime monitors and
+    // Heroku logs. See offline/durability-plan-2026-07-12.md.
+    console.error("Search error:", err);
+    res.status(500).render("pages/search", {
       query: displayQuery,
       mode: "kanji",
       results: [],
       resultsOrder: [],
-      error: "An error occurred while searching.",
+      error: "Sorry, the kanji database is unavailable. Please try again in a moment.",
     });
   }
 }
@@ -311,7 +315,7 @@ router.get("/partials/results", async (req: Request, res: Response) => {
     if (parsed) {
       const params = new URLSearchParams(parsed);
       if (mode !== "kanji") params.set("mode", mode);
-      res.setHeader("HX-Redirect", `/search?${params.toString()}`);
+      res.setHeader("X-Redirect", `/search?${params.toString()}`);
       return res.send("");
     }
   }
@@ -320,11 +324,11 @@ router.get("/partials/results", async (req: Request, res: Response) => {
     effectiveAdvancedParams = req.query as Record<string, string>;
   }
 
-  // Set HX-Push-Url so browser shows the full-page URL, not the partial endpoint
+  // Tell loadResults() to show the full-page URL, not the partial endpoint
   const queryString = new URL(req.url, "http://localhost").search;
   const pushUrl =
     basicQuery || isAdvanced ? "/search" + queryString : "/search";
-  res.setHeader("HX-Push-Url", pushUrl);
+  res.setHeader("X-Push-Url", pushUrl);
 
   try {
     if (!basicQuery && !isAdvanced) {
@@ -359,9 +363,13 @@ router.get("/partials/results", async (req: Request, res: Response) => {
       radicalStrokeGroups,
       resultsOrder,
     });
-  } catch (error) {
-    console.error("Search error:", error);
-    res.render("partials/no-results");
+  } catch (err) {
+    // Fail loudly — see renderSearchPage() above. no-results.ejs would have
+    // told the user "0 kanji found" during a database outage.
+    console.error("Search error:", err);
+    res.status(500).render("partials/error", {
+      error: "Sorry, the kanji database is unavailable. Please try again in a moment.",
+    });
   }
 });
 
@@ -387,12 +395,15 @@ router.get("/:character", async (req: Request, res: Response, next) => {
     const doc = await collection.findOne({ ka_utf: character });
 
     if (!doc) {
+      // An unknown kanji shows the welcome page under a 404 status — the status
+      // carries the signal, the UI stays as it ships today. Deliberately does
+      // NOT pass `error`: that local now renders a visible error panel (used for
+      // database outages), and showing one here would change the interface.
       return res.status(404).render("pages/search", {
         query: "",
         mode: "help",
         results: [],
         resultsOrder: [],
-        error: `Kanji "${character}" not found.`,
       });
     }
 

@@ -9,12 +9,51 @@
   <!-- CSS -->
   <link href="/static/css/kanji-alive-modern.css" rel="stylesheet">
 
-  <!-- HTMX + Alpine.js -->
-  <script src="https://unpkg.com/htmx.org@2.0.4" defer></script>
-  <script src="https://unpkg.com/alpinejs@3.14.8/dist/cdn.min.js" defer></script>
+  <!-- Alpine.js — served from this app, NOT a CDN. A vendored, pinned copy cannot
+       become un-fetchable if a package registry disappears, and browsers do not
+       break backwards compatibility, so it keeps working regardless of upstream. -->
+  <script src="/static/js/libs/alpinejs-3.14.8.min.js" defer></script>
 
-  <!-- Alpine component registration (in head so it survives any HTMX body swaps) -->
+  <!-- Results loading. Replaces HTMX, which was only ever doing this one job.
+       Kept in <head> so it survives content swaps. -->
   <script>
+  window.loadResults = async function (url) {
+    var target = document.getElementById('search-results');
+    try {
+      var res = await fetch(url);
+
+      // Server asks the browser to navigate instead (colon-syntax queries)
+      var redirect = res.headers.get('X-Redirect');
+      if (redirect) { window.location.href = redirect; return; }
+
+      var html = await res.text();
+      if (!res.ok) throw new Error('Search failed: ' + res.status);
+
+      // The custom scrollbar track is a CHILD of the swap target, so replacing
+      // the target's contents destroys it — after which the results are still
+      // scrollable but have no visible scrollbar until a full page reload.
+      // (HTMX's hx-target swap had this bug too.) Detach it first, then put the
+      // same nodes back, so Alpine's $refs stay valid.
+      var track = target.querySelector('.custom-scrollbar-track');
+      if (track) track.remove();
+      target.innerHTML = html;
+      if (track) target.appendChild(track);
+
+      // Show the full-page URL, not the partial endpoint
+      var pushUrl = res.headers.get('X-Push-Url');
+      if (pushUrl) history.pushState(null, '', pushUrl);
+
+      // Alpine's MutationObserver initialises the new subtree on its own; this
+      // just tells the page component to re-measure the custom scrollbar.
+      document.dispatchEvent(new CustomEvent('results:loaded'));
+    } catch (err) {
+      // Fail loudly: a database outage must not look like an empty result set.
+      target.innerHTML =
+        '<p class="no-results">Sorry, something went wrong. Please try again.</p>';
+    }
+  };
+
+  // Alpine component registration (in head so it survives content swaps)
   document.addEventListener('alpine:init', () => {
     Alpine.data('searchPage', () => {
       var _animFrame = null;
@@ -30,7 +69,7 @@
         this.mode = this.modes[newIndex];
         this.currentGroup = 0;
 
-        // Build URL for HTMX request
+        // Build URL for the results request
         let url = '/htmx/partials/results';
         const input = document.getElementById('search-input');
 
@@ -46,15 +85,20 @@
           return; // No search to cycle
         }
 
-        htmx.ajax('GET', url, '#search-results');
+        loadResults(url);
       },
 
-      clearAdvancedState() {
-        // Clear stored query string when doing a new basic search via form
-        // This ensures cycleMode uses the input value, not stale advanced params
+      submitSearch() {
+        // New basic search from the form. Clear stored advanced state first so
+        // cycleMode() uses the input value, not stale advanced params.
         this.queryString = '';
         this.mode = 'kanji';
         this.currentGroup = 0;
+
+        const input = document.getElementById('search-input');
+        const url =
+          '/htmx/partials/results?q=' + encodeURIComponent(input.value);
+        loadResults(url);
       },
 
       currentGroup: 0,
@@ -179,9 +223,9 @@
         this._scrollHandler = function() { self._updateScrollThumb(); };
         this.$refs.resultsContainer.addEventListener('scroll', this._scrollHandler, true);
 
-        // Update after HTMX swaps new results
+        // Re-measure the custom scrollbar after new results are swapped in
         this._settleHandler = function() { self._updateScrollThumb(); };
-        document.addEventListener('htmx:afterSettle', this._settleHandler);
+        document.addEventListener('results:loaded', this._settleHandler);
 
         // Initial update
         this._updateScrollThumb();
@@ -212,7 +256,7 @@
 
       destroy() {
         if (this._settleHandler) {
-          document.removeEventListener('htmx:afterSettle', this._settleHandler);
+          document.removeEventListener('results:loaded', this._settleHandler);
         }
         if (this._keyHandler) {
           document.removeEventListener('keydown', this._keyHandler);
@@ -238,11 +282,7 @@
     <!-- Search Form -->
     <div class="col1">
       <div class="row1">
-        <form class="search-form"
-              hx-get="/htmx/partials/results"
-              hx-target="#search-results"
-              hx-trigger="submit"
-              @submit.prevent="clearAdvancedState()">
+        <form class="search-form" @submit.prevent="submitSearch()">
           <input type="text"
                  name="q"
                  id="search-input"
@@ -303,7 +343,9 @@
         class="row3 scrollbar-wrapper"
         x-ref="resultsContainer"
         @wheel="handleWheel($event)">
-    <% if (typeof results !== 'undefined' && results.length > 0) { %>
+    <% if (typeof error !== 'undefined' && error) { %>
+      <%- include('../partials/error', { error }) %>
+    <% } else if (typeof results !== 'undefined' && results.length > 0) { %>
       <%- include('../partials/results', { results, mode, kanjiStrokeGroups, radicalStrokeGroups, query, resultsOrder }) %>
     <% } else if (typeof query !== 'undefined' && query) { %>
       <%- include('../partials/no-results') %>
