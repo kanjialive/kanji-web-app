@@ -10,10 +10,30 @@ export const init = async (database: Db) => {
   db = database;
 };
 
+/**
+ * Fields excluded from every private-API response.
+ *
+ * `textbook_search` is LICENCE-RESTRICTED data — it is deliberately absent from
+ * the public API and from the public GitHub repo. This endpoint is
+ * unauthenticated, so anything it returns is effectively published. Nothing
+ * displays this field (it is only ever a *query filter*, see search.ts), so it
+ * can safely be withheld from the response.
+ *
+ * `mn_hint` is also licence-restricted, but CANNOT be excluded here: AngularJS
+ * renders the hint in the browser and needs the text as JSON, and
+ * extendKanjiWithAssets() reads doc.mn_hint to build the hint markup. That leak
+ * closes only when Angular is deleted (migration Phase 7) and this whole API
+ * loses its last consumer — the HTMX frontend renders server-side and never
+ * calls it. See offline/durability-plan-2026-07-12.md.
+ */
+const LICENSED_FIELDS_PROJECTION = { textbook_search: 0 } as const;
+
 const getKanjiWithObject = async (obj: object, req: Request, res: Response) => {
   try {
     const collection: Collection<KanjiDocument> = db.collection("kanji");
-    const result: KanjiDocument | null = await collection.findOne(obj);
+    const result: KanjiDocument | null = await collection.findOne(obj, {
+      projection: LICENSED_FIELDS_PROJECTION,
+    });
     if (result) {
       res.send(extendKanjiWithAssets(result));
     } else {
