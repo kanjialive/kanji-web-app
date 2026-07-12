@@ -35,7 +35,6 @@
         'maru': 'Maru'
       },
       radicalFrame: 0,
-      radicalAnimating: false,
       stroketimes: [],
 
       get typefaceDisplay() {
@@ -94,21 +93,15 @@
       },
 
       startRadicalAnimation() {
-        if (this.radicalAnimating) return;
-        this.radicalAnimating = true;
-        this.radicalFrame = 0;
-
-        let frame = 0;
-        const interval = setInterval(() => {
-          frame++;
-          if (frame > 2) {
-            clearInterval(interval);
-            this.radicalFrame = 0;
-            this.radicalAnimating = false;
-          } else {
-            this.radicalFrame = frame;
-          }
-        }, 500);
+        // Frame timings replicate Angular's detail-controller.js:198 exactly —
+        // 1250 / 2500 / 3750ms, paired with the 1s CSS opacity transition on
+        // .ka-rad-anim img. The port previously used a 500ms setInterval, which
+        // ran the whole cycle 2.5x too fast.
+        // Like production, this does not guard against re-entry: clicking again
+        // mid-animation simply schedules another pass.
+        setTimeout(() => { this.radicalFrame = 1; }, 1250);
+        setTimeout(() => { this.radicalFrame = 2; }, 2500);
+        setTimeout(() => { this.radicalFrame = 0; }, 3750);
       },
 
       init() {

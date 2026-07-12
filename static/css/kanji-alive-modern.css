@@ -889,7 +889,10 @@ div.radical-meaning {
   position: absolute;
   top: 291px;
   right: 1px;
-  transition: opacity 0.5s ease-in-out;
+  /* 1s, not 0.5s — legacy kanji-alive.css:373. Pairs with the 1250/2500/3750ms
+     frame timings in detail.ejs (Angular's detail-controller.js:198). Halving
+     it made the cross-fade visibly snappier than production. */
+  transition: opacity 1s ease-in-out;
   opacity: 0;
 }
 
