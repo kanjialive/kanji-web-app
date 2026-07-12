@@ -27,6 +27,9 @@
      sans-serif inside --font-en makes every family after it unreachable,
      so Japanese text silently falls back to the system font. */
   --font-base: 'SourceSansPro-Regular', 'Yu Gothic Medium', 'mplus-1m-light', 'ヒラギノ角ゴ Pro W3', 'Hiragino Kaku Gothic Pro', 'メイリオ', 'Meiryo', sans-serif;
+  /* --font-base, but with the search box's metric-corrected face in front. Identical
+     otherwise — same JP fallbacks, generic LAST. See the @font-face below. */
+  --font-searchbar: 'KA Search Sans', 'Yu Gothic Medium', 'mplus-1m-light', 'ヒラギノ角ゴ Pro W3', 'Hiragino Kaku Gothic Pro', 'メイリオ', 'Meiryo', sans-serif;
   --font-jp: 'Yu Gothic Medium', 'mplus-1m-light', 'Hiragino Kaku Gothic Pro', 'Meiryo', sans-serif;
   --font-en: 'SourceSansPro-Regular', sans-serif;
   --font-en-italic: 'SourceSansPro-It', 'SourceSansPro-Regular', sans-serif;
@@ -63,6 +66,34 @@
   font-family: 'SourceSansPro-Regular';
   src: url('https://media.kanjialive.com/fonts/sourcesanspro-regular-webfont.woff2') format('woff2'),
        url('https://media.kanjialive.com/fonts/sourcesanspro-regular-webfont.woff') format('woff');
+  unicode-range: U+0000-007F;
+  font-display: swap;
+}
+
+/* Same outlines as SourceSansPro-Regular above, with the vertical metrics REPAIRED.
+   The CDN webfont's metrics are clamped to 0.75/0.25 em (the real face is
+   0.984/0.273) — and a text caret is drawn from the font's ascent to its descent,
+   so in the search box the caret cleared the top of an "H" by 0.9px while still
+   hanging 4px below the baseline. It looked sunken; in TextEdit, which uses the real
+   desktop font, the same string looks right.
+
+   Used by .search-bar ONLY. Correcting the metrics app-wide would move the strut and
+   shift baselines on every page, undoing the 0px parity sweep.
+
+   Metrics are tuned (ascent 16px / descent 4px at 17px) so that BOTH:
+     caret  = ascent + descent           = 20px   (maintainer's pick, 2026-07-12)
+     baseline = 16 + (ascent-descent)/2  = 22px   = production's baseline, unmoved
+   4px is also the deepest descender ink in the face (g = 3.81px), so the caret still
+   covers a "g". These depend on `line-height: 17px` being pinned on .search-bar.
+
+   Chrome/Firefox could do this in CSS with ascent-override; Safari 26 drops the
+   descriptor (verified), so the fix has to live in the file. Rebuild with
+   `tools/build-searchbar-font.py`. Renamed from "Source ..." because OFL's Reserved
+   Font Name forbids a modified version carrying it — don't rename it back. */
+@font-face {
+  font-family: 'KA Search Sans';
+  src: url('../fonts/ka-search-sans.woff2') format('woff2'),
+       url('../fonts/ka-search-sans.woff') format('woff');
   unicode-range: U+0000-007F;
   font-display: swap;
 }
@@ -266,41 +297,42 @@ h3 {
   align-items: center;
 }
 
-/* THE CARET LOOKS SLIGHTLY LOW HERE. That is known, it was investigated, and the
-   fix was REJECTED — don't "fix" it again.
+/* ⚠️ These four declarations are a SOLVED SYSTEM — change one and the others break.
+   The caret's height and the text's baseline are both functions of the font's
+   ascent/descent (see the 'KA Search Sans' @font-face above), the padding and the
+   line-height:
 
-   The field is 32px border-box; WebKit centres the 17px line box in the *content*
-   box, so production's 4px/1px padding leaves 9px of space above the line and 6px
-   below, putting the text — and the caret with it — 1.5px below the field's
-   optical centre. Symmetric padding does centre it (7.5/7.5), and we shipped that
-   to staging; but it lifts the TEXT by the same 1.5px, because a caret and the
-   glyphs share one line box and cannot move independently. The maintainer looked at
-   it and preferred production's text position (2026-07-12). So: 4px/1px stays, and
-   the caret stays 1.5px low. That is the trade, not an oversight.
+     caret height  = ascent + descent            = 20px
+     text baseline = padding-derived line top + ascent - half-leading
+                   = 16 + (ascent - descent)/2   = 22px  ← production's baseline
 
-   Not fixable at all, so don't try: the caret's offset from the glyphs (it spans the
-   font's ascent→descent em box, so it MUST fall 4px below the baseline) and its gap
-   to the previous letter (that glyph's side bearing). CSS ships only `caret-color`;
-   `caret-shape`/`caret-animation` are CSS.supports()-false in Safari. */
+   Production pads 4px/1px, which is what put the text — and the caret with it — 1.5px
+   below the field's optical centre. Symmetric 2px/2px centres the line box; the text
+   would normally rise 1.5px with it, but the corrected font metrics put the baseline
+   back at 22px, so the text does NOT move. That is the whole point: we get the caret
+   without paying for it in text position.
+
+   `line-height: 17px` is load-bearing (the arithmetic above assumes it) and is NOT
+   inherited: WebKit gives form controls `line-height: normal`; they do not take
+   body's 1.42857143. Production computes 24.285715px here only because Bootstrap adds
+   `input,button,select,textarea{line-height:inherit}` — invisible either way, since
+   WebKit's centring absorbs it.
+
+   Still NOT fixable, so don't try: the caret's gap to the previous letter (that
+   glyph's side bearing — there is no CSS offset for it). `caret-color` is the only
+   caret property that ships; `caret-shape`/`caret-animation` are CSS.supports()-false
+   in Safari 26. */
 .search-bar {
   border: 0;
   outline: none;
   background-color: var(--color-bg);
   box-shadow: none;
   color: var(--color-primary);
-  padding: 4px 0 1px 10px;
+  padding: 2px 0 2px 10px;
   height: 32px;
   width: 220px;
-  font-family: var(--font-base);
+  font-family: var(--font-searchbar);
   font-size: 17px;
-  /* Pinned, not inherited, and NOT production's value — a zero-visual-change pin.
-     WebKit's UA sheet gives form controls `line-height: normal` (= 17px here); they
-     do NOT inherit body's 1.42857143. Production computes 24.285715px on this input
-     only because Bootstrap adds `input,button,select,textarea{line-height:inherit}`,
-     which this sheet has no equivalent of — and it makes no visual difference, since
-     WebKit's centring absorbs it (that is why text parity measured 0px anyway).
-     17px === what this already computed to, so pinning it changes nothing; it just
-     stops the metrics riding on a UA default. */
   line-height: 17px;
 }
 
