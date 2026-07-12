@@ -48,6 +48,68 @@ test("parseAdvancedQuery maps the string key (kanji) to ka_utf", () => {
   assert.deepEqual(parseAdvancedQuery({ kanji: "水" }), { ka_utf: "水" });
 });
 
+// Search is case-insensitive: the hidden *_search arrays are a lowercase index, so
+// the operand is lower-cased to match. Before this, ?kem=Buddha and ?kem=Shinto
+// returned nothing at all, and "Buddhist" found 坊 but not 寺.
+test("parseAdvancedQuery lower-cases the operand (case-insensitive search)", () => {
+  for (const typed of ["Buddha", "buddha", "BUDDHA", "bUdDhA"]) {
+    assert.deepEqual(
+      parseAdvancedQuery({ kem: typed }),
+      { meaning_search: { $in: ["buddha"] } },
+      `?kem=${typed} must search for "buddha"`
+    );
+  }
+  assert.deepEqual(parseAdvancedQuery({ rem: "Katakana Tsu" }), {
+    rad_meaning_search: { $in: ["katakana tsu"] },
+  });
+  assert.deepEqual(parseAdvancedQuery({ text: "GWK" }), {
+    textbook_search: { $in: ["gwk"] },
+  });
+});
+
+// Lower-casing is a no-op for kana and kanji — "みず".toLowerCase() === "みず" — which
+// is precisely WHY it is safe here. It must not disturb Japanese matching.
+//
+// ⚠️ Do not "improve" this into a Mongo case-insensitive collation. Tested and
+// rejected: {locale:"en", strength:2} treats hiragana and katakana as EQUAL (they
+// differ only at the tertiary level, the same level as letter case), so a search for
+// すい matched the katakana onyomi スイ — 6 hits where there should be 0. That would
+// blur the on'yomi/kun'yomi distinction across the whole app.
+test("lower-casing leaves Japanese operands byte-identical", () => {
+  assert.deepEqual(parseAdvancedQuery({ kun: "みず" }), {
+    kunyomi_ja_search: { $in: ["みず"] },
+  });
+  assert.deepEqual(parseAdvancedQuery({ on: "スイ" }), {
+    onyomi_ja_search: { $in: ["スイ"] },
+  });
+  // hiragana must NOT be folded into katakana
+  assert.notDeepEqual(parseAdvancedQuery({ on: "すい" }), {
+    onyomi_ja_search: { $in: ["スイ"] },
+  });
+  // the kanji character itself is an exact match, not a text search
+  assert.deepEqual(parseAdvancedQuery({ kanji: "画" }), { ka_utf: "画" });
+});
+
+test("generateBasicQuery lower-cases the English branch, leaves the rest exact", () => {
+  assert.deepEqual(generateBasicQuery("Japan"), {
+    $or: [
+      { meaning_search: { $in: ["japan"] } },
+      { ka_utf: "Japan" },
+      { kunyomi_ja_search: { $in: ["japan"] } },
+      { onyomi_ja_search: { $in: ["japan"] } },
+    ],
+  });
+  // a Japanese basic search is untouched by the lower-casing
+  assert.deepEqual(generateBasicQuery("みず"), {
+    $or: [
+      { meaning_search: { $in: ["みず"] } },
+      { ka_utf: "みず" },
+      { kunyomi_ja_search: { $in: ["みず"] } },
+      { onyomi_ja_search: { $in: ["みず"] } },
+    ],
+  });
+});
+
 test("parseAdvancedQuery uses _search suffix for alphanumeric array operands", () => {
   assert.deepEqual(parseAdvancedQuery({ on: "shin" }), {
     onyomi_search: { $in: ["shin"] },
