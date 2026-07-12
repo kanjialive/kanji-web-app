@@ -36,6 +36,11 @@
       },
       radicalFrame: 0,
       radicalAnimating: false,
+      // Radical animation timing. The cross-fade duration lives in CSS
+      // (.ka-rad-anim img, currently 1.375s) and is subtracted from the gap, so
+      // an image is fully still for (gap - fade) = 250ms. Keep them in step.
+      radicalFirstPause: 500,   // click -> frame 1
+      radicalFrameGap: 1625,    // frame -> frame (1.375s fade + 250ms still)
       stroketimes: [],
 
       get typefaceDisplay() {
@@ -95,31 +100,42 @@
 
       startRadicalAnimation() {
         // Three deliberate departures from Angular (detail-controller.js:198),
-        // all requested by the maintainer 2026-07-12. Recorded here so a future
+        // all chosen by the maintainer 2026-07-12. Recorded here so a future
         // parity sweep does not "correct" them back to production's values.
         //
-        //  1. The pause BEFORE the first transition is 500ms, not 1250ms — the
-        //     animation used to sit motionless for over a second after the click.
-        //  2. The gap BETWEEN frames is 1750ms, not 1250ms. Note that the 1s CSS
-        //     opacity fade (.ka-rad-anim img) eats most of the gap: production's
-        //     1250ms left each image fully still for only ~250ms. 1750ms gives it
-        //     750ms of stillness — long enough to actually read.
+        //  1. radicalFirstPause is 500ms, not Angular's 1250ms — the animation
+        //     used to sit motionless for over a second after the click.
+        //  2. radicalFrameGap is 1625ms, not 1250ms. The CSS opacity fade on
+        //     .ka-rad-anim img (1.375s, vs production's 1s) is subtracted from
+        //     this gap, so an image is FULLY STILL for (gap - fade) = 250ms.
+        //     The fade IS the animation — one radical dissolving into the next —
+        //     so it takes most of the frame, and the still period is a breath
+        //     between transitions rather than a slideshow.
         //  3. Re-entrancy is guarded. Angular has none: clicking mid-animation
         //     schedules an overlapping pass and the frames fight each other.
         //
-        // Frames land at 500 / 2250 / 4000ms. The 1s fade itself is unchanged.
+        // Frames land at 500 / 2125 / 3750ms.
+        //
+        // The JS timings live on the component (not as consts) so they can be
+        // tuned live in the browser console without a rebuild — but the fade is
+        // CSS, so change BOTH or the still period drifts:
+        //   var d = document.querySelector('.container2')._x_dataStack[0];
+        //   d.radicalFrameGap = 1625;
+        //   document.querySelectorAll('.ka-rad-anim img')
+        //     .forEach(i => i.style.transitionDuration = '1.375s');
+        //   document.querySelector('.ka-rad-anim').click();
         if (this.radicalAnimating) return;
         this.radicalAnimating = true;
 
-        const FIRST_PAUSE = 500;   // click -> frame 1
-        const FRAME_GAP = 1750;    // frame -> frame (1s fade + 750ms still)
+        const first = this.radicalFirstPause;
+        const gap = this.radicalFrameGap;
 
-        setTimeout(() => { this.radicalFrame = 1; }, FIRST_PAUSE);
-        setTimeout(() => { this.radicalFrame = 2; }, FIRST_PAUSE + FRAME_GAP);
+        setTimeout(() => { this.radicalFrame = 1; }, first);
+        setTimeout(() => { this.radicalFrame = 2; }, first + gap);
         setTimeout(() => {
           this.radicalFrame = 0;
           this.radicalAnimating = false;
-        }, FIRST_PAUSE + FRAME_GAP * 2);
+        }, first + gap * 2);
       },
 
       init() {

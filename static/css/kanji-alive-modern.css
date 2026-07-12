@@ -889,10 +889,16 @@ div.radical-meaning {
   position: absolute;
   top: 291px;
   right: 1px;
-  /* 1s, not 0.5s — legacy kanji-alive.css:373. Pairs with the 1250/2500/3750ms
-     frame timings in detail.ejs (Angular's detail-controller.js:198). Halving
-     it made the cross-fade visibly snappier than production. */
-  transition: opacity 1s ease-in-out;
+  /* Cross-fade duration. Legacy (kanji-alive.css:373) and production use 1s;
+     1.375s is a deliberate choice by the maintainer (2026-07-12) — the fade IS
+     the animation, so it gets most of the frame.
+
+     This trades directly against the still period: detail.ejs waits
+     radicalFrameGap (1625ms) between frames, so an image is FULLY still for
+     (gap - fade) = 250ms. Raise the fade without raising the gap and the
+     stillness shrinks; once fade >= gap it vanishes and the fades overlap.
+     CHANGE THE TWO TOGETHER. */
+  transition: opacity 1.375s ease-in-out;
   opacity: 0;
 }
 
