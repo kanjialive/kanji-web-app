@@ -1093,10 +1093,13 @@ kbd {
   box-shadow: inset 0 -1px 0 rgba(0, 0, 0, 0.25);
 }
 
-/* Bootstrap code chip — red on pink, monospace */
+/* Bootstrap code chip — red on pink, monospace.
+   0.85em, NOT Bootstrap's 90%: the legacy sheet loads after Bootstrap and
+   overrides it (kanji-alive.css:1072), so production computes 15.3px on the
+   welcome page's 18px paragraphs, not 16.2px. */
 code {
   font-family: Menlo, Monaco, Consolas, "Courier New", monospace;
-  font-size: 90%;
+  font-size: 0.85em;
   color: var(--color-kbd-text);
   background-color: var(--color-kbd-bg);
   padding: 2px 4px;
