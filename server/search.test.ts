@@ -13,9 +13,35 @@ test("generateBasicQuery builds an $or over the four search fields", () => {
   });
 });
 
-test("parseAdvancedQuery coerces numeric keys and skips NaN", () => {
+test("parseAdvancedQuery coerces numeric keys and drops unparseable ones", () => {
   assert.deepEqual(parseAdvancedQuery({ ks: "3" }), { kstroke: 3 });
   assert.deepEqual(parseAdvancedQuery({ ks: "abc" }), {});
+});
+
+// The 229 gradeless kanji are stored with grade = NaN, and Mongo matches NaN to
+// NaN, so { grade: NaN } IS the "no grade" search — production has served it for
+// years via an unguarded parseInt(""). A previous hardening pass dropped the key
+// instead, which collapsed the filter to {} and tripped the empty-query guard in
+// private-api.ts, so ?grade= and ?grade=n/a returned "No kanji found."
+// The empty string and "n/a" are the two spellings the UI and the docs use.
+test("parseAdvancedQuery maps a valueless grade to NaN (the 229 gradeless kanji)", () => {
+  for (const operand of ["", "n/a", "N/A"]) {
+    const parsed = parseAdvancedQuery({ grade: operand }) as { grade?: number };
+    assert.ok(
+      "grade" in parsed,
+      `grade key must survive for operand ${JSON.stringify(operand)}`
+    );
+    assert.ok(
+      Number.isNaN(parsed.grade),
+      `grade must be NaN for operand ${JSON.stringify(operand)}, got ${String(
+        parsed.grade
+      )}`
+    );
+  }
+});
+
+test("parseAdvancedQuery still parses a real grade", () => {
+  assert.deepEqual(parseAdvancedQuery({ grade: "1" }), { grade: 1 });
 });
 
 test("parseAdvancedQuery maps the string key (kanji) to ka_utf", () => {

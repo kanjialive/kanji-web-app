@@ -29,11 +29,26 @@ export const parseAdvancedQuery = (query: StringDict): ParsedQuery => {
   const parsed_query: ParsedQuery = {};
 
   for (const key in numeric_keys) {
-    if (Object.prototype.hasOwnProperty.call(query, key)) {
-      const num = parseInt(query[key], 10);
-      if (!isNaN(num)) {
-        parsed_query[numeric_keys[key]] = num;
-      }
+    if (!Object.prototype.hasOwnProperty.call(query, key)) continue;
+
+    const raw = query[key];
+    // Injection guard (plans/002): qs can deliver an operator object
+    // (?grade[$ne]=1). A non-string operand must never reach Mongo.
+    if (typeof raw !== "string") continue;
+
+    // "" and "n/a" mean "this kanji has no grade" — a real search (229 kanji).
+    // Gradeless kanji are stored as NaN, and Mongo matches NaN to NaN, so the
+    // filter { grade: NaN } is what finds them. Verified against the live
+    // collection 2026-07-12: 229 docs hold grade=NaN, 0 hold null or nothing.
+    // Do NOT rewrite this as a null/$exists check without re-checking the data.
+    if (raw === "" || raw.toLowerCase() === "n/a") {
+      parsed_query[numeric_keys[key]] = NaN;
+      continue;
+    }
+
+    const num = parseInt(raw, 10);
+    if (!isNaN(num)) {
+      parsed_query[numeric_keys[key]] = num;
     }
   }
 
