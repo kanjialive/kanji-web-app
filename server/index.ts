@@ -1,7 +1,6 @@
 import { MongoClient, ServerApiVersion, Db } from "mongodb";
 import path from "path";
 import express, { Request, Response, NextFunction } from "express";
-import promBundle from "express-prom-bundle";
 import * as private_api from "./private-api";
 import * as public_api from "./public-api";
 import * as html_routes from "./html-routes";
@@ -96,25 +95,13 @@ if (!USE_HTMX) {
   });
 }
 
-// add the prometheus middleware to all routes
-app.use(
-  promBundle({
-    includeMethod: true,
-    includePath: true,
-
-    normalizePath: [
-      ["^/(?:%[0-9A-Fa-f]{2})+$", "/#character"],
-      ["^/search/.*", "/search/#search_term"],
-      ["^/api/kanji/id/.*", "/api/kanji/id/#kanji_id"],
-      ["^/api/search/.*", "/api/search/#search_term"],
-      ["^/api/kanji/.*", "/api/kanji/#character"],
-      ["^/api/public/kanji/.*", "/api/public/kanji/#character"],
-      ["^/api/public/search/.*", "/api/public/search/#search_term"],
-      ["^.*\\.[a-zA-Z0-9]+$", "/#static_files"],
-    ],
-    metricsPath: "/api/metrics",
-  })
-);
+// Prometheus metrics (express-prom-bundle + prom-client) were removed on
+// 2026-07-12. They could not observe the failures that matter: every route
+// returned HTTP 200 even during a database outage, so the metrics reported a
+// perfectly healthy app while it was broken. Failures are now loud (5xx), which
+// Heroku's logs and any uptime monitor can see — with two fewer dependencies to
+// maintain over the app's remaining lifetime.
+// See offline/durability-plan-2026-07-12.md.
 
 app.get("/api/kanji/id/:id", private_api.getKanjiWithId);
 app.get("/api/kanji/:character", private_api.getKanjiWithCharacter);

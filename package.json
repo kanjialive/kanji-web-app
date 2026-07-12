@@ -8,9 +8,7 @@
     "@types/ejs": "^3.1.5",
     "ejs": "^4.0.1",
     "express": "4.x",
-    "express-prom-bundle": "^6.6.0",
-    "mongodb": "6.x",
-    "prom-client": "^14.2.0"
+    "mongodb": "6.x"
   },
   "engines": {
     "node": "22.x"
