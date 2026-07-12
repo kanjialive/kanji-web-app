@@ -94,22 +94,25 @@
       },
 
       startRadicalAnimation() {
-        // Two deliberate departures from Angular (detail-controller.js:198),
-        // both requested by the maintainer 2026-07-12:
+        // Three deliberate departures from Angular (detail-controller.js:198),
+        // all requested by the maintainer 2026-07-12. Recorded here so a future
+        // parity sweep does not "correct" them back to production's values.
         //
         //  1. The pause BEFORE the first transition is 500ms, not 1250ms — the
-        //     animation used to sit still for over a second after the click.
-        //     The 1250ms gap BETWEEN frames is production's and is unchanged, as
-        //     is the 1s CSS opacity fade (.ka-rad-anim img).
-        //  2. Re-entrancy is guarded. Angular has none: clicking mid-animation
+        //     animation used to sit motionless for over a second after the click.
+        //  2. The gap BETWEEN frames is 1750ms, not 1250ms. Note that the 1s CSS
+        //     opacity fade (.ka-rad-anim img) eats most of the gap: production's
+        //     1250ms left each image fully still for only ~250ms. 1750ms gives it
+        //     750ms of stillness — long enough to actually read.
+        //  3. Re-entrancy is guarded. Angular has none: clicking mid-animation
         //     schedules an overlapping pass and the frames fight each other.
         //
-        // Frames land at 500 / 1750 / 3000ms.
+        // Frames land at 500 / 2250 / 4000ms. The 1s fade itself is unchanged.
         if (this.radicalAnimating) return;
         this.radicalAnimating = true;
 
         const FIRST_PAUSE = 500;   // click -> frame 1
-        const FRAME_GAP = 1250;    // frame -> frame (production's spacing)
+        const FRAME_GAP = 1750;    // frame -> frame (1s fade + 750ms still)
 
         setTimeout(() => { this.radicalFrame = 1; }, FIRST_PAUSE);
         setTimeout(() => { this.radicalFrame = 2; }, FIRST_PAUSE + FRAME_GAP);
