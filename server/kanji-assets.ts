@@ -17,6 +17,61 @@ export const radPositionPath = `${baseURL}/rad_positions`;
 export const mnemonicHintsPath = `${baseURL}/mnemonic_hints`;
 
 /**
+ * Escapes text for an HTML *element content* context (NOT an attribute).
+ * `&` and `<` are the only characters that can change parsing there; `>` is
+ * escaped by convention. Quotes are deliberately left alone — escaping them
+ * would emit &quot;/&#39; entities and churn the output of the ~200 hints that
+ * quote a gloss, for no security gain. `hint` is only ever interpolated into
+ * element content (detail.ejs), never into an attribute. If that ever changes,
+ * this function is no longer sufficient.
+ */
+function escapeHtmlText(text: string): string {
+  return text
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
+}
+
+/**
+ * The COMPLETE set of markup permitted inside a mnemonic hint.
+ *
+ * Derived by scanning all 1,006 hints in the production database on 2026-07-12,
+ * not guessed: the only markup that occurs is a `<span class='note'>` wrapper
+ * around etymology asides (115 uses) and its closing tag. No other tags, no HTML
+ * entities.
+ *
+ * Hints must render as markup (`<%- doc.hint %>` in detail.ejs) because they
+ * legitimately contain this span and the `[N]` image tokens. So renderHint()
+ * escapes the whole string, then restores ONLY these exact sequences. Anything
+ * else a hint could contain — a <script>, an onerror handler, a stray tag from a
+ * bad or compromised import — stays escaped and renders as inert, visible text.
+ *
+ * An allowlist by construction, needing no sanitizer dependency: over this app's
+ * remaining lifetime every dependency is a liability.
+ */
+const HINT_ALLOWED_MARKUP: ReadonlyArray<readonly [RegExp, string]> = [
+  [/&lt;span class='note'&gt;/g, "<span class='note'>"],
+  [/&lt;\/span&gt;/g, "</span>"],
+];
+
+/**
+ * Renders a raw `mn_hint` into display HTML: escape, restore the allowlisted
+ * markup, then expand `[N]` tokens into <img> tags (the id is constrained to
+ * digits by the regex). Escaping leaves `[`, `]` and digits untouched, so the
+ * tokens still match afterwards.
+ */
+export function renderHint(mnHint: string): string {
+  let hint = escapeHtmlText(mnHint);
+  for (const [pattern, replacement] of HINT_ALLOWED_MARKUP) {
+    hint = hint.replace(pattern, replacement);
+  }
+  return hint.replace(
+    /\[([0-9]+)\]/g,
+    `<img src="${mnemonicHintsPath}/$1.svg" />`
+  );
+}
+
+/**
  * Extends a kanji document with all asset URLs for the HTMX detail page.
  */
 export function extendKanjiWithAssets(doc: KanjiDocument): ExtendedKanjiDocument {
@@ -39,10 +94,7 @@ export function extendKanjiWithAssets(doc: KanjiDocument): ExtendedKanjiDocument
     (_, i) => `${strokesPath}/${doc.kname}_${i + 1}.svg`
   );
 
-  const hint = doc.mn_hint.replace(
-    /\[([0-9]+)\]/g,
-    `<img src="${mnemonicHintsPath}/$1.svg" />`
-  );
+  const hint = renderHint(doc.mn_hint);
 
   const rad_position_file = doc.rad_position.split(",").pop()?.trim() || "";
   const paddedID = doc.ka_id.split("_")[1].padStart(4, "0");
