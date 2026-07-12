@@ -154,6 +154,22 @@
         const handler = (e) => {
           if (e.target.tagName === 'INPUT') return;
 
+          // 'r' — replay the radical animation. The only feature with no key of
+          // its own; the radical image was mouse-only in both frontends.
+          //
+          // Matched on e.key, NOT e.code like the cases below. e.code is the
+          // physical key position, so 'KeyR' fires for whatever sits where R is
+          // on QWERTY — on Dvorak that is the key that types 'o'. A mnemonic
+          // shortcut has to follow the character the user actually typed.
+          //
+          // Modifiers are excluded so Cmd+R / Ctrl+R (reload) is never hijacked.
+          // No preventDefault: a bare 'r' has no default action to suppress, and
+          // startRadicalAnimation() already guards against re-entry.
+          if (e.key && e.key.toLowerCase() === 'r' && !e.metaKey && !e.ctrlKey && !e.altKey) {
+            this.startRadicalAnimation();
+            return;
+          }
+
           switch(e.code) {
             case 'Space':
               e.preventDefault();
