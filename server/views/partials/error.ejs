@@ -5,10 +5,12 @@
   search, so nobody ever finds out the app is broken. See
   offline/durability-plan-2026-07-12.md.
 %>
-<div class="search-results search-results-kanji">
-  <p class="no-results">
-    <%= typeof error !== 'undefined' && error
-        ? error
-        : 'Sorry, something went wrong. Please try again in a moment.' %>
-  </p>
+<div class="scroller scroller-kanji">
+  <div class="search-results search-results-kanji" style="width: 266px">
+    <p class="no-results">
+      <%= typeof error !== 'undefined' && error
+          ? error
+          : 'Sorry, something went wrong. Please try again in a moment.' %>
+    </p>
+  </div>
 </div>

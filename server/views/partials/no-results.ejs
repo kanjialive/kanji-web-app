@@ -1,8 +1,17 @@
-<div class="search-results search-results-kanji">
-  <div id="kanji-count" class="ka-results-h1">0</div>
-  <div class="ka-results-h3">Kanji</div>
-  <div class="ka-border-bottom">
-    <div class="border-inner"></div>
+<%#
+  Mirrors the kanji-grid branch of results.ejs, including the .scroller wrapper
+  and the 266px width (= max(ceil(0/12), 7) * 38, Angular's kanjiResultsStyle
+  with zero results). The header is absolutely positioned against .scroller —
+  drop the wrapper and the count, the label and the rule all shift up 23px and
+  the rule stretches to the container's width.
+%>
+<div class="scroller scroller-kanji">
+  <div class="search-results search-results-kanji" style="width: 266px">
+    <div id="kanji-count" class="ka-results-h1">0</div>
+    <div class="ka-results-h3">Kanji</div>
+    <div class="ka-border-bottom">
+      <div class="border-inner"></div>
+    </div>
+    <p class="no-results">No kanji were found matching this search.</p>
   </div>
-  <p class="no-results">No kanji were found matching this search.</p>
 </div>

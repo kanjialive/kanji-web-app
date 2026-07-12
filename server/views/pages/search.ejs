@@ -50,8 +50,13 @@
       document.dispatchEvent(new CustomEvent('results:loaded'));
     } catch (err) {
       // Fail loudly: a database outage must not look like an empty result set.
+      // .no-results is absolutely positioned against .scroller — without that
+      // wrapper the message lands 23px high (see no-results.ejs).
       target.innerHTML =
-        '<p class="no-results">Sorry, something went wrong. Please try again.</p>';
+        '<div class="scroller scroller-kanji">' +
+        '<div class="search-results search-results-kanji" style="width: 266px">' +
+        '<p class="no-results">Sorry, something went wrong. Please try again.</p>' +
+        '</div></div>';
     }
   };
 
