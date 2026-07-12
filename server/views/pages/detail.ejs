@@ -35,6 +35,7 @@
         'maru': 'Maru'
       },
       radicalFrame: 0,
+      radicalAnimating: false,
       stroketimes: [],
 
       get typefaceDisplay() {
@@ -93,15 +94,29 @@
       },
 
       startRadicalAnimation() {
-        // Frame timings replicate Angular's detail-controller.js:198 exactly —
-        // 1250 / 2500 / 3750ms, paired with the 1s CSS opacity transition on
-        // .ka-rad-anim img. The port previously used a 500ms setInterval, which
-        // ran the whole cycle 2.5x too fast.
-        // Like production, this does not guard against re-entry: clicking again
-        // mid-animation simply schedules another pass.
-        setTimeout(() => { this.radicalFrame = 1; }, 1250);
-        setTimeout(() => { this.radicalFrame = 2; }, 2500);
-        setTimeout(() => { this.radicalFrame = 0; }, 3750);
+        // Two deliberate departures from Angular (detail-controller.js:198),
+        // both requested by the maintainer 2026-07-12:
+        //
+        //  1. The pause BEFORE the first transition is 500ms, not 1250ms — the
+        //     animation used to sit still for over a second after the click.
+        //     The 1250ms gap BETWEEN frames is production's and is unchanged, as
+        //     is the 1s CSS opacity fade (.ka-rad-anim img).
+        //  2. Re-entrancy is guarded. Angular has none: clicking mid-animation
+        //     schedules an overlapping pass and the frames fight each other.
+        //
+        // Frames land at 500 / 1750 / 3000ms.
+        if (this.radicalAnimating) return;
+        this.radicalAnimating = true;
+
+        const FIRST_PAUSE = 500;   // click -> frame 1
+        const FRAME_GAP = 1250;    // frame -> frame (production's spacing)
+
+        setTimeout(() => { this.radicalFrame = 1; }, FIRST_PAUSE);
+        setTimeout(() => { this.radicalFrame = 2; }, FIRST_PAUSE + FRAME_GAP);
+        setTimeout(() => {
+          this.radicalFrame = 0;
+          this.radicalAnimating = false;
+        }, FIRST_PAUSE + FRAME_GAP * 2);
       },
 
       init() {
