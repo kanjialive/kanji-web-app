@@ -1100,8 +1100,32 @@ img.ka-breakdown:hover {
   flex-shrink: 0;
 }
 
+/* The triangle's APEX should sit on the optical middle of the Japanese compound.
+   It does not: .example is `align-items: flex-start`, so the button's box and the
+   text's box share a top edge and the glyph then falls wherever two unrelated fonts
+   happen to put it. Measured by pixel-scanning the rendered page, the apex lands
+   1.75px ABOVE the text's middle in Safari and ~1.97px above it in Chrome (the
+   latter from the maintainer's own screenshot: −13.2% of the text's ink height).
+   1.8px splits them; both land within 0.3px, well inside one device pixel.
+
+   ⚠️ The target is the text's LINE-BOX CENTRE, and that is what makes a fixed nudge
+   safe rather than a magic number. CJK ink centres on its line box in every font in
+   the stack — Yu Gothic +0.00, mplus-1m-light +0.14, Hiragino −0.59 — because CJK
+   glyphs are centred in the em box and the em box is centred in the line box by
+   half-leading. The triangle is a vendored webfont glyph (ka-multimedia \e007),
+   identical everywhere. So NEITHER side depends on the visitor's installed fonts.
+   That matters: the Japanese here actually renders in Yu Gothic Medium, a SYSTEM
+   font (it ships with MS Office) that many machines do not have — they fall through
+   to the vendored mplus-1m-light, and the nudge still holds.
+
+   Re-derive it, don't eyeball it: pixel-scan the ink. The DOM lies here — a baseline
+   probe placed inside the button perturbs its line box, and a canvas fed the raw
+   font stack resolves it differently than the DOM does. Both gave wrong answers
+   (2.41px and 1.29px) before the pixel scan settled it. */
 .audio-play {
   font-size: 15px;
+  position: relative;
+  top: 1.8px;
 }
 
 /* ============================================
