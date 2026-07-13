@@ -36,7 +36,7 @@ for a month.
 | `ka-search-sans` | the search input **only** | Source Sans Pro with **repaired vertical metrics** (below) | OFL 1.1 — `LICENSE-SourceSansPro.md` |
 | `JapaneseRadicals-Regular` | `.ka-radical` — radical glyphs in the Sort views | Adobe **Source Han Sans** → [kanjialive/kanji-data-media/radicals-font](https://github.com/kanjialive/kanji-data-media/tree/master/radicals-font) | **Apache 2.0** — `LICENSE-JapaneseRadicals.txt` |
 | `mplus-1m-icons` | typeface-gallery chevrons (`.ka-typeface-left/right`) | M+ 1m 1.056 subset (name table says `mplus-1m-regular`) | **M+ FONTS LICENSE** — `LICENSE-mplus.txt` |
-| `ka-multimedia` | play / pause / step icons, incl. every example-audio button | Kanji alive's own icon font — **no licence metadata in the file** | ❓ unstated — see below |
+| `ka-multimedia` | play / pause / step icons, incl. every example-audio button | Kanji alive's own icon font | **CC BY 4.0** — `LICENSE-ka-multimedia.md` |
 
 `.woff2` is what every current browser takes; the `.woff` beside it is the legacy fallback.
 
@@ -51,10 +51,12 @@ only; correcting the metrics app-wide would shift baselines on every page.
 Rebuild with `tools/build-searchbar-font.py`. It is **renamed** from "Source …" because OFL's
 Reserved Font Name clause forbids a modified version from carrying it.
 
-### ka-multimedia — provenance needs stating
+### ka-multimedia — Kanji alive's own, CC BY 4.0
 
-This file carries **no copyright, licence or vendor string** in its name table (verified). It
-appears to be Kanji alive's own icon font. Before this repo is published, that should be stated
-explicitly — either an authorship line here, or a licence file if it was derived from something.
-An icon font with no stated licence is the one asset here a downstream user could not safely
-redistribute.
+Kanji alive's own icon font, licensed **CC BY 4.0** (`LICENSE-ka-multimedia.md`) — the same
+licence as the other Kanji alive media in
+[kanji-data-media](https://github.com/kanjialive/kanji-data-media).
+
+⚠️ The file carries **no copyright or licence string in its `name` table** (verified), which is
+why its provenance had to be asked about rather than read. If it is ever regenerated, embed the
+copyright (name ID 0) and licence (IDs 13/14) so the metadata travels with the file.
