@@ -371,10 +371,16 @@
       <p class="meaning"><%= doc.meaning %></p>
 
       <h3 class="onyomi">Onyomi</h3>
-      <p class="onyomi"><%= doc.onyomi_ja %></p>
+      <%# lang="ja" is load-bearing, not decoration. The page is lang="en"; when font
+          fallback reaches the generic, the browser picks the CJK face by DOCUMENT
+          language — and macOS then hands back PingFang SC, i.e. CHINESE glyph forms
+          (verified: a 0.00% pixel match against PingFang SC). 骨 直 画 角 are drawn
+          differently in Chinese, and this app teaches the Japanese strokes. Marking the
+          text as Japanese makes even the generic resolve to Hiragino Sans. %>
+      <p class="onyomi" lang="ja"><%= doc.onyomi_ja %></p>
 
       <h3 class="kunyomi">Kunyomi</h3>
-      <p class="kunyomi"><%= doc.kunyomi_ka_display %></p>
+      <p class="kunyomi" lang="ja"><%= doc.kunyomi_ka_display %></p>
 
       <div class="border3"><div class="border-inner"></div></div>
 
@@ -383,7 +389,7 @@
       <% if (doc.rad_position && doc.rad_position_file) { %>
         <img class="radical-position" src="<%= doc.rad_position_file %>" alt="Radical position">
       <% } %>
-      <div class="radical-name"><%= doc.rad_name_ja %></div>
+      <div class="radical-name" lang="ja"><%= doc.rad_name_ja %></div>
       <div class="radical-meaning"><%= doc.rad_meaning %></div>
       <div class="radical-stroke"><%= doc.rad_stroke %></div>
 
@@ -439,7 +445,7 @@
         <% doc.examples.forEach((example, index) => { %>
           <div class="example">
             <div class="example-text">
-              <div class="example-ja example-japanese"><%= example.japanese %></div>
+              <div class="example-ja example-japanese" lang="ja"><%= example.japanese %></div>
               <div class="example-ja example-english"><%= example.english %></div>
             </div>
             <div class="example-audio">

@@ -22,15 +22,74 @@
   --color-kbd-bg: #f9f2f4;        /* keyboard shortcut background */
 
   /* Fonts */
-  /* --font-base is the legacy body stack: EN then JP faces, generic LAST.
-     Never build a stack as var(--font-en), var(--font-jp) — the generic
-     sans-serif inside --font-en makes every family after it unreachable,
-     so Japanese text silently falls back to the system font. */
-  --font-base: 'SourceSansPro-Regular', 'Yu Gothic Medium', 'mplus-1m-light', 'ヒラギノ角ゴ Pro W3', 'Hiragino Kaku Gothic Pro', 'メイリオ', 'Meiryo', sans-serif;
-  /* --font-base, but with the search box's metric-corrected face in front. Identical
-     otherwise — same JP fallbacks, generic LAST. See the @font-face below. */
-  --font-searchbar: 'KA Search Sans', 'Yu Gothic Medium', 'mplus-1m-light', 'ヒラギノ角ゴ Pro W3', 'Hiragino Kaku Gothic Pro', 'メイリオ', 'Meiryo', sans-serif;
-  --font-jp: 'Yu Gothic Medium', 'mplus-1m-light', 'Hiragino Kaku Gothic Pro', 'Meiryo', sans-serif;
+  /* 🔴 NEVER put an INCOMPLETE font ahead of a complete one. CSS font fallback is
+     PER CHARACTER, so a font that covers only part of a script gets first refusal on
+     every glyph and silently hands back only the ones it has.
+
+     That is the bug this stack had until 2026-07-13. 'mplus-1m-light' — the webfont
+     Kanji alive has shipped since 2013 — was subsetted years ago to exactly the 1,235
+     kanji the app teaches, and the kana were left out by accident (verified: 1,253 CJK
+     ideographs, ZERO hiragana, 1 katakana, no Latin, no full-width parens). It sat at
+     position 2. On Windows that was harmless, because 'Yu Gothic Medium' sits ahead of
+     it and covers everything (verified in DevTools on stock Windows 11: one font, all
+     glyphs). On macOS/iOS/Android/Linux — none of which have Yu Gothic — the webfont
+     was the FIRST font the OS could supply, so it took the kanji and let every kana
+     fall through to Hiragino. Kanji and kana in two different faces, on one line.
+     The webfont is now gone, and its @font-face with it.
+
+     ⚠️ The order below is NOT a priority list — it is four INDEPENDENT per-platform
+     choices. Each OS ships only its own faces, so 'Yu Gothic' never competes with
+     'Hiragino' on the same machine. Group them by platform and it stays legible.
+
+     ⚠️ The generic `sans-serif` MUST stay LAST, and must never appear mid-stack (that
+     is why --font-en can never be composed into these — its trailing generic would
+     make every family after it unreachable).
+
+     ⚠️ Japanese content needs lang="ja" — and the named fonts below are what make that
+     merely a BACKSTOP rather than the load-bearing defence. `lang` does not choose the
+     font; the family list does. `lang` only steers the browser's LAST-RESORT face, the
+     one it reaches for after running off the end of this list. Verified on macOS: with
+     no Japanese family named and the page marked lang="en", the text renders in
+     PingFang SC — a 0.00% pixel match, i.e. CHINESE glyph forms. 直/骨/画/角 are drawn
+     differently in Chinese and this app teaches the Japanese strokes. Naming a real
+     Japanese font per platform means the generic is never reached at all; lang="ja" on
+     the purely-Japanese elements covers the platforms whose names we guessed wrong.
+     That is also why MIXED content (the search box, the hints) needs no lang: it is
+     protected by these names, and marking it "ja" would make a screen reader read an
+     English query aloud in Japanese. */
+  --font-jp:
+    /* macOS / iOS. Hiragino leads because Windows can never have it — so leading with
+       it costs nothing and removes all ambiguity.
+         'Hiragino Sans W3' — the modern face (JIS2004 letterforms, which is what is
+           taught today) PINNED TO W3. ⚠️ Do not simplify this to 'Hiragino Sans':
+           font-weight:normal resolves to W4, which carries 16% MORE ink (measured) and
+           reads visibly darker than the Kaku Gothic Pro this app has always used.
+         'Hiragino Kaku Gothic ProN' — the safety net. 'Hiragino Sans W3' is a FULL FONT
+           NAME, not a family name; WebKit and Blink match it on macOS but iOS/Firefox
+           are unverified. ProN is a plain family name at the same W3 weight and also
+           JIS2004, so a name-match failure costs nothing.
+         'Hiragino Sans' — last resort. Correct forms, but the heavier W4.
+         'Hiragino Kaku Gothic Pro' — oldest; JIS90 (pre-2004) letterforms. */
+    'Hiragino Sans W3', 'Hiragino Kaku Gothic ProN', 'Hiragino Sans',
+    'ヒラギノ角ゴ Pro W3', 'Hiragino Kaku Gothic Pro',
+    /* Windows 10/11 — default-installed. Medium is deliberate: Yu Gothic Regular renders
+       notoriously thin on Windows, and Medium is verified as what Windows renders today
+       (DevTools, stock Win11). 'Yu Gothic UI'/'Yu Gothic' follow because 'Yu Gothic
+       Medium' is a STYLE name: Chrome matches it, but a browser that matches only family
+       names would fall past it — and the generic on Windows is the bitmapped MS PGothic. */
+    'Yu Gothic Medium', 'Yu Gothic UI', 'Yu Gothic',
+    /* Windows — only if the optional "Japanese Supplemental Fonts" pack is installed.
+       NOT on a stock English Windows 11 any more, so this is a genuine fallback now. */
+    'メイリオ', 'Meiryo',
+    /* Android / Linux / ChromeOS — previously unnamed; reached only via the generic. */
+    'Noto Sans CJK JP', 'Noto Sans JP',
+    sans-serif;
+  /* Latin face first, then the identical JP chain. Latin glyphs inside a JP font sit on
+     full-width em boxes and look wrong, so EN must precede JP — never the reverse. */
+  --font-base: 'SourceSansPro-Regular', 'Hiragino Sans W3', 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', 'ヒラギノ角ゴ Pro W3', 'Hiragino Kaku Gothic Pro', 'Yu Gothic Medium', 'Yu Gothic UI', 'Yu Gothic', 'メイリオ', 'Meiryo', 'Noto Sans CJK JP', 'Noto Sans JP', sans-serif;
+  /* --font-base with the search box's metric-corrected face in front (see @font-face).
+     The JP names here are what keep a typed kanji out of PingFang SC — no lang needed. */
+  --font-searchbar: 'KA Search Sans', 'Hiragino Sans W3', 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', 'ヒラギノ角ゴ Pro W3', 'Hiragino Kaku Gothic Pro', 'Yu Gothic Medium', 'Yu Gothic UI', 'Yu Gothic', 'メイリオ', 'Meiryo', 'Noto Sans CJK JP', 'Noto Sans JP', sans-serif;
   --font-en: 'SourceSansPro-Regular', sans-serif;
   --font-en-italic: 'SourceSansPro-It', 'SourceSansPro-Regular', sans-serif;
   --font-icons: 'mplus-1m-icons';
@@ -55,12 +114,13 @@
 /* ============================================
    Font Faces
    ============================================ */
-@font-face {
-  font-family: 'mplus-1m-light';
-  src: url('https://media.kanjialive.com/fonts/mplus-1m-light-webfont.woff2') format('woff2'),
-       url('https://media.kanjialive.com/fonts/mplus-1m-light-webfont.woff') format('woff');
-  font-display: swap;
-}
+/* 'mplus-1m-light' was declared here and is DELETED (2026-07-13). It was a kanji-only
+   subset with no kana — see the note on --font-jp. Removing it also drops a 299 KB
+   download from every page load. Its original 2013 justification (Windows defaulted to
+   the bitmapped MS Gothic) expired: Windows has shipped Yu Gothic as the default
+   Japanese face since Windows 10.
+
+   'mplus-1m-icons' below is a DIFFERENT font (the UI icon glyphs). Do not remove it. */
 
 @font-face {
   font-family: 'SourceSansPro-Regular';
@@ -610,9 +670,15 @@ span.search {
   position: absolute;
 }
 
-/* Kanji characters in results */
+/* Kanji characters in results.
+   Production prepends 'Yu Gothic Regular' here. Dropped 2026-07-13: Regular is the weight
+   that renders notoriously thin on Windows, so these 25px kanji — the largest Japanese on
+   the page, and the ones students click to learn a character — came out LIGHTER than the
+   surrounding text, which uses Medium. They now follow --font-jp like everything else
+   (Yu Gothic Medium on Windows, Hiragino Sans W3 on macOS). No change on macOS: Yu Gothic
+   is not installed there and never was. */
 .kanji {
-  font-family: 'Yu Gothic Regular', var(--font-jp);
+  font-family: var(--font-jp);
   font-size: 25px;
 }
 
@@ -626,7 +692,7 @@ p.kanji {
 }
 
 a.ka {
-  font-family: 'Yu Gothic Regular', var(--font-jp);
+  font-family: var(--font-jp);   /* was 'Yu Gothic Regular', … — see .kanji above */
   font-size: 25px;
   color: black;
   text-decoration: none;
@@ -1109,14 +1175,12 @@ img.ka-breakdown:hover {
    1.8px splits them; both land within 0.3px, well inside one device pixel.
 
    ⚠️ The target is the text's LINE-BOX CENTRE, and that is what makes a fixed nudge
-   safe rather than a magic number. CJK ink centres on its line box in every font in
-   the stack — Yu Gothic +0.00, mplus-1m-light +0.14, Hiragino −0.59 — because CJK
-   glyphs are centred in the em box and the em box is centred in the line box by
-   half-leading. The triangle is a vendored webfont glyph (ka-multimedia \e007),
-   identical everywhere. So NEITHER side depends on the visitor's installed fonts.
-   That matters: the Japanese here actually renders in Yu Gothic Medium, a SYSTEM
-   font (it ships with MS Office) that many machines do not have — they fall through
-   to the vendored mplus-1m-light, and the nudge still holds.
+   safe rather than a magic number. CJK ink centres on its line box in every candidate
+   face (Yu Gothic, Hiragino, Noto) — CJK glyphs are centred in the em box, and the em
+   box is centred in the line box by half-leading. The triangle is a vendored webfont
+   glyph (ka-multimedia \e007), identical everywhere. So NEITHER side of the equation
+   depends on which Japanese font the visitor happens to have: Windows renders this
+   text in Yu Gothic Medium, macOS/iOS in Hiragino, Android/Linux in Noto.
 
    Re-derive it, don't eyeball it: pixel-scan the ink. The DOM lies here — a baseline
    probe placed inside the button perturbs its line box, and a canvas fed the raw
