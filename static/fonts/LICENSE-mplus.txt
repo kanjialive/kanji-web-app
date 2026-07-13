@@ -1,0 +1,28 @@
+M+ FONTS LICENSE
+================
+
+Applies to: mplus-1m-icons.woff2 / .woff  (in this directory)
+
+These files are a subset of M+ 1m (the font's own name table reports family
+"mplus-1m-regular", Version 1.056), reduced to the handful of UI icon glyphs
+Kanji alive uses. The embedded copyright notice reads:
+
+    Copyright(c) 2013 M+ FONTS PROJECT
+
+M+ 1m of this vintage is distributed under the M+ FONTS LICENSE, reproduced in
+full below (it is the complete text of the project's LICENSE_E file).
+
+NOTE: the newer "M PLUS 1" / "M PLUS 2" families, released from ~2021 onward,
+switched to the SIL Open Font License. That does NOT apply here — this file is
+the older M+ 1m, and the older licence governs it.
+
+----------------------------------------------------------------------
+M+ FONTS LICENSE
+
+These fonts are free software.
+Unlimited permission is granted to use, copy, and distribute them, with or
+without modification, either commercially or noncommercially.
+THESE FONTS ARE PROVIDED "AS IS" WITHOUT WARRANTY.
+----------------------------------------------------------------------
+
+Upstream project: https://mplusfonts.github.io/
