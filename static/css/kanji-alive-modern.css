@@ -1194,30 +1194,54 @@ img.ka-breakdown:hover {
   flex-shrink: 0;
 }
 
-/* The triangle's APEX should sit on the optical middle of the Japanese compound.
-   It does not: .example is `align-items: flex-start`, so the button's box and the
-   text's box share a top edge and the glyph then falls wherever two unrelated fonts
-   happen to put it. Measured by pixel-scanning the rendered page, the apex lands
-   1.75px ABOVE the text's middle in Safari and ~1.97px above it in Chrome (the
-   latter from the maintainer's own screenshot: −13.2% of the text's ink height).
-   1.8px splits them; both land within 0.3px, well inside one device pixel.
+/* The triangle must sit on the optical middle of the Japanese compound to its left.
+   It is centred here by CONSTRUCTION, not by a nudge — an earlier `top: 1.8px` fudge
+   was right in Chrome/Firefox and ~2px low in Safari, because the thing it corrected
+   for is itself engine-specific:
 
-   ⚠️ The target is the text's LINE-BOX CENTRE, and that is what makes a fixed nudge
-   safe rather than a magic number. CJK ink centres on its line box in every candidate
-   face (Yu Gothic, Hiragino, Noto) — CJK glyphs are centred in the em box, and the em
-   box is centred in the line box by half-leading. The triangle is a vendored webfont
-   glyph (ka-multimedia \e007), identical everywhere. So NEITHER side of the equation
-   depends on which Japanese font the visitor happens to have: Windows renders this
-   text in Yu Gothic Medium, macOS/iOS in Hiragino, Android/Linux in Noto.
+     - `<button>` carries UA padding, and it is ASYMMETRIC in WebKit: Safari says
+       2px top / 3px bottom, Chrome 1px / 1px. So the glyph's line box already starts
+       from a different y in each engine.
+     - `line-height: normal` (inherited from .icon-play) then resolves the baseline out
+       of the font's own metrics, which each engine rounds its own way.
 
-   Re-derive it, don't eyeball it: pixel-scan the ink. The DOM lies here — a baseline
-   probe placed inside the button perturbs its line box, and a canvas fed the raw
-   font stack resolves it differently than the DOM does. Both gave wrong answers
-   (2.41px and 1.29px) before the pixel scan settled it. */
+   No single offset can serve both, so don't reach for one. Instead make the button's
+   line box IDENTICAL to the Japanese text's, and let half-leading do the centring:
+
+     - ka-multimedia's ascent (+480) and descent (-32) ARE the glyph bbox (yMax/yMin).
+       The ink is therefore exactly centred between them, so a glyph of this font always
+       lands ink-centred on its own line box, whatever the line-height.
+     - CJK ink likewise centres on its line box (glyph centred in the em box, em box
+       centred in the line box by half-leading) — in Yu Gothic, Hiragino and Noto alike.
+     - `.example` is `align-items: flex-start`, so both boxes already share a top edge.
+
+   Same top edge + same line box => same centre. Neither side depends on the visitor's
+   installed fonts (Windows renders this text in Yu Gothic Medium, macOS/iOS Hiragino,
+   Android/Linux Noto), and there is no number here to re-tune.
+
+   ⚠️ `line-height` must track .example-japanese's LINE BOX: 16px x body's 1.42857143.
+   Change one, change the other.
+   ⚠️ `padding-top/bottom: 0` is load-bearing (it deletes the asymmetric UA padding).
+   The horizontal UA padding is deliberately LEFT ALONE — it sets the button's 25.13px
+   width, and the row is right-flush, so zeroing it slides the triangle ~6px right.
+
+   Residual: the triangle lands 0.5px high in Chrome and 0.5px low in Safari (was 1px
+   in both, in the same opposite directions). That last half-pixel is NOT ours to fix:
+   at font-size 16px, where this font's ascent/descent are integral and no engine has
+   anything to round, Chrome goes to exactly 0.000 but Safari still reads +0.50 — so it
+   is the engines disagreeing about the JAPANESE face's metrics, not about the triangle.
+   Don't chase it per-engine; `ascent-override` would be the tool and Safari drops it
+   (see the search-font note above).
+
+   Re-derive, don't eyeball: pixel-scan the rendered ink. The DOM lies here — a baseline
+   probe inside the button perturbs its line box, and a canvas fed the raw font stack
+   resolves it differently than the DOM does. Both gave wrong answers before the pixel
+   scan settled it. */
 .audio-play {
   font-size: 15px;
-  position: relative;
-  top: 1.8px;
+  padding-top: 0;
+  padding-bottom: 0;
+  line-height: 22.857143px;
 }
 
 /* ============================================
