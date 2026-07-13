@@ -670,15 +670,22 @@ span.search {
   position: absolute;
 }
 
-/* Kanji characters in results.
-   Production prepends 'Yu Gothic Regular' here. Dropped 2026-07-13: Regular is the weight
-   that renders notoriously thin on Windows, so these 25px kanji — the largest Japanese on
-   the page, and the ones students click to learn a character — came out LIGHTER than the
-   surrounding text, which uses Medium. They now follow --font-jp like everything else
-   (Yu Gothic Medium on Windows, Hiragino Sans W3 on macOS). No change on macOS: Yu Gothic
-   is not installed there and never was. */
+/* Kanji characters in results — 25px, the largest Japanese on the page.
+   🔴 These are DELIBERATELY LIGHTER than the 16px body text. That is OPTICAL SIZING, not an
+   inconsistency: the same weight reads heavier at display size, so the big kanji are drawn
+   lighter to match. Production does exactly this on BOTH platforms — mplus-1m-light on macOS
+   (a LIGHT face) and 'Yu Gothic Regular' on Windows (the light weight, vs Medium elsewhere).
+
+   ⚠️ It looks like a bug and it is not. It was "fixed" once (2026-07-13) by dropping the
+   lighter faces so these followed --font-jp; the grid came out **+31% heavier** and the
+   maintainer caught it immediately. Restored the same day. Don't do it again.
+
+   W2 is the macOS stand-in for the deleted mplus-1m-light: +11% ink against it, where the
+   W3 used everywhere else is +31%. Yu Gothic Regular keeps Windows lighter than its Medium.
+   The var(--font-jp) tail carries every other platform (and the Chinese-forms protection —
+   see the note on --font-jp). */
 .kanji {
-  font-family: var(--font-jp);
+  font-family: 'Hiragino Sans W2', 'Yu Gothic Regular', var(--font-jp);
   font-size: 25px;
 }
 
@@ -692,7 +699,7 @@ p.kanji {
 }
 
 a.ka {
-  font-family: var(--font-jp);   /* was 'Yu Gothic Regular', … — see .kanji above */
+  font-family: 'Hiragino Sans W2', 'Yu Gothic Regular', var(--font-jp);  /* see .kanji above */
   font-size: 25px;
   color: black;
   text-decoration: none;
