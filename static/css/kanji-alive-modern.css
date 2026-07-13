@@ -1010,20 +1010,26 @@ div.hint {
    measured across all 181 files). Capping both axes at 12px therefore renders
    e.g. ⺌ (36.svg) at 8.0 x 3.7px and 一 (4.svg) at 10.6 x 2.5px.
 
-   18px is the ceiling, not a preference. The image's bottom sits on the text
-   baseline, and the line above has its deepest descender ink 18.07px up
-   (21.43px line pitch − 3.36px of descender), so anything taller can collide.
+   14px chosen by the maintainer 2026-07-13 from a slider comparing 12–18 against
+   real hints. 18px is the hard ceiling (the image's bottom sits on the text
+   baseline and the line above has its deepest descender ink 18.07px up), but 18
+   was "too big a jump" — 14 is the gentlest step that visibly helps.
 
-   `margin-top: -6px` keeps the LINE PITCH IDENTICAL. A replaced inline element
-   contributes its MARGIN box to the line box, so the image now offers
-   18 − 6 = 12px above the baseline — exactly what the 12px version offered.
-   Without it, every line holding a component would space itself further from
-   the one above and the hint block would grow past .border6. The image still
-   PAINTS at its full 18px; margins do not clip. Change the two together. */
+   `margin-top: -2px` keeps the LINE PITCH IDENTICAL, and it is NOT an arbitrary
+   nudge: a replaced inline element contributes its MARGIN box to the line box, so
+   the invariant is that the image offers 12px above the baseline — exactly what
+   the 12px version offered. Hence margin-top = 12px − cap. Retune BOTH together
+   or every line holding a component drifts away from the one above it. The image
+   still PAINTS at its full height; margins do not clip.
+
+   Line pitch cannot move, but WRAPPING can — a wider image takes more of the line.
+   At 14px, 5 hints of 1,235 gain a line (磁 遅 募 楽 商). Verified harmless: the
+   tallest hint block is 85.7px (4 lines) at every cap 12–18, i.e. unchanged from
+   today, and .border6 leaves 97px. Nothing overflows. */
 .hint img {
-  max-width: 18px;
-  max-height: 18px;
-  margin-top: -6px;
+  max-width: 14px;
+  max-height: 14px;
+  margin-top: -2px;
 }
 
 /* Stroke Breakdown */
