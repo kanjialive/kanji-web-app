@@ -148,6 +148,13 @@ body {
   font-size: 15px;
   margin: 0;
   line-height: 1.42857143; /* Bootstrap's default — row pitch and text metrics depend on it */
+
+  /* Centres the sheet vertically as well as horizontally (see .container).
+     The 55px is the old top/bottom margin, kept as a minimum gap. */
+  min-height: 100vh;
+  padding: 55px 0;
+  display: flex;
+  flex-direction: column;
 }
 
 /* Production antialiases ONLY these (legacy kanji-alive.css); body text renders
@@ -214,10 +221,21 @@ h3 {
 /* ============================================
    Layout: Container
    ============================================ */
+/* `margin: auto` (was `55px auto`) centres the sheet on BOTH axes: body is a
+   column flex container, so auto top/bottom margins absorb the spare vertical
+   space, and auto left/right margins still centre horizontally as before.
+
+   ⚠️ Do NOT "simplify" this to `justify-content: center` on body. The sheet is
+   768px tall (55 + 658 + 55) and a laptop's content area is often shorter —
+   centring by justify-content overflows in BOTH directions, pushing the top of
+   the sheet above the scroll origin where it cannot be scrolled back into view.
+   Auto margins are defined to resolve to 0 when the free space is negative, so
+   a short viewport falls back to exactly the old layout: flush under body's
+   55px padding, scrolling down normally. */
 .container {
   width: var(--container-width);
   min-height: var(--container-min-height);
-  margin: 55px auto;
+  margin: auto;
   padding: 0 15px;
   display: flow-root;
   background-color: var(--color-bg-white);
@@ -911,8 +929,20 @@ h3.radical, h3.hint {
   font-size: 16px;
 }
 
+/* Bottom edge sits on the radical-stroke digit's BASELINE, which is where the
+   digit's ink ends (digits are flat-bottomed, no descender).
+
+     digit baseline = .radical-stroke top (335) + half-leading (3.43) + ascent (12)
+                    = 350.43   [16px text, line-height 1.42857, webfont ascent 0.75em]
+     image bottom   = top + 12  ->  top = 338.43, rounded to 338.5
+
+   Production's 338 leaves the graphic 0.42px high — about one device pixel on a
+   Retina screen, which is exactly how it reads. The .5 is deliberate: at 2x DPR
+   both edges land on whole device pixels, so the SVG is not resampled.
+   ⚠️ The ashi.svg family fills its box edge to edge (verified), so the box
+   bottom IS the visual bottom — no ink padding to compensate for. */
 img.radical-position {
-  top: 338px;
+  top: 338.5px;
   position: absolute;
   margin-left: 21px;
   height: 12px;
@@ -973,9 +1003,27 @@ div.hint {
   top: 294px;
 }
 
+/* Hand-drawn kanji components inline in the mnemonic hint (github issue #8:
+   "increase size of small image components"). Production caps them at 12px.
+   They read as tiny because each SVG is a SQUARE canvas but most components are
+   WIDE AND SHORT: the ink fills only 20%–99% of the canvas height (median 87%,
+   measured across all 181 files). Capping both axes at 12px therefore renders
+   e.g. ⺌ (36.svg) at 8.0 x 3.7px and 一 (4.svg) at 10.6 x 2.5px.
+
+   18px is the ceiling, not a preference. The image's bottom sits on the text
+   baseline, and the line above has its deepest descender ink 18.07px up
+   (21.43px line pitch − 3.36px of descender), so anything taller can collide.
+
+   `margin-top: -6px` keeps the LINE PITCH IDENTICAL. A replaced inline element
+   contributes its MARGIN box to the line box, so the image now offers
+   18 − 6 = 12px above the baseline — exactly what the 12px version offered.
+   Without it, every line holding a component would space itself further from
+   the one above and the hint block would grow past .border6. The image still
+   PAINTS at its full 18px; margins do not clip. Change the two together. */
 .hint img {
-  max-width: 12px;
-  max-height: 12px;
+  max-width: 18px;
+  max-height: 18px;
+  margin-top: -6px;
 }
 
 /* Stroke Breakdown */
