@@ -85,7 +85,22 @@ if (USE_HTMX) {
   });
 }
 
-// Static files — serve only intended directories, not the entire dist/ root
+// Static files — serve only intended directories, not the entire dist/ root.
+//
+// Fonts are mounted FIRST, and separately, so they can carry a long cache lifetime.
+// Every webfont is self-hosted (see the @font-face note in kanji-alive-modern.css:
+// webfonts are CORS-restricted, media is not, so a font on the CDN depends on a
+// Cloudflare header that nothing else in the app needs). Express's default for static
+// files is `Cache-Control: max-age=0`, i.e. revalidate on every page load — which
+// would mean six extra round trips per page, where the CDN previously sent 30 days.
+//
+// ⚠️ Do NOT fold this into the /static mount below. CSS and JS MUST keep revalidating,
+// or a deploy would not reach anyone for a month. Fonts are safe to cache hard because
+// they only ever change by being REPLACED under a new name (as ka-search-sans was).
+app.use(
+  "/static/fonts",
+  express.static(path.join(__dirname, "static/fonts"), { maxAge: "30d" })
+);
 app.use("/static", express.static(path.join(__dirname, "static")));
 app.use("/partials", express.static(path.join(__dirname, "partials")));
 if (!USE_HTMX) {

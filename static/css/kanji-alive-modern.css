@@ -122,10 +122,31 @@
 
    'mplus-1m-icons' below is a DIFFERENT font (the UI icon glyphs). Do not remove it. */
 
+/* 🔴 EVERY font is SELF-HOSTED from static/fonts/ (2026-07-13). They used to come from
+   media.kanjialive.com. Do not move them back, and never add a font by URL.
+
+   The reason is NOT outage resilience — if the media CDN is down the app is useless
+   anyway (no video, no strokes, no audio). It is that **webfonts are CORS-restricted and
+   media is not**. Verified against the CDN:
+
+       font  -> access-control-allow-origin: *     (REQUIRED, or the browser rejects it)
+       image -> no CORS header at all              (not required)
+
+   So that one Cloudflare header is load-bearing for the fonts and for nothing else in the
+   app. Lose it — a tightened rule, Hotlink Protection (which media-cdn notes already say
+   never to enable), any config drift — and the CDN stays perfectly healthy: every image,
+   video and audio file keeps loading, while EVERY font is silently rejected. The play
+   buttons vanish, the Sort view's radicals turn to tofu, and nothing in the logs explains
+   why. A same-origin font cannot have that failure, ever: no header, no config, no risk.
+
+   Cost of self-hosting: 47 KB in the repo, and the fonts need their own cache headers —
+   see the /static/fonts mount in server/index.ts. Do not fold that mount back into the
+   general /static one: CSS and JS MUST keep revalidating or a deploy would not take
+   effect for a month. */
 @font-face {
   font-family: 'SourceSansPro-Regular';
-  src: url('https://media.kanjialive.com/fonts/sourcesanspro-regular-webfont.woff2') format('woff2'),
-       url('https://media.kanjialive.com/fonts/sourcesanspro-regular-webfont.woff') format('woff');
+  src: url('../fonts/sourcesanspro-regular-webfont.woff2') format('woff2'),
+       url('../fonts/sourcesanspro-regular-webfont.woff') format('woff');
   unicode-range: U+0000-007F;
   font-display: swap;
 }
@@ -160,30 +181,30 @@
 
 @font-face {
   font-family: 'SourceSansPro-It';
-  src: url('https://media.kanjialive.com/fonts/sourcesanspro-italic-webfont.woff2') format('woff2'),
-       url('https://media.kanjialive.com/fonts/sourcesanspro-italic-webfont.woff') format('woff');
+  src: url('../fonts/sourcesanspro-italic-webfont.woff2') format('woff2'),
+       url('../fonts/sourcesanspro-italic-webfont.woff') format('woff');
   font-style: italic;
   font-display: swap;
 }
 
 @font-face {
   font-family: 'JapaneseRadicals-Regular';
-  src: url('https://media.kanjialive.com/fonts/JapaneseRadicals-Regular.woff2') format('woff2'),
-       url('https://media.kanjialive.com/fonts/JapaneseRadicals-Regular.woff') format('woff');
+  src: url('../fonts/JapaneseRadicals-Regular.woff2') format('woff2'),
+       url('../fonts/JapaneseRadicals-Regular.woff') format('woff');
   font-display: swap;
 }
 
 @font-face {
   font-family: 'mplus-1m-icons';
-  src: url('https://media.kanjialive.com/fonts/mplus-1m-icons.woff2') format('woff2'),
-       url('https://media.kanjialive.com/fonts/mplus-1m-icons.woff') format('woff');
+  src: url('../fonts/mplus-1m-icons.woff2') format('woff2'),
+       url('../fonts/mplus-1m-icons.woff') format('woff');
   font-display: swap;
 }
 
 @font-face {
   font-family: 'ka-multimedia';
-  src: url('https://media.kanjialive.com/fonts/ka-multimedia.woff2') format('woff2'),
-       url('https://media.kanjialive.com/fonts/ka-multimedia.woff') format('woff');
+  src: url('../fonts/ka-multimedia.woff2') format('woff2'),
+       url('../fonts/ka-multimedia.woff') format('woff');
   font-display: swap;
 }
 
