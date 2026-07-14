@@ -1341,9 +1341,25 @@ div.examples {
 
    ⚠️ `line-height` must track .example-japanese's LINE BOX: 16px x body's 1.42857143.
    Change one, change the other.
-   ⚠️ `padding-top/bottom: 0` is load-bearing (it deletes the asymmetric UA padding).
-   The horizontal UA padding is deliberately LEFT ALONE — it sets the button's 25.13px
-   width, and the row is right-flush, so zeroing it slides the triangle ~6px right.
+
+   🔴 `padding: 0` — ALL FOUR SIDES — is load-bearing, and it is PAIRED WITH `.example`'s
+   width. An earlier note here said the horizontal UA padding was "deliberately left alone"
+   because zeroing it slid the triangle ~6px right. That was true when `.example` restated
+   258px; it is false now that it is the column's real 255px, and the two must move together:
+
+     .example 258 + padding 6px  ->  ink tip at 1139.88   (3px SHORT of the rule)
+     .example 258 + padding 0    ->  ink tip at 1145.88   (3px PAST the rule)
+     .example 255 + padding 6px  ->  ink tip at 1136.88   (6px SHORT of the rule)
+     .example 255 + padding 0    ->  ink tip at 1142.88   = PRODUCTION, tip on the rule ✓
+
+   Production's control is an <a> (13.13px, no padding) whose box edge IS its ink edge; ours
+   is a <button> carrying 6px of UA padding each side. Zeroing it makes our box 13.13px too —
+   geometrically identical to production's, right edge on the column edge, tip on the rule.
+   Vertical is unaffected (top/bottom were already 0), so the centring above still holds.
+
+   ⚠️ A box-based audit CANNOT see this. Measured by getBoundingClientRect() the padded
+   button looked like it OVERHUNG the rule by 3px while its ink actually sat 3px inside it.
+   Measure the ink. */
 
    Residual: the triangle lands 0.5px high in Chrome and 0.5px low in Safari (was 1px
    in both, in the same opposite directions). That last half-pixel is NOT ours to fix:
@@ -1359,8 +1375,7 @@ div.examples {
    scan settled it. */
 .audio-play {
   font-size: 15px;
-  padding-top: 0;
-  padding-bottom: 0;
+  padding: 0;
   line-height: 22.857143px;
 }
 
