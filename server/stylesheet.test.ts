@@ -106,9 +106,14 @@ const LOAD_BEARING: Array<[string, RegExp]> = [
   ["p.kanji collapses the whitespace between anchors", /p\.kanji\s*\{[^}]*font-size:\s*0\s*;/],
   ["p.kanji > a.ka declares the 12.5px grid gap", /p\.kanji\s*>\s*a\.ka\s*\{[^}]*padding-right:\s*12\.5px/],
 
-  // col4 is 255px, not the 258px of columns 1-3 — anything inside it must size to 100%.
+  // Anything inside a column must size to it, never restate its width.
   [".example tracks its column (width: 100%)", /\.example\s*\{[^}]*width:\s*100%/],
   ["div.examples tracks its column (width: 100%)", /div\.examples\s*\{[^}]*width:\s*100%/],
+
+  // The true grid: 4 x 258 + 3 x 24 = 1104, centred by (1158 - 1104) / 2 = 27.
+  ["content block is 1104px (4 cols + 3 gutters)", /--content-width:\s*1104px/],
+  ["content block is centred (container2 margin-left: 27px)", /\.container2\s*\{[^}]*margin-left:\s*27px/],
+  ["col4 completes the grid at 846px with no width override", /\.col4\s*\{\s*left:\s*846px;\s*\}/],
 
   // Production's <a> left-aligns its glyph; a <button> centres it (UA sheet).
   ["animation controls left-align their glyph", /\.animation-controls\s+\.icon-step-left\s*\{[^}]*text-align:\s*left/],
@@ -126,6 +131,62 @@ for (const [name, pattern] of LOAD_BEARING) {
     assert.ok(
       pattern.test(css),
       "Missing from static/css/kanji-alive-modern.css — read the comment at that rule before removing it.",
+    );
+  });
+}
+
+//
+// Every heading→value `top` on the detail page is DERIVED, not chosen:
+//
+//     value_top = heading_effective_top + 31.5 − d(value's font)
+//
+// so that all eight pairs share one 31.5px baseline gap. `d` is how much lower the value's
+// baseline sits inside its line box than the h3's — it depends ONLY on the value's font,
+// which is why three values with the same font-size need three different tops to LOOK
+// aligned. Give two of them the same top "because they line up in the CSS" and their
+// baselines drift apart on screen; that is precisely the bug this replaced.
+//
+// This test re-derives the numbers rather than hard-coding them, so it explains itself when
+// it fails. If the clamped SourceSansPro metrics are ever repaired, d changes and every top
+// must move — this is the test that will tell you.
+//
+const GAP = 31.5;
+const D = { latin15: 0.5, latin16: 1.5, japanese16: 3.5 };
+
+function declaredTop(selector: string): number {
+  // The selector must match EXACTLY — `\s*\{`, not `[^{]*\{`. These properties are split
+  // across two rules on purpose (a shared `position: absolute`, then a per-font `top`), and
+  // a loose match happily finds the shared one, which declares no top at all.
+  const escaped = selector.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const rule = new RegExp(`(?:^|\\n)${escaped}\\s*\\{([^}]*)\\}`);
+  const m = css.match(rule);
+  assert.ok(m, `could not find a rule whose selector is exactly \`${selector}\``);
+  const top = m![1].match(/(?:^|;)\s*top:\s*(-?[\d.]+)px/);
+  assert.ok(top, `rule \`${selector}\` declares no top`);
+  return parseFloat(top![1]);
+}
+
+// heading effective top = its `top` + its `margin-top`
+const HEADING_TOP = { row1: 10 + 20, row2: 123 - 8, row3: 194 - 8 };
+
+const VALUE_PAIRS: Array<[string, string, keyof typeof HEADING_TOP, keyof typeof D]> = [
+  ["Meaning", "p.meaning", "row1", "latin15"],
+  ["Strokes / Grade", "p.strokes,\np.grade", "row1", "latin16"],
+  ["Examples", "div.examples", "row1", "japanese16"],
+  ["Onyomi", "p.onyomi", "row2", "latin15"],
+  ["Kodansha / Nelson", "p.kodansha,\np.nelson", "row2", "latin16"],
+  ["Kunyomi", "p.kunyomi", "row3", "latin15"],
+];
+
+for (const [name, selector, row, font] of VALUE_PAIRS) {
+  test(`detail page: ${name} keeps the 31.5px baseline gap`, () => {
+    const expected = HEADING_TOP[row] + GAP - D[font];
+    assert.equal(
+      declaredTop(selector),
+      expected,
+      `${name}: top should be ${HEADING_TOP[row]} + ${GAP} - ${D[font]} = ${expected}px. ` +
+        `Every value's top is derived from its FONT's baseline offset — see the comment above ` +
+        `h3.meaning in the stylesheet before changing it.`,
     );
   });
 }

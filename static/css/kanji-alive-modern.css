@@ -99,9 +99,20 @@
   /* Sizing */
   --container-width: 1188px;
   --container-min-height: 658px;
-  /* Columns 1–3. ⚠️ col4 is 255px — the grid breaks at the fourth column (production
-     does this too). Anything living in col4 must size to 100%, NOT to this. */
+  /* 🔴 THE GRID IS TRUE (2026-07-14). Four equal columns, three equal gutters:
+       4 x 258 + 3 x 24 = 1104 = --content-width.
+     Production's is NOT: its content block is 1103px, one pixel short of what a 258/24
+     grid needs, so it absorbed the shortfall by pushing col4 +2px and narrowing it to
+     255px — gutters 24/24/26, and everything in the Examples column sitting 2px right of
+     the grid's own rhythm. We widened the block by 1px instead, which lets every column
+     be 258 and every gutter 24. Maintainer's decision, 2026-07-14; a deliberate departure
+     from the frozen UI, not a parity bug. Do not "restore" 1103/255.
+     ⚠️ --col-width now applies to ALL FOUR columns. Sizing to 100% inside a column is
+     still the right habit (it tracks the column), but col4 is no longer a special case. */
   --col-width: 258px;
+  --gutter: 24px;
+  /* Width of every horizontal rule, the version line, and the results scroller. */
+  --content-width: 1104px;
   --row-height: 32px;
   --content-height: 445px;
   /* The detail page's media "stage": the video and the typeface gallery are the same
@@ -341,8 +352,16 @@ h3 {
   box-shadow: 0 3px 6px rgba(100, 100, 100, 0.3);
 }
 
+/* 🔴 27px CENTRES the content block, and that is arithmetic, not taste:
+     .container is 1188px with 15px padding  ->  inner width 1158px
+     (1158 - 1104) / 2 = 27px               ->  equal insets, left and right
+   Production uses 25px, which leaves 25 left / 30 right — the whole sheet's content, every
+   horizontal rule and all four columns sit 2.5px LEFT of centre, and it is why no other
+   measurement in this app ever lands on a round number. Fixed 2026-07-14 (maintainer's
+   decision) together with the 1103->1104 content block; the two only work as a pair.
+   ⚠️ If --content-width or .container's width/padding ever change, re-derive this. */
 .container2 {
-  margin-left: 25px;
+  margin-left: 27px;
   margin-top: var(--spacing-xl);
   position: relative;
 }
@@ -356,10 +375,14 @@ h3 {
   position: absolute;
 }
 
+/* Each column starts one (--col-width + --gutter) = 282px after the last. All four are
+   258px and all three gutters are 24px; the last column's right edge lands exactly on
+   --content-width (846 + 258 = 1104), so the Examples column is flush with every rule.
+   Production is 0 / 282 / 564 / 848 with col4 at 255px — see --col-width. */
 .col1 { left: 0; }
 .col2 { left: 282px; }
 .col3 { left: 564px; }
-.col4 { left: 848px; width: 255px; }
+.col4 { left: 846px; }
 
 /* ============================================
    Layout: Rows
@@ -379,12 +402,20 @@ h3 {
   user-select: none;
 }
 
-/* UA button padding shifted the Info label 6px right of production's <a>;
-   the +2px matches the Safari button-baseline offset (see .sort-button) */
+/* UA button padding shifted the Info label 6px right of production's <a>; the `top` matches
+   the button-baseline offset (see .sort-button).
+
+   3px, not 2px: at 2px `Info` sat exactly 1.00px ABOVE the other three things in row 1 —
+   the search-bar text, Sort, and the record counter all share a baseline, and Info did not
+   (pixel-scanned; "Sort" and "Info" have no descenders, so ink bottom IS the baseline).
+   Production has the same 1px error. The cause is `span.search`, which carries
+   `padding-top: 1px` and therefore pushes Sort AND the counter down a pixel — Info lives
+   outside that span, so it never got it. Three of four agreed; Info was the outlier, so
+   Info is what moved. (2026-07-14, maintainer's decision — a departure from production.) */
 .info-button {
   padding: 0;
   position: relative;
-  top: 2px;
+  top: 3px;
 }
 
 .row2 {
@@ -605,7 +636,7 @@ span.search {
 
 .border1 {
   position: absolute;
-  width: 1103px;
+  width: var(--content-width);
   top: 50px;
 }
 
@@ -613,7 +644,7 @@ span.search {
    at the same place on both pages regardless of preceding in-flow content */
 .border2 {
   position: absolute;
-  width: 1103px;
+  width: var(--content-width);
   top: 564px;
 }
 
@@ -641,7 +672,7 @@ span.search {
 /* No font-size override — production's version text inherits the body's 15px */
 .version {
   position: absolute;
-  width: 1103px;
+  width: var(--content-width);
   top: 579px;
   color: var(--color-text-muted);
 }
@@ -650,7 +681,7 @@ span.search {
    Search Results
    ============================================ */
 .scrollbar-wrapper {
-  width: 1103px;
+  width: var(--content-width);
   height: auto;
   overflow: hidden;
   float: left;
@@ -707,7 +738,7 @@ span.search {
 }
 
 .scroller-kanji {
-  width: 1103px;
+  width: var(--content-width);
   overflow: hidden;
 }
 
@@ -1067,7 +1098,39 @@ h3#kanji {
   font-size: 15px;
 }
 
-/* Meaning, Readings */
+/* ═══ Meaning, Readings — and the one rule that governs every heading→value gap ═══
+ *
+ * 🔴 EVERY VALUE'S `top` IS DERIVED, NOT CHOSEN. The invariant is:
+ *
+ *     baseline gap (heading → value) = 31.5px, for ALL EIGHT pairs
+ *     value_top = heading_effective_top + 31.5 − d(value's font)
+ *
+ * where d is how much LOWER the value's baseline sits inside its line box than the h3's:
+ *
+ *     d = 0.5   value is 15px SourceSansPro   (Meaning, Onyomi, Kunyomi)
+ *     d = 1.5   value is 16px SourceSansPro   (Strokes, Grade, Kodansha, Nelson)
+ *     d = 3.5   value is 16px Hiragino / JP   (Examples)
+ *
+ * WHY the values need different tops to look aligned: a baseline sits at
+ * (half-leading + the font's ascent) inside its line box, so three fonts put it in three
+ * places. Production gives all four row-1 values the SAME top:60px — which is why their
+ * baselines came out staggered 148 / 149 / 149 / 151, a 3px drift across four adjacent
+ * columns. The CSS was consistent; the RENDERING was not.
+ *
+ * 🔎 The 2px between the Latin values and the Japanese one is not Hiragino being odd — it
+ * is SourceSansPro's ascent being CLAMPED to 0.75em by the webfont generator (the real face
+ * is 0.984). Same clamp that sank the search caret; see the 'KA Search Sans' @font-face.
+ * If those metrics are ever repaired app-wide, d(15px)/d(16px) change and EVERY top below
+ * must be re-derived. That is the one thing that can break this.
+ *
+ * ⚠️ So: never give two values the same `top` just because they line up in the CSS, and
+ * never change a value's font-size without re-deriving its top from the formula.
+ * Verified with a zero-height baseline probe, cross-checked against a pixel scan of the
+ * descender-free strings ("read", "14", "2") — probe and ink agreed exactly.
+ * (2026-07-14, maintainer's decision: unify at 31.5, the top row's gap.)
+ */
+
+/* Row 1 headings — effective top = 10 + 20 = 30 */
 h3.meaning, h3.strokes, h3.grade, h3.examples {
   position: absolute;
   top: 10px;
@@ -1075,14 +1138,22 @@ h3.meaning, h3.strokes, h3.grade, h3.examples {
 }
 
 p.meaning, p.strokes, p.grade, div.examples {
-  top: 60px;
   position: absolute;
 }
+
+/* 30 + 31.5 − 0.5 */
+p.meaning  { top: 61px; }
+/* 30 + 31.5 − 1.5 */
+p.strokes,
+p.grade    { top: 60px; }
+/* 30 + 31.5 − 3.5 — the Japanese compounds sit 2px higher to land on the same baseline */
+div.examples { top: 58px; }
 
 p.strokes, p.kodansha, p.nelson, p.grade {
   font-size: 16px;
 }
 
+/* Row 2 headings — effective top = 123 − 8 = 115 */
 h3.onyomi, h3.kodansha, h3.nelson {
   top: 123px;
   position: absolute;
@@ -1090,18 +1161,25 @@ h3.onyomi, h3.kodansha, h3.nelson {
 }
 
 p.onyomi, p.kodansha, p.nelson {
-  top: 142px;
   position: absolute;
 }
 
+/* 115 + 31.5 − 0.5 */
+p.onyomi   { top: 146px; }
+/* 115 + 31.5 − 1.5 */
+p.kodansha,
+p.nelson   { top: 145px; }
+
+/* Row 3 heading — effective top = 194 − 8 = 186 */
 h3.kunyomi {
   top: 194px;
   position: absolute;
   margin-top: -8px;
 }
 
+/* 186 + 31.5 − 0.5 */
 p.kunyomi {
-  top: 214px;
+  top: 217px;
   position: absolute;
 }
 
@@ -1256,18 +1334,20 @@ img.ka-breakdown:hover {
 }
 
 /* Examples */
-/* ⚠️ These two widths are `100%` ON PURPOSE — do not "restore" the 258px they replaced.
-   258 is the width of columns 1–3 (--col-width); col4 is the ONE column that is 255px
-   (see .col4). Production laid these rows out with floats, which shrink-wrap to the
-   column, so its play triangles landed on the real column edge at x=1143 — flush with
-   .border2 and every other rule on the page. Our `justify-content: space-between`
-   faithfully pushes the button to whatever width is declared, so the copied 258 put all
-   ten triangles 3px OUTSIDE the column, the only ink on the page to overhang the rules.
+/* ⚠️ These two widths are `100%` ON PURPOSE — do not restate a pixel number here.
+   They used to say 258px, which was a COPY of --col-width, and the copy was wrong for the
+   column it lived in: before the grid was made true (see --col-width), col4 was 255px, so
+   the row was 3px wider than the column that held it and `justify-content: space-between`
+   pushed the audio button to the row's edge instead of the column's.
 
-   100% resolves against .row2, which is 100% of .col4 = 255px. It cannot drift out of
-   step with the column the way a second copy of the number can.
-   (.grouped-column's 258px is CORRECT — that is a results column, not col4.)
-   `div.` is load-bearing: <h3 class="examples"> shares the class. */
+   100% resolves against .row2, which is 100% of .col4 — whatever col4 happens to be. It
+   cannot drift out of step with the column the way a second copy of the number can, and it
+   survived the 255 -> 258 change without an edit. That is the point.
+   (.grouped-column's 258px is a RESULTS column, unrelated to this one.)
+   `div.` is load-bearing: <h3 class="examples"> shares the class.
+
+   ⚠️ This width is only HALF of what puts the play triangle's tip on the rule — the other
+   half is `padding: 0` on .audio-play. See the note there; the two are a matched pair. */
 div.examples {
   width: 100%;
 }
@@ -1343,23 +1423,27 @@ div.examples {
    Change one, change the other.
 
    🔴 `padding: 0` — ALL FOUR SIDES — is load-bearing, and it is PAIRED WITH `.example`'s
-   width. An earlier note here said the horizontal UA padding was "deliberately left alone"
-   because zeroing it slid the triangle ~6px right. That was true when `.example` restated
-   258px; it is false now that it is the column's real 255px, and the two must move together:
+   width. Together they are what lands the triangle's TIP on the rule. State it as an
+   invariant, not as pixels, because the grid has moved once already:
 
-     .example 258 + padding 6px  ->  ink tip at 1139.88   (3px SHORT of the rule)
-     .example 258 + padding 0    ->  ink tip at 1145.88   (3px PAST the rule)
-     .example 255 + padding 6px  ->  ink tip at 1136.88   (6px SHORT of the rule)
-     .example 255 + padding 0    ->  ink tip at 1142.88   = PRODUCTION, tip on the rule ✓
+     .example is 100%          -> the row's right edge IS the column's right edge
+     .audio-play has no padding -> the button's box is 13.13px, the bare glyph advance,
+                                   so its BOX edge is its INK edge (0.12px side bearing)
+     => the tip lands on the column's right edge, which is the rule's right edge.
 
-   Production's control is an <a> (13.13px, no padding) whose box edge IS its ink edge; ours
-   is a <button> carrying 6px of UA padding each side. Zeroing it makes our box 13.13px too —
-   geometrically identical to production's, right edge on the column edge, tip on the rule.
-   Vertical is unaffected (top/bottom were already 0), so the centring above still holds.
+   Production's control is an <a>: 13.13px, no padding, box edge == ink edge. Ours is a
+   <button>, which the UA sheet gives 6px of padding on each side. An earlier note here said
+   that padding was "deliberately left alone" because zeroing it slid the triangle ~6px
+   right — true at the time, because `.example` then restated a width 3px WIDER than its
+   column, and the two errors were partly cancelling. Fix the width without the padding (or
+   the padding without the width) and the tip misses by 3-6px in one direction or the other.
+   Change one, change the other.
 
-   ⚠️ A box-based audit CANNOT see this. Measured by getBoundingClientRect() the padded
-   button looked like it OVERHUNG the rule by 3px while its ink actually sat 3px inside it.
-   Measure the ink.
+   Vertical is unaffected (top/bottom padding were already 0), so the centring above holds.
+
+   ⚠️ A box-based audit CANNOT see any of this, and one got it exactly backwards: measured
+   by getBoundingClientRect() the padded button looked like it OVERHUNG the rule by 3px,
+   while its ink actually sat 3px INSIDE it. Measure the ink.
 
    Residual: the triangle lands 0.5px high in Chrome and 0.5px low in Safari (was 1px
    in both, in the same opposite directions). That last half-pixel is NOT ours to fix:
