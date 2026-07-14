@@ -1128,6 +1128,26 @@ h3#kanji {
  * Verified with a zero-height baseline probe, cross-checked against a pixel scan of the
  * descender-free strings ("read", "14", "2") — probe and ink agreed exactly.
  * (2026-07-14, maintainer's decision: unify at 31.5, the top row's gap.)
+ *
+ * ═══ KNOWN AND ACCEPTED: the OPTICAL gaps are NOT equal, and that is deliberate ═══
+ *
+ * The BASELINES are equal (31.5px, all 8). The WHITESPACE is not. Latin ink rises ~10.5px
+ * above its baseline (cap/ascender height, ~0.68em); kana rises ~12.2px and kanji ~13.6px,
+ * because CJK glyphs nearly fill the em box (~0.81–0.85em). So the three JAPANESE values —
+ * Onyomi, Kunyomi, and the Examples compounds — sit about 2.2px TIGHTER to their headings:
+ *
+ *     gap from heading baseline to the value's INK   (pixel-scanned at 2x DPR)
+ *       Latin    (read / 14 / 2 / 1038)      20.80 .. 21.24px
+ *       Japanese (読者… / ドク… / よ)          17.90 .. 19.35px
+ *
+ * You CANNOT have both in a mixed-script column: equalise the ink and the baselines stagger;
+ * equalise the baselines and the ink gaps stagger. The maintainer chose BASELINES
+ * (2026-07-14), which is also the standard typographic convention.
+ *
+ * 🔎 Production's "wrong" staggered baselines (148/149/149/151) were in fact COMPENSATING for
+ * this — its row-1 optical gaps came out to a 1.4px spread, better than our 3.3px. Removing
+ * the stagger removed the compensation. Both facts are true; the maintainer weighed them.
+ * **This is measured and settled — do not "fix" the 2-3px as if it were a bug.**
  */
 
 /* Row 1 headings — effective top = 10 + 20 = 30 */
