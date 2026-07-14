@@ -600,8 +600,20 @@ span.search {
 /* ============================================
    Branding
    ============================================ */
+/* padding-top is 11px, not the 10px it inherits from .row1, and that 1px is the whole point.
+   Everything in row 1 sits on baseline 69:
+     - the search-bar TEXT, by its own solved metrics (input top 47 + 22 — see .search-bar)
+     - `Sort` and the record counter, because span.search carries `padding-top: 1px`
+     - `Info`, since it was corrected to match (see .info-button)
+   `Kanji alive` is a plain inline in .row1, so it got neither, and landed on the natural 68
+   — 1px high, which the maintainer spotted by eye. Production has the same 1px error, on
+   BOTH Info and the branding; correcting only Info left this one as the last item out of
+   line, which is what made it newly visible. (2026-07-14.)
+   ⚠️ Nothing to do with the italic face: sourcesanspro-italic's metrics are clamped to
+   0.751/-0.250, i.e. within 0.001em of the regular's — read from the font, not assumed. */
 .desktop-branding {
   display: block;
+  padding-top: 11px;
 }
 
 .desktop-branding a {

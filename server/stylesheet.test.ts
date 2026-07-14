@@ -124,6 +124,11 @@ const LOAD_BEARING: Array<[string, RegExp]> = [
 
   // Hover feedback on the media controls — templates apply .ka-icon-gray, not .gray-out.
   ["icon hover targets the class the templates apply", /\.ka-icon-gray:hover\s*\{[^}]*color:\s*gray/],
+
+  // Row 1 all lands on baseline 69. `Info` and the branding each need a 1px correction to
+  // get there; the search bar, Sort and the counter arrive by other routes.
+  ["Info sits on the row-1 baseline", /\.info-button\s*\{[^}]*top:\s*3px/],
+  ["branding sits on the row-1 baseline", /\.desktop-branding\s*\{[^}]*padding-top:\s*11px/],
 ];
 
 for (const [name, pattern] of LOAD_BEARING) {
