@@ -1359,7 +1359,7 @@ div.examples {
 
    ⚠️ A box-based audit CANNOT see this. Measured by getBoundingClientRect() the padded
    button looked like it OVERHUNG the rule by 3px while its ink actually sat 3px inside it.
-   Measure the ink. */
+   Measure the ink.
 
    Residual: the triangle lands 0.5px high in Chrome and 0.5px low in Safari (was 1px
    in both, in the same opposite directions). That last half-pixel is NOT ours to fix:
