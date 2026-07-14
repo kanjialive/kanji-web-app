@@ -99,17 +99,35 @@
   /* Sizing */
   --container-width: 1188px;
   --container-min-height: 658px;
+  /* Columns 1–3. ⚠️ col4 is 255px — the grid breaks at the fourth column (production
+     does this too). Anything living in col4 must size to 100%, NOT to this. */
   --col-width: 258px;
   --row-height: 32px;
   --content-height: 445px;
+  /* The detail page's media "stage": the video and the typeface gallery are the same
+     248px square and must stay so — 4 rules depend on it. (The artwork DRAWN inside is
+     offset: the video carries margin-left:6px and the 220px typeface image sits at
+     margin-left:20px, so both are drawn centred on x=130, not on the box's centre 124.
+     Anything that should line up under the kanji lines up with 130.) */
+  --stage-size: 248px;
+  /* Where results content begins, under the results header. Derived from the header
+     stack, not chosen: .ka-results-h1 top -6 / .ka-results-h3 top 36 / rule at 64. */
+  --results-content-top: 79px;
 
-  /* Spacing */
-  --spacing-xs: 4px;
+  /* Spacing. Only these two survive — --spacing-xs/-md/-lg were declared and never
+     referenced (-lg's one user, .help-footer, matched no element in either modal). */
   --spacing-sm: 8px;
-  --spacing-md: 16px;
-  --spacing-lg: 24px;
   --spacing-xl: 42px;
 }
+
+/* 🔎 NOT tokenised, on purpose: the 17px that appears in eight rules (h3, .row1 a/button,
+   .sort-button, .ka-results-h1/-h3, .modal-header h2, .ka-welcome-text, .search-bar). It
+   IS one constant — the legacy sheet's UI text size — but a custom property here would be
+   a lever that looks safe and is not: .search-bar's 17px is load-bearing ARITHMETIC. Its
+   caret height and text baseline are solved against ka-search-sans's ascent/descent, which
+   were baked into the font file AT 17px (tools/build-searchbar-font.py). Changing a shared
+   token would silently break the caret and require regenerating a font. The UI is frozen —
+   schools depend on it — so the token would buy nothing and cost that. Left literal. */
 
 /* ============================================
    Font Faces
@@ -472,35 +490,66 @@ h3 {
   padding: 0;
 }
 
+/* 🔴 font-family is NOT optional here, and its absence was a live trapdoor.
+   These two glyphs are 〈 U+3008 and 〉 U+3009 — CJK brackets. SourceSansPro-Regular is
+   unicode-range'd to Latin, so they fell through the family list to whatever the OS chose:
+   production (whose sheet names no Japanese family) lands on the bare `sans-serif` generic
+   and renders them in PingFang SC — CHINESE bracket forms. We were saved only by
+   --font-base's Japanese names, i.e. by luck, and the shape still varied per platform.
+
+   mplus-1m-icons exists for exactly this: a 4-glyph icon font already used by the typeface
+   chevrons two columns over, whose ink is EXACTLY mirrored — 〈 ink centre 14.507, 〉 5.493,
+   both about the same 20.00px advance's centre at 10.0. Naming it makes these deterministic
+   on every OS and browser, and makes the two pairs of chevrons in the app the same shape. */
 .recordCounter .icon-left,
 .recordCounter .icon-right {
+  font-family: var(--font-icons);
   font-size: 20px;
   color: var(--color-primary);
+  /* ⚠️ Load-bearing, and it REPLACES a `top: -1.9px` nudge that used to sit on the
+     <button> form (the search header renders these as <button>s, the detail header as
+     <a>s). That nudge looked like an engine quirk and was not: WebKit gives form controls
+     `line-height: normal`, so a <button> does NOT inherit body's 1.42857143 — it resolves
+     its line box out of THE FONT'S OWN metrics (30px under Hiragino, 20px under
+     mplus-1m-icons) while the <a> takes the inherited 28.57px. The nudge was tuned against
+     Hiragino's 30px, so naming the icon font above threw it 6px out.
+
+     Pinning the line box to the anchor's own value (20px x body's 1.42857143) makes the two
+     forms identical BY CONSTRUCTION, for any font and in any engine — which matters here
+     because WebKit's UA <button> padding is asymmetric (2px/3px) where Chrome's is 1px/1px,
+     so no single `top:` offset could ever have been right in both. Same lesson as the
+     example-audio triangle: don't nudge, match the line box. */
+  line-height: 28.571429px;
 }
 
-/* Both chevrons are absolutely positioned: line-box baseline placement of
-   inline <button>s varies between the search and detail headers (±1.9px),
-   absolute positioning is deterministic. top:0 puts the glyph box at the
-   legacy app's y=56.3 rel .container (a tip-at-search-box-midline variant
-   was tried and rejected — it read as too high next to the counter text). */
+/* Both chevrons are absolutely positioned — a line box's baseline placement is not
+   deterministic here, an absolute offset is. The position they land on is DELIBERATE and
+   was chosen by eye: a tip-at-search-box-midline variant was tried and rejected — it read
+   as too high next to the counter text.
+
+   `top: -2.4px` HOLDS that chosen position across the icon-font change above. It is not a
+   fudge: a glyph's baseline sits where its font's metrics put it, and mplus-1m-icons draws
+   these 2.41px lower in the same line box than the Hiragino face they used to fall through
+   to (pixel-scanned, not estimated). Without it the chevrons would drop ~2.4px and go
+   bottom-heavy in the 25px counter — a position change nobody asked for, riding along with
+   a shape change that was. So: the glyph looks different now; it has not MOVED.
+
+   ⚠️ This number is paired with the font. Change --font-icons and it must be re-measured. */
 .recordCounter .icon-left {
   position: absolute;
   left: -10px;
-  top: 0;
+  top: -2.4px;
 }
 
 .recordCounter .icon-right {
   position: absolute;
   left: 121px;
-  top: 0;
+  top: -2.4px;
 }
 
-/* The search header renders the chevrons as <button>s (detail uses <a>s);
-   Safari lays a button's glyph 1.9px lower within the same box */
-.recordCounter button.icon-left,
-.recordCounter button.icon-right {
-  top: -1.9px;
-}
+/* The `top: -1.9px` that used to live here — on button.icon-left/.icon-right — is GONE.
+   See the line-height note above: it was compensating for a font metric, not for Safari,
+   and the two forms now land identically without it. Don't reintroduce it. */
 
 .recordCounter .icon-left.disabled,
 .recordCounter .icon-right.disabled {
@@ -687,7 +736,7 @@ span.search {
 }
 
 .no-results {
-  top: 79px;
+  top: var(--results-content-top);
   position: absolute;
 }
 
@@ -710,13 +759,43 @@ span.search {
   font-size: 25px;
 }
 
+/* 🔴 The grid's COLUMN PITCH is declared here (25px kanji + 12.5px pad = 37.5px). It
+   used to be a FONT METRIC, and that is the bug this pair of rules exists to kill.
+
+   The gap between two kanji was a literal space character in the markup, so its width
+   was whatever the first font in a.ka's stack said a space was. mplus-1m-light — the
+   webfont the app shipped from 2013 until 2026-07-13 — is MONOSPACED: space = 0.5em =
+   12.50px at 25px, giving a 37.50px pitch. The inline `max(ceil(N/12),7) * 38px` width
+   in results.ejs is sized to exactly that: it is what makes results fill 12 rows
+   top-to-bottom and then extend RIGHT into the horizontal scroll.
+
+   Retiring that webfont (correctly — it had no kana) substituted Hiragino Sans W2,
+   whose space is 0.333em = 8.32px. Pitch fell to 33.33px, 8 kanji fitted where 7
+   should, and the grid came out 8 x 10 with a dead band underneath. The substitution
+   was chosen to match the face's INK; nobody checked its ADVANCES.
+
+     font-size: 0   collapses the whitespace text nodes EJS emits between the anchors
+                    (Angular's ng-repeat did not emit them) — same trick as .grouped-row.
+                    a.ka re-declares 25px, so the kanji are unaffected, and the line box
+                    is still set by the anchors, so the row pitch does not move either.
+     padding-right  restates the 12.5px gap as layout. Now no font can move it.
+
+   ⚠️ padding-RIGHT, not the padding-LEFT .grouped-row uses. Grouped rows are separate
+   <div>s, so a left pad indents each row uniformly — deliberate there. These kanji WRAP,
+   so a left pad would indent the first kanji of every row and slide the whole grid
+   12.5px right. The gap has to trail the glyph. */
 p.kanji {
   position: absolute;
-  top: 79px;
+  top: var(--results-content-top);
   margin-left: 3px;
   margin-bottom: 28px;
   word-wrap: break-word;
   white-space: normal;
+  font-size: 0;
+}
+
+p.kanji > a.ka {
+  padding-right: 12.5px;
 }
 
 a.ka {
@@ -752,12 +831,13 @@ a.ka:active {
 }
 
 .grouped-results {
-  margin-top: 79px;
+  margin-top: var(--results-content-top);
   display: flex;
 }
 
+/* 258px is CORRECT here — a results column, not the detail page's col4 (255px). */
 .grouped-column {
-  width: 258px;
+  width: var(--col-width);
   margin-right: 25px;
   display: inline-table;
 }
@@ -837,14 +917,14 @@ a.ka:active {
 /* Video Container */
 .container-typeface-video {
   position: absolute;
-  width: 248px;
-  height: 248px;
+  width: var(--stage-size);
+  height: var(--stage-size);
   top: 50px;
 }
 
 .video-container .video {
-  width: 248px;
-  height: 248px;
+  width: var(--stage-size);
+  height: var(--stage-size);
 }
 
 video {
@@ -856,13 +936,26 @@ video {
 }
 
 video[poster] {
-  width: 248px;
-  height: 248px;
-  margin-left: 6px;
+  width: var(--stage-size);
+  height: var(--stage-size);
+  margin-left: 6px; /* see --stage-size: this is what draws the video centred on 130 */
 }
 
 /* Legacy pins the three video-control icons absolutely (left 63/122/175 within
-   the column) rather than flex-centering them */
+   the column) rather than flex-centering them.
+
+   🔴 DO NOT "even out" 63/122/175 — the uneven gaps are an OPTICAL CORRECTION, and
+   this is the single most dangerous false positive in the sheet. The play glyph is a
+   hollow triangle, so its ink's centre of MASS sits 2.50px left of its bounding box
+   (the other icons are balanced to ±0.03px). Measured in centroids, production's play
+   button is optically centred between its neighbours to 0.01px. A bounding-box audit
+   "finds" a 5px asymmetry here and breaks working code. Measure the ink, not the box.
+
+   ⚠️ `text-align: left` is load-bearing. These boxes are 20px but the glyphs advance
+   18.125 / 17.5 / 18.125px, and a <button> gets `text-align: center` from the UA sheet
+   — production's <a> did not. So each icon's INK drifted right by half its own slack
+   (+1.00 / +1.25 / +1.00px) while the BOXES stayed identical at 63/122/175. That is
+   exactly why the 0px parity sweep missed it: it measured getBoundingClientRect(). */
 .animation-controls {
   margin-top: 16px;
 }
@@ -875,6 +968,7 @@ video[poster] {
   position: absolute;
   left: 63px;
   width: 20px;
+  text-align: left;
 }
 
 .animation-controls .icon-play,
@@ -882,12 +976,14 @@ video[poster] {
   position: absolute;
   left: 122px;
   width: 20px;
+  text-align: left;
 }
 
 .animation-controls .icon-step-right {
   position: absolute;
   left: 175px;
   width: 20px;
+  text-align: left;
 }
 
 h3#kanji {
@@ -913,14 +1009,22 @@ h3#kanji {
 .icon-pause:before { content: "\e006"; }
 .icon-step-right:before { content: "\e005"; }
 
-.gray-out:hover {
+/* Hover feedback on the play / step / audio icons. Production carries TWO classes on
+   each control — `ka-icon-gray gray-out` — and greys on hover via `.gray-out:hover`.
+   The EJS port kept `ka-icon-gray` (which has no rule anywhere, in either sheet) and
+   dropped `gray-out`, so this rule matched nothing and the icons went dead: the whole
+   affordance was gone, silently, with no CSS error and nothing to see in a diff.
+
+   Pointed at the class the templates ACTUALLY apply rather than restoring the second
+   one — one class, one rule, nothing left to fall out of sync. */
+.ka-icon-gray:hover {
   color: gray;
 }
 
 /* Typeface Gallery */
 .ka-typefaces {
-  height: 248px;
-  width: 248px;
+  height: var(--stage-size);
+  width: var(--stage-size);
   cursor: pointer;
 }
 
@@ -1152,9 +1256,25 @@ img.ka-breakdown:hover {
 }
 
 /* Examples */
+/* ⚠️ These two widths are `100%` ON PURPOSE — do not "restore" the 258px they replaced.
+   258 is the width of columns 1–3 (--col-width); col4 is the ONE column that is 255px
+   (see .col4). Production laid these rows out with floats, which shrink-wrap to the
+   column, so its play triangles landed on the real column edge at x=1143 — flush with
+   .border2 and every other rule on the page. Our `justify-content: space-between`
+   faithfully pushes the button to whatever width is declared, so the copied 258 put all
+   ten triangles 3px OUTSIDE the column, the only ink on the page to overhang the rules.
+
+   100% resolves against .row2, which is 100% of .col4 = 255px. It cannot drift out of
+   step with the column the way a second copy of the number can.
+   (.grouped-column's 258px is CORRECT — that is a results column, not col4.)
+   `div.` is load-bearing: <h3 class="examples"> shares the class. */
+div.examples {
+  width: 100%;
+}
+
 .example {
   min-height: 39.5px;
-  width: 258px;
+  width: 100%;
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
@@ -1262,10 +1382,6 @@ img.ka-breakdown:hover {
   background: rgba(0, 0, 0, 0.5);
 }
 
-.help-modal a {
-  color: #337ab7; /* Bootstrap link blue — production modal links keep it */
-}
-
 .modal-content {
   position: relative;
 }
@@ -1326,11 +1442,6 @@ img.ka-breakdown:hover {
   padding: 5px;
   border: 1px solid #ddd;
   vertical-align: top;
-}
-
-.help-footer {
-  margin-top: var(--spacing-lg);
-  text-align: center;
 }
 
 /* Keyboard shortcuts / advanced-search keys (production styles these like code) */
@@ -1394,10 +1505,6 @@ dialog:focus-visible {
 /* ============================================
    Utility Classes
    ============================================ */
-.hidden {
-  display: none;
-}
-
 .pointer {
   cursor: pointer;
 }

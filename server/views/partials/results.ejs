@@ -27,11 +27,20 @@ function buildDetailUrl(kanjiChar) {
           the page marked lang="en", any browser that reaches the generic font renders them
           in a Chinese face (macOS hands back PingFang SC — a 0.00% pixel match), so 直/骨/
           画/角 would show the wrong strokes in the very grid students click to learn them. %>
+      <%# ⚠️ NO trailing space after the kanji, and none between the anchors either —
+          the gap is CSS now (p.kanji > a.ka { padding-right }). It used to be this
+          literal space character, which made the grid's column pitch a FONT METRIC:
+          the retired mplus-1m-light was monospaced (space = 0.5em = 12.5px), so the
+          pitch was 37.5px and the 38px-per-column width above was sized to it. Any
+          substitute face has a narrower space (Hiragino: 0.333em = 8.32px) and the
+          grid silently reflows — 8 kanji per row instead of 7. p.kanji's font-size:0
+          collapses the whitespace between these tags, so re-indenting this loop is
+          safe; adding a space back inside the anchor is not. %>
       <p class="kanji" lang="ja" style="width: <%= kanjiGridWidth %>px">
         <% results.forEach((kanji, index) => { %>
           <a href="<%= buildDetailUrl(kanji.ka_utf) %>"
              id="<%= kanji.ka_id %>"
-             class="ka"><%= kanji.ka_utf %> </a>
+             class="ka"><%= kanji.ka_utf %></a>
         <% }); %>
       </p>
     </div>
