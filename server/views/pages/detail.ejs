@@ -143,6 +143,29 @@
       init() {
         this.stroketimes = JSON.parse(this.$el.dataset.stroketimes || '[]');
 
+        // Persist the view mode and chosen typeface across kanji navigation.
+        // Prev/next paging replaces .container2 with a freshly-initialised
+        // component (see navigateKanji), so without this the mode would reset
+        // to 'video' every time you stepped left/right — you'd flip to a new
+        // kanji only to be dropped back into the animation. Production keeps
+        // these on the singleton searchService (detail-controller.js); the
+        // window store is the equivalent that survives a content swap.
+        const saved = window._detailViewState;
+        if (saved) {
+          this.detailMode = saved.detailMode;
+          this.typeface = saved.typeface;
+          this.typefaceIndex = saved.typefaceIndex;
+        }
+        const persist = () => {
+          window._detailViewState = {
+            detailMode: this.detailMode,
+            typeface: this.typeface,
+            typefaceIndex: this.typefaceIndex,
+          };
+        };
+        this.$watch('detailMode', persist);
+        this.$watch('typeface', persist);
+
         if (window._detailKeydownHandler) {
           document.removeEventListener('keydown', window._detailKeydownHandler);
         }
