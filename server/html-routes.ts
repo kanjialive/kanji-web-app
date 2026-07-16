@@ -9,28 +9,6 @@ import * as search from "./search";
 import * as grouping from "./grouping";
 import { KanjiDocument } from "./types";
 import { extendKanjiWithAssets } from "./kanji-assets";
-import { KANJI_INK_DX } from "./kanji-ink-offsets";
-
-/**
- * The 2013 nudge that draws every stroke video centred on x=130 rather than the box's
- * centre 124. Empirically correct (it puts the corpus's mean centre of mass 0.6px from the
- * column centre) — see static/css/kanji-alive-modern.css `video[poster]`. Leave it alone.
- */
-const VIDEO_NUDGE_PX = 6;
-
-/**
- * The video's `margin-left` for this kanji: the 2013 nudge plus, for the 60 stills the
- * maintainer approved, his horizontal ink correction. Everything else returns exactly 6 —
- * the CSS default — so the template emits no inline style at all and the other 1,175 kanji
- * keep the untouched rendering path.
- *
- * Deliberately `margin-left` and NOT `transform: translateX()`: a transform would promote
- * the <video> to a composited layer, which is the very thing `clip-path: inset(0)` on
- * `video` exists to prevent (Safari hardware-overlay seams). That hairline is invisible to
- * screenshots, so a regression there could not be caught by automation.
- */
-export const videoMarginLeft = (kaId: string): number =>
-  VIDEO_NUDGE_PX + (KANJI_INK_DX[kaId] ?? 0);
 
 let db: Db;
 
@@ -490,7 +468,6 @@ router.get("/:character", async (req: Request, res: Response, next) => {
 
     res.render("pages/detail", {
       doc: extendedDoc,
-      videoMarginLeft: videoMarginLeft(extendedDoc.ka_id),
       lastSearch,
       searchQuery: displaySearchQuery,
       searchMode,

@@ -319,17 +319,9 @@
         <!-- Video Mode -->
         <div class="video-container" x-show="detailMode === 'video'">
           <div class="video">
-            <%_ /* margin-left is normally 6px from CSS (the 2013 nudge). For the 60 stroke
-                    stills whose ink the maintainer approved a correction for, it becomes
-                    6 + dx and is written inline. Every other kanji emits no style at all.
-                    NOT a transform — that would composite the video and risk the Safari
-                    overlay hairline that clip-path:inset(0) exists to suppress. */ _%>
             <video x-ref="video"
                    @click="detailMode = 'typeface'"
                    poster="<%= doc.poster_video_source %>"
-                   <%_ if (videoMarginLeft !== 6) { _%>
-                   style="margin-left: <%= videoMarginLeft %>px"
-                   <%_ } _%>
                    playsinline
                    preload="metadata">
               <source src="<%= doc.mp4_video_source %>" type="video/mp4">
