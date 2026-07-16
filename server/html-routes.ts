@@ -10,6 +10,24 @@ import * as grouping from "./grouping";
 import { KanjiDocument } from "./types";
 import { extendKanjiWithAssets } from "./kanji-assets";
 
+/**
+ * Render a number the way production renders it, i.e. blank when it is the NaN sentinel.
+ *
+ * 229 kanji hold `grade: NaN` and 々 holds `rad_stroke: NaN`. That is a DELIBERATE sentinel
+ * meaning "this kanji has no grade", and it is LOAD-BEARING: search.ts turns `?grade=n/a`
+ * into `{ grade: NaN }` because Mongo matches NaN to NaN, and that is a real search which
+ * returns those 229 kanji. **Never clean the sentinel out of the data** — only keep it off
+ * the page.
+ *
+ * Production never had to think about this. Its data reaches AngularJS as JSON, and JSON has
+ * no NaN literal, so the driver serialises NaN -> null and `{{doc.grade}}` renders as an
+ * empty string. EJS renders server-side from the Mongo document itself, where the value is
+ * still a double, so `<%= doc.grade %>` printed the literal text "NaN" onto 229 detail pages
+ * (and into 々's radical block). This restores production's blank.
+ */
+export const numberOrBlank = (value: unknown): unknown =>
+  typeof value === "number" && Number.isNaN(value) ? "" : value;
+
 let db: Db;
 
 export const router = Router();
@@ -468,6 +486,7 @@ router.get("/:character", async (req: Request, res: Response, next) => {
 
     res.render("pages/detail", {
       doc: extendedDoc,
+      numberOrBlank,
       lastSearch,
       searchQuery: displaySearchQuery,
       searchMode,

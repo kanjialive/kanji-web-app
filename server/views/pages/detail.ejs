@@ -414,7 +414,9 @@
       <% } %>
       <div class="radical-name" lang="ja"><%= doc.rad_name_ja %></div>
       <div class="radical-meaning"><%= doc.rad_meaning %></div>
-      <div class="radical-stroke"><%= doc.rad_stroke %></div>
+      <%_ /* Only 々 reaches this as NaN (it has no radical strokes). Same sentinel, same
+              production behaviour: blank. */ _%>
+      <div class="radical-stroke"><%= numberOrBlank(doc.rad_stroke) %></div>
 
       <div class="ka-rad-anim pointer" @click="startRadicalAnimation()">
         <img :class="{'opaque': radicalFrame === 0}" src="<%= doc.rad_anim_frame_0 %>" alt="Radical animation frame 1">
@@ -436,7 +438,10 @@
       <p class="strokes"><%= doc.kstroke %></p>
 
       <h3 class="grade">Grade</h3>
-      <p class="grade"><%= doc.grade %></p>
+      <%_ /* 229 kanji have no grade, stored as the NaN sentinel that `?grade=n/a` searches
+              on. Production renders it blank (its NaN becomes null crossing JSON); print
+              the raw value here and the student reads "NaN". */ _%>
+      <p class="grade"><%= numberOrBlank(doc.grade) %></p>
 
       <div class="border4"><div class="border-inner"></div></div>
 
