@@ -156,16 +156,39 @@
         _animFrame = requestAnimationFrame(step);
       },
 
+      // The last group that can actually be parked at the left inset.
+      //
+      // NOT groups.length - 1. That is the last group that EXISTS; the trailing groups
+      // start beyond maxScroll, so the browser clamps the scroll and they never reach the
+      // left edge — they are already fully on screen in the final viewport, with nothing
+      // left to scroll to. Advancing currentGroup into them desynchronises the index from
+      // the view: the view sits at the end while the index climbs, and every ArrowLeft
+      // afterwards steps back through groups that all clamp to the same scrollLeft, moving
+      // NOTHING, until the index drops below this bound. It reads as though the extra
+      // ArrowRight presses were cached and have to be paid back one for one.
+      // (grade:1 rsort had three such groups = three dead presses. Reported 2026-07-17.)
+      //
+      // Derive the bound from the scroller, never from the element count.
+      _lastAlignableGroup(scroller, groups) {
+        var maxScroll = scroller.scrollWidth - scroller.offsetWidth;
+        for (var i = groups.length - 1; i >= 0; i--) {
+          if (groups[i].offsetLeft <= maxScroll) return i;
+        }
+        return 0;
+      },
+
       scrollForward() {
         var scroller = this.$refs.resultsContainer?.querySelector('.scroller');
         if (!scroller) return;
 
         if (this.mode === 'kanji') {
+          // Reads the LIVE scrollLeft, which the browser has already clamped, so this
+          // branch cannot bank presses the way the group branch could.
           this._smoothScroll(scroller, scroller.scrollLeft + scroller.offsetWidth);
         } else {
           var groups = scroller.querySelectorAll('.results-group');
           if (groups.length === 0) return;
-          this.currentGroup = Math.min(groups.length - 1, this.currentGroup + 1);
+          this.currentGroup = Math.min(this._lastAlignableGroup(scroller, groups), this.currentGroup + 1);
           this._smoothScroll(scroller, Math.max(0, groups[this.currentGroup].offsetLeft));
         }
       },
