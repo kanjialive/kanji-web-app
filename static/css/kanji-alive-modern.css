@@ -879,10 +879,40 @@ a.ka:active {
 }
 
 /* 258px is CORRECT here — a results column, not the detail page's col4 (255px). */
+/* 🔴 THE GUTTER IS var(--gutter) = 24px, NOT production's 25px (2026-07-17). This was the
+   last place in the sheet still off the true grid, and the 1px cost more than it looks.
+
+   A viewport is --content-width = 1104px = 4 x 258 + 3 x 24, so four columns and three
+   gutters fit it EXACTLY. At 25px gutters they need 1107px — 3px more than exists — so the
+   scroll could never rest with four whole columns framed, and each group heading drifted a
+   further 1px off the sheet grid: group 3's heading sat 3px right of `Kanji alive` directly
+   above it (891 vs 888). At 24px every heading lands on 42 + n x 282, under the header
+   control it belongs to.
+
+   The trailing gutter below is the other half. Together they make the maximum scroll
+
+       maxScroll = (N x 282 - 24) - (4 x 282 - 24) = (N - 4) x 282
+
+   an exact multiple of the pitch for ANY N >= 4 — the trailing gutters cancel. So the scroll
+   ALWAYS ends with a column flush at the left inset, and there is no position past the last
+   aligned column. That is why this needs no scroll clamp and no scroll-snap: the alignment
+   falls out of the arithmetic, and a clamp would only hide a grid that was still wrong.
+   Before this, every sorted view overscrolled by exactly 28px (= 25 trailing + 3 pitch),
+   regardless of the query — the constant is the fingerprint of the mismatch. */
 .grouped-column {
   width: var(--col-width);
-  margin-right: 25px;
+  margin-right: var(--gutter);
   display: inline-table;
+}
+
+/* The last column's trailing gutter is NOT content, but it counts toward scrollWidth — it
+   was 25 of the 28px of overscroll. Scoped to the last column of the LAST group: every
+   other group keeps its trailing gutter, which is what holds the groups' bottom rules
+   contiguous (.ka-border-bottom is width:100% of its group). Verified: adjacent rules still
+   meet with 0px gaps, and the final rule's right edge lands on the content edge (1146 rel
+   .container) rather than 24px short of it. */
+.results-group:last-child .grouped-column:last-child {
+  margin-right: 0;
 }
 
 /* font-size:0 collapses the whitespace text nodes between links (EJS emits

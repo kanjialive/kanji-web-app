@@ -110,6 +110,16 @@ const LOAD_BEARING: Array<[string, RegExp]> = [
   [".example tracks its column (width: 100%)", /\.example\s*\{[^}]*width:\s*100%/],
   ["div.examples tracks its column (width: 100%)", /div\.examples\s*\{[^}]*width:\s*100%/],
 
+  // The sorted views' scroll ends on a column boundary ONLY if both of these hold: the
+  // results gutter is the grid's 24px (not production's 25px) AND the last column drops its
+  // trailing gutter. Either one alone leaves the scroll running past the last aligned
+  // column — 24px or 3px respectively, where both together give 0. See .grouped-column.
+  ["results columns use the grid gutter, not a literal", /\.grouped-column\s*\{[^}]*margin-right:\s*var\(--gutter\)/],
+  [
+    "the last results column drops its trailing gutter",
+    /\.results-group:last-child\s+\.grouped-column:last-child\s*\{[^}]*margin-right:\s*0\s*;/,
+  ],
+
   // The true grid: 4 x 258 + 3 x 24 = 1104, centred by (1158 - 1104) / 2 = 27.
   ["content block is 1104px (4 cols + 3 gutters)", /--content-width:\s*1104px/],
   ["content block is centred (container2 margin-left: 27px)", /\.container2\s*\{[^}]*margin-left:\s*27px/],
@@ -139,6 +149,38 @@ for (const [name, pattern] of LOAD_BEARING) {
     );
   });
 }
+
+//
+// The grid identity. --content-width is not an independent number: it IS four columns and
+// three gutters. Everything downstream leans on that, but the consequence people trip over
+// is the sorted views' horizontal scroll. With the results columns on the same pitch and no
+// trailing gutter, the maximum scroll is
+//
+//     (N x pitch - gutter) - (contentWidth - gutter)  =  (N - 4) x pitch
+//
+// for any N >= 4 — an exact multiple of the pitch, so the scroll always ends with a column
+// flush at the left inset. The gutters cancel ONLY because contentWidth is 4 columns + 3
+// gutters. Change any of the three variables so that identity no longer holds and the
+// sorted views silently start overscrolling again (they did, by 28px, until 2026-07-17).
+//
+function cssVar(name: string): number {
+  const m = css.match(new RegExp(`--${name}:\\s*([\\d.]+)px`));
+  assert.ok(m, `--${name} is not declared in the stylesheet`);
+  return parseFloat(m![1]);
+}
+
+test("grid identity: 4 columns + 3 gutters = the content width", () => {
+  const col = cssVar("col-width");
+  const gutter = cssVar("gutter");
+  const content = cssVar("content-width");
+  assert.equal(
+    4 * col + 3 * gutter,
+    content,
+    `4 x ${col} + 3 x ${gutter} = ${4 * col + 3 * gutter}, but --content-width is ${content}px. ` +
+      `These three are one system, not three choices. While this holds, the sorted views' ` +
+      `scroll ends on a column boundary by construction; break it and they overscroll.`,
+  );
+});
 
 //
 // Every heading→value `top` on the detail page is DERIVED, not chosen:
