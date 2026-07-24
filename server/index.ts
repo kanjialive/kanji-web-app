@@ -65,7 +65,7 @@ async function connectMongoDB() {
       process.on("SIGTERM", shutdown);
       process.on("SIGINT", shutdown);
 
-      break;
+      return;
     } catch (err) {
       console.error(
         `Error connecting to MongoDB database (attempt ${
@@ -73,9 +73,22 @@ async function connectMongoDB() {
         }/${maxConnectionAttempts}): ${err}`
       );
       connectionAttempts++;
-      await new Promise((resolve) => setTimeout(resolve, 5000));
+      // No point sleeping after the last attempt — nothing follows it.
+      if (connectionAttempts < maxConnectionAttempts) {
+        await new Promise((resolve) => setTimeout(resolve, 5000));
+      }
     }
   }
+
+  // Fail LOUDLY, the same rule the HTML routes follow. This used to fall out of the
+  // loop and simply... stop: no app.listen(), no exit, no final message. The process
+  // stayed alive, serving nothing, saying nothing — a deploy that looks like it booted
+  // and never did. Exiting non-zero is what makes Heroku's log say "crashed" instead.
+  // Missing MONGODB_URI already exits 1 above; an unreachable database must too.
+  console.error(
+    `FATAL: could not connect to MongoDB after ${maxConnectionAttempts} attempts. Exiting.`
+  );
+  process.exit(1);
 }
 
 // Root route handler for HTMX mode (must be before static middleware)
@@ -161,8 +174,11 @@ app.get(
 if (USE_HTMX) {
   app.use("/htmx", (req: Request, res: Response, next: NextFunction) => {
     if (req.path.startsWith("/partials/")) return next();
-    const canonical = req.originalUrl.replace(/^\/htmx/, "") || "/";
-    res.redirect(canonical);
+    // 🔴 canonicalHtmxUrl() collapses the leading slashes — do NOT inline a bare
+    // originalUrl.replace(/^\/htmx/, "") here again. That left "/htmx//evil.example"
+    // redirecting to "//evil.example", which a browser reads as protocol-relative and
+    // follows OFF this site. res.redirect() does not normalise the location for us.
+    res.redirect(html_routes.canonicalHtmxUrl(req.originalUrl));
   });
   app.use("/htmx", html_routes.router);
   app.use("/", html_routes.router);

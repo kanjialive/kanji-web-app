@@ -28,6 +28,45 @@ import { extendKanjiWithAssets } from "./kanji-assets";
 export const numberOrBlank = (value: unknown): unknown =>
   typeof value === "number" && Number.isNaN(value) ? "" : value;
 
+/**
+ * Read a query parameter as a string, or as "" if it is anything else.
+ *
+ * 🔴 `req.query.q as string` is a LIE THE COMPILER CANNOT CATCH. Express parses the
+ * query string with `qs`, which returns `string | string[] | object`: `?q=a&q=b` gives
+ * an ARRAY and `?q[$ne]=x` gives an OBJECT. The cast asserts one of those three and
+ * erases the other two, so the value reaches string methods that do not exist on it.
+ *
+ * That is not a theoretical tidy-up. `parseColonSyntax(basicQuery)` runs BEFORE the
+ * route's try/catch and calls `.includes(":")`, so `GET /search?q[$ne]=x` threw
+ * `TypeError: query.includes is not a function` out of an async handler — and Node
+ * terminates the process on an unhandled rejection. Two unauthenticated GETs took the
+ * staging dyno down and Heroku's crash backoff kept it down. Verified 2026-07-24; see
+ * offline/code-review-evaluation-2026-07-24.md.
+ *
+ * ⚠️ The `typeof === "string"` guards in search.ts do NOT cover this. They sit at the
+ * Mongo-filter sink; this crash happens in the route, one layer earlier, on the way there.
+ * A guard at the sink protects nothing that touches the value before it.
+ *
+ * Non-strings are IGNORED rather than rejected with a 400: a nonsense `q` then renders
+ * the welcome page, which is what the same nonsense already does in production.
+ */
+const queryParam = (value: unknown): string =>
+  typeof value === "string" ? value : "";
+
+/**
+ * The canonical URL for a legacy `/htmx/...` page URL — used by the redirect in
+ * index.ts, and exported ONLY so it can be tested (importing index.ts runs the whole
+ * app: it connects to MongoDB and exits the process when the env vars are missing).
+ *
+ * 🔴 The leading-slash collapse is the load-bearing part. Stripping the prefix off
+ * `/htmx//evil.example/path` leaves `//evil.example/path`, which a browser reads as
+ * PROTOCOL-RELATIVE — the redirect then sends the visitor to another origin entirely.
+ * Backslashes are equivalent for this purpose (browsers normalise `/\` to `//`), so
+ * both are collapsed. Verified 2026-07-24, offline/code-review-evaluation-2026-07-24.md.
+ */
+export const canonicalHtmxUrl = (originalUrl: string): string =>
+  "/" + originalUrl.replace(/^\/htmx/, "").replace(/^[/\\]+/, "");
+
 let db: Db;
 
 export const router = Router();
@@ -56,7 +95,12 @@ function hasAdvancedParams(query: Record<string, unknown>): boolean {
 function buildAdvancedSearchInput(query: Record<string, unknown>): string {
   const parts: string[] = [];
   for (const key of ADVANCED_KEYS) {
-    if (query[key]) parts.push(`${key}:${query[key]}`);
+    // Same qs hazard as queryParam(): `?on=a&on=b` is an array and `?on[$ne]=x` an
+    // object. Neither crashes here, but both would paint "on:a,b" / "on:[object
+    // Object]" into the visible search box for a parameter search.ts then DISCARDS.
+    // Showing only what was actually searched keeps the box honest.
+    const value = queryParam(query[key]);
+    if (value) parts.push(`${key}:${value}`);
   }
   return parts.join(" ");
 }
@@ -224,8 +268,8 @@ async function renderSearchPage(
   res: Response,
   basicOverride?: string
 ) {
-  const basicQuery = basicOverride ?? ((req.query.q as string) || "");
-  const mode = (req.query.mode as string) || "kanji";
+  const basicQuery = basicOverride ?? queryParam(req.query.q);
+  const mode = queryParam(req.query.mode) || "kanji";
   const isAdvanced = hasAdvancedParams(req.query as Record<string, unknown>);
 
   // Parse colon syntax in basic query (e.g., "on:shin grade:3") → redirect
@@ -322,8 +366,8 @@ router.get("/search/:search", (req: Request, res: Response) =>
  * Supports both basic search (?q=...) and advanced search (?on=...&grade=...)
  */
 router.get("/partials/results", async (req: Request, res: Response) => {
-  const basicQuery = (req.query.q as string) || "";
-  const mode = (req.query.mode as string) || "kanji";
+  const basicQuery = queryParam(req.query.q);
+  const mode = queryParam(req.query.mode) || "kanji";
   const isAdvanced = hasAdvancedParams(req.query as Record<string, unknown>);
   let effectiveAdvancedParams: Record<string, string> | undefined;
 
@@ -428,8 +472,8 @@ router.get("/:character", async (req: Request, res: Response, next) => {
     const extendedDoc = extendKanjiWithAssets(doc);
 
     // Get search context from query params
-    const searchQuery = (req.query.q as string) || "";
-    const searchMode = (req.query.mode as string) || "kanji";
+    const searchQuery = queryParam(req.query.q);
+    const searchMode = queryParam(req.query.mode) || "kanji";
     const isAdvanced = hasAdvancedParams(req.query as Record<string, unknown>);
 
     // Build display query for search input (show colon syntax for advanced searches)
