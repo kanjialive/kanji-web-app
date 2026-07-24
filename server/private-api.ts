@@ -13,18 +13,18 @@ export const init = async (database: Db) => {
 /**
  * Fields excluded from every private-API response.
  *
- * `textbook_search` is LICENCE-RESTRICTED data — it is deliberately absent from
- * the public API and from the public GitHub repo. This endpoint is
- * unauthenticated, so anything it returns is effectively published. Nothing
- * displays this field (it is only ever a *query filter*, see search.ts), so it
- * can safely be withheld from the response.
+ * `textbook_search` and `mn_hint` are both LICENCE-RESTRICTED and this endpoint is
+ * unauthenticated — but this projection closes very little:
  *
- * `mn_hint` is also licence-restricted, but CANNOT be excluded here: AngularJS
- * renders the hint in the browser and needs the text as JSON, and
- * extendKanjiWithAssets() reads doc.mn_hint to build the hint markup. That leak
- * closes only when Angular is deleted (migration Phase 7) and this whole API
- * loses its last consumer — the HTMX frontend renders server-side and never
- * calls it. See offline/durability-plan-2026-07-12.md.
+ *   - public-api.ts returns both fields anyway: it spreads the whole document and
+ *     projects nothing on either kanji read path.
+ *   - The filter is the leak. search.ts maps text/list onto textbook_search, so an
+ *     unauthenticated ?list=gen:19 returns exactly that chapter whether or not the
+ *     field is in the body.
+ *   - mn_hint cannot be dropped here at all: AngularJS renders the hint from JSON.
+ *     Phase 7 closes that leak and no other.
+ *
+ * See offline/durability-plan-2026-07-12.md.
  */
 const LICENSED_FIELDS_PROJECTION = { textbook_search: 0 } as const;
 
