@@ -162,7 +162,13 @@ function emptyDb(): Db {
 
 // Bound the wait. A reintroduced crash leaves the request unanswered forever; without
 // a deadline the assertion below never runs and the runner sits there looking busy.
-const HOSTILE_FETCH: RequestInit = { signal: AbortSignal.timeout(5000) };
+//
+// ⚠️ A FUNCTION, not a shared constant. AbortSignal.timeout() starts counting the moment
+// it is CREATED, not when a fetch picks it up, and once fired it stays fired forever. One
+// module-scope signal would therefore be a single 5s budget for the whole FILE: on a slow
+// CI runner every test after the 5s mark fails instantly with TimeoutError — a red that
+// has nothing to do with the crash these tests guard. Each call gets its own deadline.
+const hostileFetch = (): RequestInit => ({ signal: AbortSignal.timeout(5000) });
 
 const HOSTILE_QUERIES = [
   "q[$ne]=x", // object — the shape that crashed staging
@@ -174,7 +180,7 @@ const HOSTILE_QUERIES = [
 for (const query of HOSTILE_QUERIES) {
   test(`the search page survives ?${query} without crashing the process`, async () => {
     await withServer(emptyDb(), async (base) => {
-      const res = await fetch(`${base}/search?${query}`, HOSTILE_FETCH);
+      const res = await fetch(`${base}/search?${query}`, hostileFetch());
       assert.ok(
         res.status < 500,
         `?${query} must not be a server error, got ${res.status}`
@@ -184,7 +190,7 @@ for (const query of HOSTILE_QUERIES) {
 
   test(`the results partial survives ?${query} without crashing the process`, async () => {
     await withServer(emptyDb(), async (base) => {
-      const res = await fetch(`${base}/partials/results?${query}`, HOSTILE_FETCH);
+      const res = await fetch(`${base}/partials/results?${query}`, hostileFetch());
       assert.ok(
         res.status < 500,
         `?${query} must not be a server error, got ${res.status}`
@@ -194,7 +200,7 @@ for (const query of HOSTILE_QUERIES) {
 
   test(`the detail page survives ?${query} without crashing the process`, async () => {
     await withServer(emptyDb(), async (base) => {
-      const res = await fetch(`${base}/${encodeURIComponent("水")}?${query}`, HOSTILE_FETCH);
+      const res = await fetch(`${base}/${encodeURIComponent("水")}?${query}`, hostileFetch());
       assert.ok(
         res.status < 500,
         `?${query} must not be a server error, got ${res.status}`
