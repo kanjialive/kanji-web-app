@@ -23,11 +23,27 @@ export const init = (database: Db) => {
   db = database;
 };
 
+/**
+ * 🔴 An empty filter is NOT "match everything" — it means the caller gave us nothing
+ * we could parse, and the honest answer is "no kanji found".
+ *
+ * parseAdvancedQuery() silently drops every parameter it does not recognise or cannot
+ * coerce, so `?foo=bar`, `?grade=abc` and a bare `/api/public/search/advanced` all
+ * arrive here as `{}`. Passing that to find() returned the ENTIRE collection — 1,235
+ * documents — as though every kanji had matched a search that specified nothing. On a
+ * metered API that bills a typo'd parameter as a successful full-collection fetch.
+ *
+ * private-api.ts has had this guard all along; the public copy never got it. Same
+ * response shape as the private one, and as this file's own not-found paths.
+ */
 const getSearchResultsWithQuery = async (
   query: object,
   req: Request,
   res: Response
 ) => {
+  if (Object.keys(query).length === 0) {
+    return res.send({ error: "No kanji found." });
+  }
   try {
     const collection: Collection<KanjiDocument> = db.collection("kanji");
     const results: KanjiDocument[] = await collection

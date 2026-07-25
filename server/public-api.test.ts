@@ -1,6 +1,9 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
+import type { Request, Response } from "express";
+import type { Db } from "mongodb";
 import type { KanjiDocument } from "./types";
+import * as publicApi from "./public-api";
 import { extendKanjiWithAssets } from "./public-api";
 
 // Golden test for the PUBLIC (nested) enrichment contract. External RapidAPI
@@ -79,4 +82,99 @@ test("public extendKanjiWithAssets output is stable (golden)", () => {
     "kunyomi",
     "video",
   ]);
+});
+
+/**
+ * An unparseable advanced search must not return the whole collection.
+ *
+ * parseAdvancedQuery() silently drops every parameter it cannot recognise or coerce, so
+ * `?foo=bar`, `?grade=abc` and a bare /api/public/search/advanced all reached this file
+ * as `{}` — and `find({})` matches EVERYTHING. A typo'd parameter came back as 1,235
+ * documents billed as a successful search. private-api.ts has always guarded this; the
+ * public copy never did.
+ *
+ * ⚠️ Asserts the Mongo call is never MADE, not just that the body looks right. A guard
+ * that queried first and discarded the result afterwards would still be wrong.
+ *
+ * Seen red: removing the Object.keys() guard from getSearchResultsWithQuery() fails all
+ * three unparseable cases and leaves ?grade=1 green.
+ */
+interface StubCursor {
+  toArray(): Promise<KanjiDocument[]>;
+}
+
+function countingDb(calls: object[]): Db {
+  const cursor: StubCursor = {
+    toArray: async (): Promise<KanjiDocument[]> => [doc, doc, doc],
+  };
+  return {
+    collection() {
+      return {
+        find: (filter: object): StubCursor => {
+          calls.push(filter);
+          return cursor;
+        },
+      };
+    },
+  } as unknown as Db;
+}
+
+function captureRes() {
+  return {
+    body: undefined as unknown,
+    send(payload: unknown) {
+      this.body = payload;
+      return this;
+    },
+  };
+}
+
+const UNPARSEABLE = [
+  {}, // no parameters at all
+  { foo: "bar" }, // nothing search.ts recognises
+  { grade: "abc" }, // recognised key, uncoercible value — parseInt drops it
+];
+
+for (const query of UNPARSEABLE) {
+  test(`advanced search with ${JSON.stringify(query)} finds nothing, not everything`, async () => {
+    const calls: object[] = [];
+    publicApi.init(countingDb(calls));
+    const res = captureRes();
+
+    await publicApi.advancedSearch(
+      { query } as unknown as Parameters<typeof publicApi.advancedSearch>[0],
+      res as unknown as Response
+    );
+
+    assert.deepEqual(calls, [], "an empty filter must never reach Mongo");
+    assert.deepEqual(res.body, { error: "No kanji found." });
+  });
+}
+
+test("a parseable advanced search still queries Mongo and returns results", async () => {
+  const calls: object[] = [];
+  publicApi.init(countingDb(calls));
+  const res = captureRes();
+
+  await publicApi.advancedSearch(
+    { query: { grade: "1" } } as unknown as Parameters<typeof publicApi.advancedSearch>[0],
+    res as unknown as Response
+  );
+
+  assert.deepEqual(calls, [{ grade: 1 }], "the guard must not swallow a real search");
+  assert.equal((res.body as unknown[]).length, 3);
+});
+
+test("basic search is unaffected — its filter is never empty", async () => {
+  const calls: object[] = [];
+  publicApi.init(countingDb(calls));
+  const res = captureRes();
+
+  await publicApi.basicSearch(
+    { params: { search: "water" } } as unknown as Request,
+    res as unknown as Response
+  );
+
+  assert.equal(calls.length, 1, "a basic search must always reach Mongo");
+  assert.equal((res.body as unknown[]).length, 3);
 });
