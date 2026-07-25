@@ -160,6 +160,149 @@ function emptyDb(): Db {
   } as unknown as Db;
 }
 
+// A Db that answers every query with the given documents.
+function resultsDb(docs: KanjiDocument[]): Db {
+  const cursor: StubCursor = {
+    toArray: async (): Promise<KanjiDocument[]> => docs,
+    sort: (): StubCursor => cursor,
+  };
+  return {
+    collection() {
+      return {
+        find: (): StubCursor => cursor,
+        findOne: async (): Promise<KanjiDocument | null> => docs[0] ?? null,
+      };
+    },
+  } as unknown as Db;
+}
+
+function kanjiDoc(fields: Partial<KanjiDocument>): KanjiDocument {
+  return {
+    ka_id: "kanji_1",
+    ka_utf: "水",
+    kstroke: 4,
+    rad_utf: "水",
+    rad_stroke: 4,
+    rad_order: 85,
+    ...fields,
+  } as KanjiDocument;
+}
+
+/**
+ * An unrecognised ?mode= must never report zero results over a non-empty result set.
+ *
+ * partials/results.ejs branches on exactly 'kanji' / 'ksort' / 'rsort' and its final
+ * `else` falls through to no-results.ejs, so `?mode=xyz` rendered "No kanji were found
+ * matching this search" — HTTP 200, with matches in hand. That is the SAME silent-failure
+ * shape as the outage tests above: an answer the user cannot tell from a correct one.
+ *
+ * Seen red: restoring `queryParam(req.query.mode) || "kanji"` fails every case below
+ * except 'kanji', 'ksort' and 'rsort'.
+ */
+const MODE_INPUTS = [
+  "kanji", // the three real modes must still work
+  "ksort",
+  "rsort",
+  "xyz", // nonsense
+  "KANJI", // right word, wrong case — a plausible hand-typed URL
+  "help", // a mode the SERVER sets; must not be reachable from the query string
+  " kanji", // stray whitespace from a copied URL
+];
+
+for (const mode of MODE_INPUTS) {
+  test(`?mode=${JSON.stringify(mode)} still shows the kanji it found`, async () => {
+    const docs = [kanjiDoc({}), kanjiDoc({ ka_id: "kanji_2", ka_utf: "氷", kstroke: 5 })];
+    await withServer(resultsDb(docs), async (base) => {
+      for (const url of [
+        `${base}/search?q=water&mode=${encodeURIComponent(mode)}`,
+        `${base}/partials/results?q=water&mode=${encodeURIComponent(mode)}`,
+      ]) {
+        const res = await fetch(url, hostileFetch());
+        assert.equal(res.status, 200, url);
+        const body = await res.text();
+        assert.ok(
+          !body.includes("No kanji were found"),
+          `${url} claimed zero results while holding two`
+        );
+        assert.ok(body.includes("水"), `${url} did not render the results`);
+      }
+    });
+  });
+}
+
+/**
+ * 🔴 The NaN sentinel must not reach a results heading.
+ *
+ * 々 holds `rad_stroke: NaN` meaning "no radical strokes", and the rsort view printed it
+ * straight into the group heading as the literal text "NaN". Production renders it blank
+ * — not by choice, but because its NaN becomes null crossing JSON to AngularJS. Rendering
+ * from the Mongo document directly loses that accident, which is what numberOrBlank()
+ * exists to restore. It was fully unit-tested and simply not in scope in this template.
+ *
+ * ⚠️ This drives the REAL route and renders the REAL template, so it also proves the
+ * helper is actually reachable from the view — a numberOrBlank() unit test cannot.
+ *
+ * Seen red: dropping numberOrBlank() from the rsort heading in partials/results.ejs, and
+ * separately removing the res.locals middleware, both fail this and nothing else.
+ */
+test("the rsort view renders a blank heading for 々, never the text NaN", async () => {
+  const docs = [
+    kanjiDoc({}),
+    kanjiDoc({ ka_id: "kanji_noma", ka_utf: "々", kstroke: 3, rad_utf: "々", rad_stroke: NaN, rad_order: -1 }),
+  ];
+  await withServer(resultsDb(docs), async (base) => {
+    const res = await fetch(`${base}/partials/results?q=x&mode=rsort`, hostileFetch());
+    assert.equal(res.status, 200);
+    const body = await res.text();
+
+    const headings = [...body.matchAll(/ka-results-h1">([^<]*)</g)].map((m) => m[1].trim());
+    assert.ok(headings.length > 0, "found no group headings — has the class name changed?");
+    assert.deepEqual(
+      headings.filter((h) => h === "NaN"),
+      [],
+      `a group heading rendered the raw sentinel: ${JSON.stringify(headings)}`
+    );
+    assert.ok(body.includes("々"), "々 must still be listed under its blank heading");
+  });
+});
+
+/**
+ * The detail page's own numberOrBlank sites, through the real route. These were already
+ * correct; this pins that moving the helper onto res.locals did not quietly unhook them.
+ */
+test("the detail page still blanks the grade and radical-stroke sentinels", async () => {
+  const doc = kanjiDoc({
+    ka_utf: "々",
+    kname: "noma",
+    grade: NaN,
+    rad_stroke: NaN,
+    examples: [],
+    mn_hint: "",
+    rad_position: "",
+    rad_name: "noma",
+    rad_name_file: "noma",
+    stroketimes: [],
+    meaning: "repetition mark",
+  });
+  await withServer(resultsDb([doc]), async (base) => {
+    const res = await fetch(`${base}/${encodeURIComponent("々")}`, hostileFetch());
+    assert.equal(res.status, 200);
+    const body = await res.text();
+    // The VALUE elements, not the <h3> labels that share their class name.
+    for (const selector of ['<p class="grade">', '<div class="radical-stroke">']) {
+      const match = body.match(
+        new RegExp(`${selector.replace(/[[\]{}()*+?.\\^$|]/g, "\\$&")}([^<]*)<`)
+      );
+      assert.ok(match, `found no ${selector} — has the template changed?`);
+      assert.equal(
+        match[1].trim(),
+        "",
+        `${selector} rendered the raw sentinel instead of a blank`
+      );
+    }
+  });
+});
+
 // Bound the wait. A reintroduced crash leaves the request unanswered forever; without
 // a deadline the assertion below never runs and the runner sits there looking busy.
 //

@@ -71,12 +71,48 @@ let db: Db;
 
 export const router = Router();
 
+/**
+ * numberOrBlank is available to EVERY view rendered by this router, not passed
+ * render-by-render.
+ *
+ * 🔴 The invariant is "the NaN sentinel never reaches a page" — so the helper has to
+ * be reachable from every page, including ones added later. It used to be an explicit
+ * local on the detail render alone, which is how partials/results.ejs came to print a
+ * results heading reading literally "NaN" for 々 (`rad_stroke: NaN`) while the helper
+ * that fixes it sat one file away, fully unit-tested and simply not in scope there.
+ * A helper that must be remembered at each call site will eventually be forgotten at one.
+ */
+router.use((_req: Request, res: Response, next) => {
+  res.locals.numberOrBlank = numberOrBlank;
+  next();
+});
+
 export const init = (database: Db) => {
   db = database;
 };
 
 // Advanced search parameter keys (from search.ts)
 const ADVANCED_KEYS = ["ks", "rs", "grade", "kanji", "kem", "rem", "on", "kun", "rpos", "rjn", "text", "list"];
+
+/**
+ * The COMPLETE set of result view modes, and the only values the templates branch on.
+ *
+ * 🔴 partials/results.ejs matches these three exactly and its final `else` falls through
+ * to no-results.ejs, so ANY other value reported "No kanji were found matching this
+ * search" over a perfectly good result set — HTTP 200, with matches in hand. That is the
+ * same silent-failure shape as a database outage rendering as an empty search (see the
+ * outage tests in html-routes.test.ts): a wrong answer that looks exactly like a right one.
+ *
+ * `?mode=KANJI` did it, and so did any typo or stale bookmark. Normalise at the edge —
+ * an unrecognised mode means "show me the default view", never "show me nothing".
+ *
+ * ⚠️ 'help' is deliberately NOT here. It is a mode the SERVER sets to render the welcome
+ * page; it must not be reachable from the query string.
+ */
+const RESULT_MODES = ["kanji", "ksort", "rsort"];
+
+const searchModeParam = (value: unknown): string =>
+  typeof value === "string" && RESULT_MODES.includes(value) ? value : "kanji";
 
 /**
  * Check if request has advanced search parameters.
@@ -269,7 +305,7 @@ async function renderSearchPage(
   basicOverride?: string
 ) {
   const basicQuery = basicOverride ?? queryParam(req.query.q);
-  const mode = queryParam(req.query.mode) || "kanji";
+  const mode = searchModeParam(req.query.mode);
   const isAdvanced = hasAdvancedParams(req.query as Record<string, unknown>);
 
   // Parse colon syntax in basic query (e.g., "on:shin grade:3") → redirect
@@ -367,7 +403,7 @@ router.get("/search/:search", (req: Request, res: Response) =>
  */
 router.get("/partials/results", async (req: Request, res: Response) => {
   const basicQuery = queryParam(req.query.q);
-  const mode = queryParam(req.query.mode) || "kanji";
+  const mode = searchModeParam(req.query.mode);
   const isAdvanced = hasAdvancedParams(req.query as Record<string, unknown>);
   let effectiveAdvancedParams: Record<string, string> | undefined;
 
@@ -473,7 +509,7 @@ router.get("/:character", async (req: Request, res: Response, next) => {
 
     // Get search context from query params
     const searchQuery = queryParam(req.query.q);
-    const searchMode = queryParam(req.query.mode) || "kanji";
+    const searchMode = searchModeParam(req.query.mode);
     const isAdvanced = hasAdvancedParams(req.query as Record<string, unknown>);
 
     // Build display query for search input (show colon syntax for advanced searches)
@@ -530,7 +566,7 @@ router.get("/:character", async (req: Request, res: Response, next) => {
 
     res.render("pages/detail", {
       doc: extendedDoc,
-      numberOrBlank,
+      // numberOrBlank arrives via res.locals — see the router.use() above.
       lastSearch,
       searchQuery: displaySearchQuery,
       searchMode,

@@ -53,7 +53,10 @@ function buildDetailUrl(kanjiChar) {
       <ul class="list-inline">
         <% kanjiStrokeGroups.forEach(group => { %>
           <li class="results-group">
-            <div class="ka-results-h1"><%= group.stroke %></div>
+            <%# numberOrBlank — a stroke count is a raw Mongo number and NaN is a real
+                sentinel in this data. No kanji holds kstroke: NaN today; the radical
+                branch below does, and these two headings must not drift apart. %>
+            <div class="ka-results-h1"><%= numberOrBlank(group.stroke) %></div>
             <div class="ka-results-h3">Kanji Stroke<%= group.stroke !== 1 ? 's' : '' %></div>
             <div class="ka-border-bottom">
               <div class="border-inner"></div>
@@ -93,7 +96,13 @@ function buildDetailUrl(kanjiChar) {
       <ul class="list-inline">
         <% radicalStrokeGroups.forEach(group => { %>
           <li class="results-group">
-            <div class="ka-results-h1"><%= group.stroke %></div>
+            <%# 🔴 numberOrBlank is load-bearing HERE. 々 holds rad_stroke: NaN meaning
+                "no radical strokes", so this printed a results heading reading literally
+                "NaN" — reachable at /search?rs=n/a&mode=rsort. Production renders it
+                blank (its NaN becomes null crossing JSON to Angular); so must this.
+                The label below deliberately still says "Strokes": NaN !== 1, exactly as
+                production's null !== 1. %>
+            <div class="ka-results-h1"><%= numberOrBlank(group.stroke) %></div>
             <div class="ka-results-h3">Radical Stroke<%= group.stroke !== 1 ? 's' : '' %></div>
             <div class="ka-border-bottom">
               <div class="border-inner"></div>
