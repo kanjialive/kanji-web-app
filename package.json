@@ -5,7 +5,7 @@
   "main": "dist/index.js",
   "author": "dayj",
   "dependencies": {
-    "ejs": "^4.0.1",
+    "ejs": "^6.0.1",
     "express": "4.x",
     "mongodb": "6.x"
   },
