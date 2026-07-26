@@ -177,6 +177,28 @@
         const handler = (e) => {
           if (e.target.tagName === 'INPUT') return;
 
+          // NOTHING on this page wants auto-repeat, so the guard sits here rather than
+          // per-case. Holding a key fires ~33 keydowns/sec, which would flip the
+          // video/typeface view 33 times a second, strobe play/pause, blast through the
+          // stroke steps and the whole typeface list in a fraction of a second, and —
+          // for the unshifted arrows — fire one page navigation per event. A hold now
+          // does exactly what a single tap does.
+          //
+          // This differs from search.ejs deliberately: there ArrowLeft/ArrowRight SCROLL
+          // the sorted views, where repeating on a held key is the entire point, so the
+          // guard is scoped to the two mode keys. Here the same arrows step one kanji at
+          // a time, so there is no held-key gesture worth keeping.
+          //
+          // preventDefault still runs for the keys this page owns, so a held ArrowDown
+          // or Space suppresses the window's own scrolling exactly as a single press
+          // does — only the ACTION is skipped, never the default suppression.
+          if (e.repeat) {
+            if (e.code === 'Space' || e.code === 'ArrowUp' || e.code === 'ArrowDown') {
+              e.preventDefault();
+            }
+            return;
+          }
+
           // 'r' — replay the radical animation. The only feature with no key of
           // its own; the radical image was mouse-only in both frontends.
           //
@@ -242,14 +264,38 @@
     }));
   });
 
+  // DETAIL-NAV-START — server/detail-nav.test.ts lifts everything between this marker
+  // and DETAIL-NAV-END and runs it against stub globals. Keep both markers.
+  var _latestNavRequest = 0;
+  var _inFlightNav = null;
+
   // Smooth prev/next navigation via fetch + DOM swap. Alpine's MutationObserver
   // initialises the replaced subtree on its own — do not reintroduce a swap
   // library here, its settling pipeline races the observer (see CLAUDE.md).
+  //
+  // Overlapping navigations are easy to produce: prev/next are reachable from the
+  // on-screen chevrons AND from ArrowLeft/ArrowRight (which call .click() on the same
+  // links), so rapid clicking and rapid key presses land here identically. Whichever
+  // response ARRIVED last used to win — replacing .container2 with one kanji while
+  // history.pushState had already written a different one, so the page and the address
+  // bar disagreed about which kanji you were looking at. Same shape as loadResults() in
+  // search.ejs: abort to spare the server, stamp for correctness, because a response
+  // already past the abort point still resolves.
   window.navigateKanji = async function(url, e) {
     e.preventDefault();
+
+    if (_inFlightNav) _inFlightNav.abort();
+    var controller = new AbortController();
+    _inFlightNav = controller;
+    var requestId = ++_latestNavRequest;
+
     try {
-      var r = await fetch(url);
+      var r = await fetch(url, { signal: controller.signal });
+      if (requestId !== _latestNavRequest) return;
+
       var html = await r.text();
+      if (requestId !== _latestNavRequest) return;
+
       var doc = new DOMParser().parseFromString(html, 'text/html');
       var nc = doc.querySelector('.container2');
       if (!nc) throw new Error('missing container');
@@ -257,9 +303,16 @@
       history.pushState(null, '', url.replace(/\?.*$/, ''));
       if (nc.dataset.title) document.title = nc.dataset.title;
     } catch(err) {
+      // A SUPERSEDED NAVIGATION IS NOT A FAILURE, and the fallback below is a HARD
+      // page load. Without this line, aborting would yank the browser to the kanji the
+      // user had already moved past — a far worse outcome than the wrong error message
+      // the equivalent bug produces on the search page. The fallback must only ever
+      // fire for a navigation that is still the one the user is waiting for.
+      if (err.name === 'AbortError' || requestId !== _latestNavRequest) return;
       window.location.href = url;
     }
   };
+  // DETAIL-NAV-END
 
   // Handle browser back/forward after pushState navigation
   window.addEventListener('popstate', function() {
