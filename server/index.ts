@@ -40,32 +40,16 @@ async function connectMongoDB() {
   let connectionAttempts = 0;
   const maxConnectionAttempts = 10;
   while (connectionAttempts < maxConnectionAttempts) {
+    // ONLY the connection is retried, and only it is inside this try. Everything below
+    // used to sit in here too, so any throw from an init(), app.set() or app.listen()
+    // was logged as "Error connecting to MongoDB database", retried ten times over ~45
+    // seconds, and finally reported as FATAL: could not connect to MongoDB — sending
+    // whoever read the log to check Atlas while Atlas was fine. Retrying app.listen()
+    // is meaningless anyway. Nothing below can realistically throw today; this keeps the
+    // message honest if that ever changes.
     try {
       await client.connect();
       await client.db("kanjialive").command({ ping: 1 });
-      console.log("Successfully connected to MongoDB database for kanjialive!");
-
-      db = client.db("kanjialive");
-      public_api.init(db);
-      private_api.init(db);
-      html_routes.init(db);
-
-      app.set("port", process.env.PORT || 5000);
-
-      const server = app.listen(app.get("port"), function () {
-        console.log("Node app is running at localhost:" + app.get("port"));
-      });
-
-      const shutdown = async () => {
-        console.log("Shutting down gracefully...");
-        server.close();
-        await client.close();
-        process.exit(0);
-      };
-      process.on("SIGTERM", shutdown);
-      process.on("SIGINT", shutdown);
-
-      return;
     } catch (err) {
       console.error(
         `Error connecting to MongoDB database (attempt ${
@@ -77,7 +61,32 @@ async function connectMongoDB() {
       if (connectionAttempts < maxConnectionAttempts) {
         await new Promise((resolve) => setTimeout(resolve, 5000));
       }
+      continue;
     }
+
+    console.log("Successfully connected to MongoDB database for kanjialive!");
+
+    db = client.db("kanjialive");
+    public_api.init(db);
+    private_api.init(db);
+    html_routes.init(db);
+
+    app.set("port", process.env.PORT || 5000);
+
+    const server = app.listen(app.get("port"), function () {
+      console.log("Node app is running at localhost:" + app.get("port"));
+    });
+
+    const shutdown = async () => {
+      console.log("Shutting down gracefully...");
+      server.close();
+      await client.close();
+      process.exit(0);
+    };
+    process.on("SIGTERM", shutdown);
+    process.on("SIGINT", shutdown);
+
+    return;
   }
 
   // Fail LOUDLY, the same rule the HTML routes follow. This used to fall out of the

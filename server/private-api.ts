@@ -6,7 +6,12 @@ import { extendKanjiWithAssets } from "./kanji-assets";
 
 let db: Db;
 
-export const init = async (database: Db) => {
+// Sync, like public-api's and html-routes'. It was `async` with nothing to await, and
+// index.ts calls it WITHOUT await — so a rejection would never have reached the startup
+// try/catch. It would have become an unhandled rejection, which terminates the process in
+// Node 24, bypassing both the connection retry and the deliberate FATAL log Heroku reads.
+// Nothing here could reject, so nothing was broken; keeping it sync keeps it that way.
+export const init = (database: Db) => {
   db = database;
 };
 
