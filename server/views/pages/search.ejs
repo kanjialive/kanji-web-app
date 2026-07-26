@@ -19,20 +19,14 @@
   <!-- Results loading. Replaces HTMX, which was only ever doing this one job.
        Kept in <head> so it survives content swaps. -->
   <script>
-  // LOAD-RESULTS-START — server/results-race.test.ts lifts everything between this
-  // marker and LOAD-RESULTS-END and runs it against stub globals. Keep both markers.
+  // LOAD-RESULTS-START — results-race.test.ts lifts this region and runs it. Keep the markers.
   var _latestResultsRequest = 0;
   var _inFlightResults = null;
 
-  // BOTH outcomes below replace the target's contents, and the custom scrollbar
-  // track is a CHILD of that target — so a naive swap destroys it, after which the
-  // results are still scrollable but have no visible scrollbar until a full page
-  // reload. (HTMX's hx-target swap had this bug too.) Worse, once the node is gone
-  // the querySelector here returns null forever, so ONE failed search used to
-  // disable the scrollbar for every later search, however successful. Detach the
-  // node, swap, put the SAME node back, so Alpine's $refs stay valid. Keep this a
-  // single shared function: the moment the success and error paths each grow their
-  // own copy, one of them drifts, and that is exactly how the bug arose.
+  // The scrollbar track is a CHILD of the swap target, so a naive swap destroys it and
+  // the querySelector below then returns null forever — one failed search used to kill
+  // the scrollbar for every later search. Detach, swap, re-append the SAME node so
+  // Alpine's $refs stay valid. Keep it one shared function or the two paths drift.
   function _swapResults(target, html) {
     var track = target.querySelector('.custom-scrollbar-track');
     if (track) track.remove();
@@ -43,13 +37,9 @@
   window.loadResults = async function (url) {
     var target = document.getElementById('search-results');
 
-    // Requests overlap ROUTINELY — no slow network required. Holding ArrowUp or
-    // ArrowDown fires OS key repeat at ~30 events/sec, and each one calls
-    // cycleMode(), which calls this. Abort the previous request to spare the
-    // server, and stamp this one, because abort alone is not enough: a response
-    // already past the abort point still resolves. The response that ARRIVES last
-    // is not reliably the one that was SENT last, and if a stale one wins, the
-    // displayed sort mode disagrees with the URL and with the highlighted control.
+    // Requests overlap routinely — no slow network needed, just a held arrow key
+    // (~33/sec via cycleMode). Abort spares the server; the stamp is the correctness
+    // guarantee, because a response already past the abort point still resolves.
     if (_inFlightResults) _inFlightResults.abort();
     var controller = new AbortController();
     _inFlightResults = controller;
@@ -78,9 +68,8 @@
       // just tells the page component to re-measure the custom scrollbar.
       document.dispatchEvent(new CustomEvent('results:loaded'));
     } catch (err) {
-      // A SUPERSEDED REQUEST IS NOT A FAILURE. Without this line the race fix is
-      // visibly worse than the race: every aborted request lands here and paints
-      // "something went wrong" over results that are perfectly good.
+      // A superseded request is not a failure: without this, every aborted request
+      // paints "something went wrong" over perfectly good results.
       if (err.name === 'AbortError' || requestId !== _latestResultsRequest) return;
 
       // Fail loudly: a database outage must not look like an empty result set.
@@ -105,17 +94,10 @@
       modes: ['kanji', 'rsort', 'ksort'],
       queryString: '',
 
-      // Arrow-key entry point for cycleMode. Auto-repeat must NOT cycle: holding a key
-      // fires ~33 keydowns/sec (macOS default), so a two-second hold advanced the mode
-      // ~55 times and landed on hold-duration mod 3. Holding now does exactly what a
-      // single tap does. Deliberately scoped to the two MODE keys — ArrowLeft/ArrowRight
-      // scroll the sorted views, where repeating on a held key is the whole point.
-      //
-      // BOTH arrow-key call sites must come through here. The global keydown handler
-      // returns early when focus is in an INPUT, so the search box has its own
-      // @keydown.up/.down bindings — and that is the common case, since focus is still
-      // in the box immediately after a search. Guarding only the global handler leaves
-      // the path most users actually take unguarded.
+      // Auto-repeat must not cycle: a held key fires ~33/sec. Scoped to the MODE keys
+      // only — ArrowLeft/Right scroll, where repeating is the point.
+      // BOTH call sites route through here: the global handler skips INPUTs, so the
+      // search box has its own bindings, and that is the common case after a search.
       cycleModeKey(event, direction) {
         if (event.repeat) return;
         this.cycleMode(direction);

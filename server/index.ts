@@ -40,13 +40,9 @@ async function connectMongoDB() {
   let connectionAttempts = 0;
   const maxConnectionAttempts = 10;
   while (connectionAttempts < maxConnectionAttempts) {
-    // ONLY the connection is retried, and only it is inside this try. Everything below
-    // used to sit in here too, so any throw from an init(), app.set() or app.listen()
-    // was logged as "Error connecting to MongoDB database", retried ten times over ~45
-    // seconds, and finally reported as FATAL: could not connect to MongoDB — sending
-    // whoever read the log to check Atlas while Atlas was fine. Retrying app.listen()
-    // is meaningless anyway. Nothing below can realistically throw today; this keeps the
-    // message honest if that ever changes.
+    // Only the connection belongs in this try. Everything below used to be inside it,
+    // so any throw from an init() or app.listen() was reported as a MongoDB connection
+    // failure and retried ten times — sending the reader to check Atlas for no reason.
     try {
       await client.connect();
       await client.db("kanjialive").command({ ping: 1 });
