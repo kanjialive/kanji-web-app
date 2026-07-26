@@ -105,6 +105,22 @@
       modes: ['kanji', 'rsort', 'ksort'],
       queryString: '',
 
+      // Arrow-key entry point for cycleMode. Auto-repeat must NOT cycle: holding a key
+      // fires ~33 keydowns/sec (macOS default), so a two-second hold advanced the mode
+      // ~55 times and landed on hold-duration mod 3. Holding now does exactly what a
+      // single tap does. Deliberately scoped to the two MODE keys — ArrowLeft/ArrowRight
+      // scroll the sorted views, where repeating on a held key is the whole point.
+      //
+      // BOTH arrow-key call sites must come through here. The global keydown handler
+      // returns early when focus is in an INPUT, so the search box has its own
+      // @keydown.up/.down bindings — and that is the common case, since focus is still
+      // in the box immediately after a search. Guarding only the global handler leaves
+      // the path most users actually take unguarded.
+      cycleModeKey(event, direction) {
+        if (event.repeat) return;
+        this.cycleMode(direction);
+      },
+
       cycleMode(direction) {
         const currentIndex = this.modes.indexOf(this.mode);
         const newIndex = (currentIndex + direction + this.modes.length) % this.modes.length;
@@ -302,11 +318,11 @@
           switch(e.code) {
             case 'ArrowUp':
               e.preventDefault();
-              this.cycleMode(-1);
+              this.cycleModeKey(e, -1);
               break;
             case 'ArrowDown':
               e.preventDefault();
-              this.cycleMode(1);
+              this.cycleModeKey(e, 1);
               break;
             case 'ArrowLeft':
               this.scrollBackward();
@@ -356,8 +372,8 @@
                  spellcheck="false"
                  autocapitalize="off"
                  autocorrect="off"
-                 @keydown.up.prevent="cycleMode(-1)"
-                 @keydown.down.prevent="cycleMode(1)">
+                 @keydown.up.prevent="cycleModeKey($event, -1)"
+                 @keydown.down.prevent="cycleModeKey($event, 1)">
           <button type="submit" class="search-button" aria-label="Search"></button>
         </form>
       </div>
