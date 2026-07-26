@@ -262,3 +262,48 @@ test("auto-repeat still suppresses the browser's own scrolling", () => {
   }
   assert.match(guard, /e\.preventDefault\(\)/);
 });
+
+// ── play/pause state (2026-07-26) ────────────────────────────────────────────────────
+
+// String-matched, like the auto-repeat tests above and for the same reason: these live
+// inside the Alpine component and close over `this`, so they cannot be lifted and run.
+//
+// The bug this pins was NOT ours, which is what makes it worth pinning. A Safari
+// extension ("Stop the Madness", https://underpassapp.com/StopTheMadness/) also binds
+// the spacebar and paused the video immediately after our handler started it. Because
+// `playing` was set optimistically beside video.play(), and only `ended` could clear it,
+// the icon flipped to pause and STAYED there while nothing played — and every further
+// press re-asserted it. It read as an application bug for an hour of investigation.
+// Bound to the element's own events the icon cannot lie, so the same interference would
+// present as the icon flipping straight back: visibly something else fighting the page.
+
+test("the video's own events are the only thing that sets `playing`", () => {
+  for (const evt of ["play", "pause", "ended"]) {
+    assert.match(
+      src,
+      new RegExp(`addEventListener\\('${evt}',`),
+      `the '${evt}' listener is gone from views/pages/detail.ejs — the play/pause icon ` +
+        `can no longer track the video's real state`,
+    );
+  }
+});
+
+test("togglePlayPause and seek never assign `playing` themselves", () => {
+  const body = (name: string): string => {
+    const m = src.match(new RegExp(`\\n      ${name}\\([^)]*\\) \\{([\\s\\S]*?)\\n      \\},`));
+    assert.ok(m, `could not find ${name}() in views/pages/detail.ejs — update this pattern`);
+    return m![1];
+  };
+
+  for (const fn of ["togglePlayPause", "seek"]) {
+    assert.doesNotMatch(
+      body(fn),
+      /this\.playing\s*=/,
+      `${fn}() sets this.playing directly again. That is optimistic state: if playback ` +
+        `does not actually start, the icon lies and cannot recover.`,
+    );
+  }
+
+  // The rejection must be handled, or a blocked start becomes an unhandled rejection.
+  assert.match(body("togglePlayPause"), /\.catch\(/, "video.play()'s rejection is unhandled");
+});

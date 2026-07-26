@@ -49,14 +49,15 @@
         return this.typefaceDisplayNames[this.typeface] || this.typeface;
       },
 
+      // Never set this.playing here — the listeners in init() own it.
       togglePlayPause() {
         const video = this.$refs.video;
         if (video.paused) {
-          video.play();
-          this.playing = true;
+          // A blocked start leaves the icon on play, which is the signal. Unhandled it
+          // would only spam the console.
+          video.play().catch(() => {});
         } else {
           video.pause();
-          this.playing = false;
         }
       },
 
@@ -85,8 +86,7 @@
 
       seek(time) {
         const video = this.$refs.video;
-        video.pause();
-        this.playing = false;
+        video.pause();   // the 'pause' listener clears this.playing; do not set it here
         video.currentTime = time;
       },
 
@@ -170,28 +170,20 @@
           document.removeEventListener('keydown', window._detailKeydownHandler);
         }
 
-        this.$refs.video?.addEventListener('ended', () => {
-          this.playing = false;
-        });
+        // These listeners are the ONLY writer of `playing`, so the icon cannot lie.
+        // A Safari extension binding Space paused the video right after play(); with no
+        // 'pause' listener the icon stuck on pause and every press re-asserted it.
+        const video = this.$refs.video;
+        video?.addEventListener('play', () => { this.playing = true; });
+        video?.addEventListener('pause', () => { this.playing = false; });
+        video?.addEventListener('ended', () => { this.playing = false; });
 
         const handler = (e) => {
           if (e.target.tagName === 'INPUT') return;
 
-          // NOTHING on this page wants auto-repeat, so the guard sits here rather than
-          // per-case. Holding a key fires ~33 keydowns/sec, which would flip the
-          // video/typeface view 33 times a second, strobe play/pause, blast through the
-          // stroke steps and the whole typeface list in a fraction of a second, and —
-          // for the unshifted arrows — fire one page navigation per event. A hold now
-          // does exactly what a single tap does.
-          //
-          // This differs from search.ejs deliberately: there ArrowLeft/ArrowRight SCROLL
-          // the sorted views, where repeating on a held key is the entire point, so the
-          // guard is scoped to the two mode keys. Here the same arrows step one kanji at
-          // a time, so there is no held-key gesture worth keeping.
-          //
-          // preventDefault still runs for the keys this page owns, so a held ArrowDown
-          // or Space suppresses the window's own scrolling exactly as a single press
-          // does — only the ACTION is skipped, never the default suppression.
+          // Nothing here wants auto-repeat: a held key fires ~33/sec. Unlike search.ejs,
+          // where ArrowLeft/Right scroll and must repeat, these arrows step one kanji.
+          // preventDefault still runs, or a held key scrolls the window instead.
           if (e.repeat) {
             if (e.code === 'Space' || e.code === 'ArrowUp' || e.code === 'ArrowDown') {
               e.preventDefault();
@@ -264,23 +256,15 @@
     }));
   });
 
-  // DETAIL-NAV-START — server/detail-nav.test.ts lifts everything between this marker
-  // and DETAIL-NAV-END and runs it against stub globals. Keep both markers.
+  // DETAIL-NAV-START — detail-nav.test.ts lifts this region and runs it. Keep the markers.
   var _latestNavRequest = 0;
   var _inFlightNav = null;
 
-  // Smooth prev/next navigation via fetch + DOM swap. Alpine's MutationObserver
-  // initialises the replaced subtree on its own — do not reintroduce a swap
-  // library here, its settling pipeline races the observer (see CLAUDE.md).
-  //
-  // Overlapping navigations are easy to produce: prev/next are reachable from the
-  // on-screen chevrons AND from ArrowLeft/ArrowRight (which call .click() on the same
-  // links), so rapid clicking and rapid key presses land here identically. Whichever
-  // response ARRIVED last used to win — replacing .container2 with one kanji while
-  // history.pushState had already written a different one, so the page and the address
-  // bar disagreed about which kanji you were looking at. Same shape as loadResults() in
-  // search.ejs: abort to spare the server, stamp for correctness, because a response
-  // already past the abort point still resolves.
+  // Prev/next via fetch + DOM swap. Alpine's MutationObserver initialises the replaced
+  // subtree — never reintroduce a swap library, its settling races the observer.
+  // The chevrons and ArrowLeft/Right (which .click() them) both land here, so requests
+  // overlap easily. Abort spares the server; the stamp is the correctness guarantee,
+  // because a response already past the abort point still resolves.
   window.navigateKanji = async function(url, e) {
     e.preventDefault();
 
@@ -303,11 +287,8 @@
       history.pushState(null, '', url.replace(/\?.*$/, ''));
       if (nc.dataset.title) document.title = nc.dataset.title;
     } catch(err) {
-      // A SUPERSEDED NAVIGATION IS NOT A FAILURE, and the fallback below is a HARD
-      // page load. Without this line, aborting would yank the browser to the kanji the
-      // user had already moved past — a far worse outcome than the wrong error message
-      // the equivalent bug produces on the search page. The fallback must only ever
-      // fire for a navigation that is still the one the user is waiting for.
+      // A superseded navigation is not a failure, and the fallback below is a HARD page
+      // load — without this, aborting yanks the browser to a kanji already left.
       if (err.name === 'AbortError' || requestId !== _latestNavRequest) return;
       window.location.href = url;
     }
