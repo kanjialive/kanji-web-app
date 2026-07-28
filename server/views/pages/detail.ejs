@@ -434,7 +434,10 @@
           (verified: a 0.00% pixel match against PingFang SC). 骨 直 画 角 are drawn
           differently in Chinese, and this app teaches the Japanese strokes. Marking the
           text as Japanese makes even the generic resolve to Hiragino Sans. %>
-      <p class="onyomi" lang="ja"><%= doc.onyomi_ja %></p>
+      <%_ /* No onyomi is recorded as `onyomi: "n/a"` with `onyomi_ja` empty (13 kanji).
+              Test the romaji sentinel, not an empty `onyomi_ja` — the record's own
+              statement of absence, so a mistakenly blank field can't print "n/a". */ _%>
+      <p class="onyomi" lang="ja"><%= doc.onyomi === "n/a" ? "n/a" : doc.onyomi_ja %></p>
 
       <h3 class="kunyomi">Kunyomi</h3>
       <p class="kunyomi" lang="ja"><%= doc.kunyomi_ka_display %></p>
@@ -474,8 +477,9 @@
       <h3 class="grade">Grade</h3>
       <%_ /* 229 kanji have no grade, stored as the NaN sentinel that `?grade=n/a` searches
               on. Production renders it blank (its NaN becomes null crossing JSON); print
-              the raw value here and the student reads "NaN". */ _%>
-      <p class="grade"><%= numberOrBlank(doc.grade) %></p>
+              the raw value here and the student reads "NaN". 々 alone says "n/a" — it is
+              not a kanji, so no grade can apply (maintainer's ruling, 2026-07-28). */ _%>
+      <p class="grade"><%= doc.ka_utf === "々" ? "n/a" : numberOrBlank(doc.grade) %></p>
 
       <div class="border4"><div class="border-inner"></div></div>
 

@@ -267,39 +267,92 @@ test("the rsort view renders a blank heading for 々, never the text NaN", async
 });
 
 /**
- * The detail page's own numberOrBlank sites, through the real route. These were already
- * correct; this pins that moving the helper onto res.locals did not quietly unhook them.
+ * Detail-page "n/a" — a deliberate departure from production, which renders these blank
+ * (maintainer's ruling, 2026-07-28). Two DIFFERENT scopes, easy to conflate:
+ *   Onyomi — GENERAL: all 13 kanji whose romaji field holds the "n/a" sentinel.
+ *   Grade  — 々 ONLY: the repetition mark is not a kanji, so no grade can apply; the
+ *            other 228 gradeless kanji stay blank (numberOrBlank, as production does).
+ * Radical strokes stays blank — held until the "does 々 have a radical" question is
+ * settled. Results-grid headings stay blank too (the rsort test above).
  */
-test("the detail page still blanks the grade and radical-stroke sentinels", async () => {
-  const doc = kanjiDoc({
+function detailDoc(fields: Partial<KanjiDocument>): KanjiDocument {
+  return kanjiDoc({
+    examples: [],
+    mn_hint: "",
+    rad_position: "",
+    rad_name: "x",
+    rad_name_file: "x",
+    stroketimes: [],
+    meaning: "x",
+    ...fields,
+  });
+}
+
+// The VALUE elements, not the <h3> labels that share their class name.
+function valueOf(body: string, selector: string): string {
+  const match = body.match(
+    new RegExp(`${selector.replace(/[[\]{}()*+?.\\^$|]/g, "\\$&")}([^<]*)<`)
+  );
+  assert.ok(match, `found no ${selector} — has the template changed?`);
+  return match[1].trim();
+}
+
+test("々 renders n/a for grade and onyomi, blank for radical strokes", async () => {
+  const doc = detailDoc({
     ka_utf: "々",
     kname: "noma",
     grade: NaN,
     rad_stroke: NaN,
-    examples: [],
-    mn_hint: "",
-    rad_position: "",
-    rad_name: "noma",
-    rad_name_file: "noma",
-    stroketimes: [],
+    onyomi: "n/a",
+    onyomi_ja: "",
     meaning: "repetition mark",
   });
   await withServer(resultsDb([doc]), async (base) => {
     const res = await fetch(`${base}/${encodeURIComponent("々")}`, hostileFetch());
     assert.equal(res.status, 200);
     const body = await res.text();
-    // The VALUE elements, not the <h3> labels that share their class name.
-    for (const selector of ['<p class="grade">', '<div class="radical-stroke">']) {
-      const match = body.match(
-        new RegExp(`${selector.replace(/[[\]{}()*+?.\\^$|]/g, "\\$&")}([^<]*)<`)
-      );
-      assert.ok(match, `found no ${selector} — has the template changed?`);
-      assert.equal(
-        match[1].trim(),
-        "",
-        `${selector} rendered the raw sentinel instead of a blank`
-      );
-    }
+    assert.equal(valueOf(body, '<p class="grade">'), "n/a");
+    assert.equal(valueOf(body, '<p class="onyomi" lang="ja">'), "n/a");
+    assert.equal(valueOf(body, '<div class="radical-stroke">'), "");
+  });
+});
+
+test("a gradeless kanji that is not 々 still renders grade blank", async () => {
+  // 畑 is both gradeless in shape here AND one of the 13 with no onyomi — the two
+  // rules must not leak into each other: onyomi n/a, grade blank.
+  const doc = detailDoc({
+    ka_utf: "畑",
+    kname: "hatake",
+    grade: NaN,
+    onyomi: "n/a",
+    onyomi_ja: "",
+    meaning: "field",
+  });
+  await withServer(resultsDb([doc]), async (base) => {
+    const res = await fetch(`${base}/${encodeURIComponent("畑")}`, hostileFetch());
+    assert.equal(res.status, 200);
+    const body = await res.text();
+    assert.equal(valueOf(body, '<p class="grade">'), "");
+    assert.equal(valueOf(body, '<p class="onyomi" lang="ja">'), "n/a");
+  });
+});
+
+// A real onyomi must pass through untouched — the "n/a" branch keys on the romaji
+// sentinel, never on the Japanese field being empty.
+test("a real onyomi renders as itself, not n/a", async () => {
+  const doc = detailDoc({
+    kname: "water",
+    grade: 1,
+    onyomi: "sui",
+    onyomi_ja: "スイ",
+    meaning: "water",
+  });
+  await withServer(resultsDb([doc]), async (base) => {
+    const res = await fetch(`${base}/${encodeURIComponent("水")}`, hostileFetch());
+    assert.equal(res.status, 200);
+    const body = await res.text();
+    assert.equal(valueOf(body, '<p class="grade">'), "1");
+    assert.equal(valueOf(body, '<p class="onyomi" lang="ja">'), "スイ");
   });
 });
 
