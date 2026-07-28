@@ -47,6 +47,7 @@
                 <td>Kanji stroke number, #</td>
                 <td><code>ks=16</code></td>
             </tr>
+            <tr>
                 <td><code>kanji</code></td>
                 <td>Kanji character, J</td>
                 <td><code>kanji=親</code></td>
@@ -72,7 +73,6 @@
                 <td><code>rpos:hen</code> or <code>rpos:へん</code></td>
             </tr>
             <tr>
-            <tr>
                 <td><code>grade</code></td>
                 <td>Grade level, #</td>
                 <td><code>grade=2</code></td>
@@ -86,7 +86,7 @@
         </table>
         <p>Here is an example of an advanced search matching the radical Japanese name みる with all 7 stroke kanji. The advanced search endpoint accepts an arbitrary number of parameters separated by an ampersand:</p>
     <pre>https://kanjialive-api.p.rapidapi.com/api/public/search/advanced?rjn=みる&ks=7</pre>
-        <h3>Advanced Search on Study Lists)</h3>
+        <h3>Advanced Search on Study Lists</h3>
         <p>Advanced searches on study lists are a slightly idiosyncratic. The aforementioned URL parameter still exists, with the key <code>list</code>, but the value can be constructed using either one or two values in succession.</p>
         <p>The leftmost column shows what the search parameter would look like for all kanji in a specific list. The rightmost column shows a chapter specific search.</p>
         <table class="table table-bordered table-condensed">
