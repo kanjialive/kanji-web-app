@@ -13,35 +13,70 @@ test("generateBasicQuery builds an $or over the four search fields", () => {
   });
 });
 
-test("parseAdvancedQuery coerces numeric keys and drops unparseable ones", () => {
+// An unusable numeric operand MATCHES NOTHING — it is never dropped. Dropping it
+// silently broadens a combined query to the surviving terms (?grade=n/a&ks=3 ran as
+// ?ks=3), while the search box repaints the term as though it had been searched.
+test("parseAdvancedQuery turns an unusable numeric operand into a match-nothing clause", () => {
   assert.deepEqual(parseAdvancedQuery({ ks: "3" }), { kstroke: 3 });
-  assert.deepEqual(parseAdvancedQuery({ ks: "abc" }), {});
+  assert.deepEqual(parseAdvancedQuery({ ks: "abc" }), { kstroke: { $in: [] } });
+  assert.deepEqual(parseAdvancedQuery({ grade: "n/a" }), { grade: { $in: [] } });
+  assert.deepEqual(parseAdvancedQuery({ grade: "N/A" }), { grade: { $in: [] } });
+});
+
+// Full-string parse. parseInt reads digits until it hits a letter and calls that
+// success, so grade:3abc and grade:3.5 ran as grade:3 — a documented-wrong search
+// and a correct one giving the same answer. Whitespace is trimmed (copied URLs).
+test("parseAdvancedQuery does not truncate a partial numeric operand", () => {
+  assert.deepEqual(parseAdvancedQuery({ grade: "3abc" }), { grade: { $in: [] } });
+  assert.deepEqual(parseAdvancedQuery({ grade: "3.5" }), { grade: { $in: [] } });
+  assert.deepEqual(parseAdvancedQuery({ ks: " 3 " }), { kstroke: 3 });
+});
+
+// Pins the end of silent broadening: the unusable term stays in the filter and
+// forces zero results, instead of vanishing and running the other term alone.
+test("an unusable term in a combined query forces zero results, never a broadened search", () => {
+  assert.deepEqual(parseAdvancedQuery({ grade: "n/a", ks: "3" }), {
+    grade: { $in: [] },
+    kstroke: 3,
+  });
 });
 
 // The 229 gradeless kanji are stored with grade = NaN, and Mongo matches NaN to
 // NaN, so { grade: NaN } IS the "no grade" search — production has served it for
 // years via an unguarded parseInt(""). A previous hardening pass dropped the key
 // instead, which collapsed the filter to {} and tripped the empty-query guard in
-// private-api.ts, so ?grade= and ?grade=n/a returned "No kanji found."
-// The empty string and "n/a" are the two spellings the UI and the docs use.
+// private-api.ts, so ?grade= returned "No kanji found."
+// ?key= is the ONE spelling for absence, on every key; n/a is an ordinary operand.
 test("parseAdvancedQuery maps a valueless grade to NaN (the 229 gradeless kanji)", () => {
-  for (const operand of ["", "n/a", "N/A"]) {
-    const parsed = parseAdvancedQuery({ grade: operand }) as { grade?: number };
-    assert.ok(
-      "grade" in parsed,
-      `grade key must survive for operand ${JSON.stringify(operand)}`
-    );
-    assert.ok(
-      Number.isNaN(parsed.grade),
-      `grade must be NaN for operand ${JSON.stringify(operand)}, got ${String(
-        parsed.grade
-      )}`
-    );
-  }
+  const parsed = parseAdvancedQuery({ grade: "" }) as { grade?: number };
+  assert.ok("grade" in parsed, "grade key must survive an empty operand");
+  assert.ok(Number.isNaN(parsed.grade), `grade must be NaN, got ${String(parsed.grade)}`);
 });
 
 test("parseAdvancedQuery still parses a real grade", () => {
   assert.deepEqual(parseAdvancedQuery({ grade: "1" }), { grade: 1 });
+});
+
+// An empty array-key operand is an ABSENCE search and must bypass the suffix rule:
+// "" has no alphanumerics, so the rule below would send it to the Japanese index —
+// which does not exist for meaning or rad_meaning (0 of 1,235 docs), silently
+// returning 0. The romaji index exists on all 1,235 and stores absence as "".
+test("an empty array-key operand routes to the romaji _search index, never _ja_search", () => {
+  const pairs: StringDict = {
+    kem: "meaning",
+    rem: "rad_meaning",
+    on: "onyomi",
+    kun: "kunyomi",
+    rpos: "rad_position",
+    rjn: "rad_name",
+  };
+  for (const key in pairs) {
+    assert.deepEqual(
+      parseAdvancedQuery({ [key]: "" }),
+      { [`${pairs[key]}_search`]: { $in: [""] } },
+      `?${key}= must ask the romaji index for the "" absence marker`
+    );
+  }
 });
 
 test("parseAdvancedQuery maps the string key (kanji) to ka_utf", () => {

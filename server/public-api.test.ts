@@ -87,11 +87,12 @@ test("public extendKanjiWithAssets output is stable (golden)", () => {
 /**
  * An unparseable advanced search must not return the whole collection.
  *
- * parseAdvancedQuery() silently drops every parameter it cannot recognise or coerce, so
- * `?foo=bar`, `?grade=abc` and a bare /api/public/search/advanced all reached this file
- * as `{}` — and `find({})` matches EVERYTHING. A typo'd parameter came back as 1,235
- * documents billed as a successful search. private-api.ts has always guarded this; the
- * public copy never did.
+ * parseAdvancedQuery() silently drops every parameter it does not recognise, so
+ * `?foo=bar` and a bare /api/public/search/advanced reached this file as `{}` — and
+ * `find({})` matches EVERYTHING. A typo'd parameter came back as 1,235 documents billed
+ * as a successful search. private-api.ts has always guarded this; the public copy never
+ * did. (A RECOGNISED key with an unusable operand is different: it becomes a
+ * match-nothing clause, tested separately below.)
  *
  * ⚠️ Asserts the Mongo call is never MADE, not just that the body looks right. A guard
  * that queried first and discarded the result afterwards would still be wrong.
@@ -132,7 +133,6 @@ function captureRes() {
 const UNPARSEABLE = [
   {}, // no parameters at all
   { foo: "bar" }, // nothing search.ts recognises
-  { grade: "abc" }, // recognised key, uncoercible value — parseInt drops it
 ];
 
 for (const query of UNPARSEABLE) {
@@ -150,6 +150,22 @@ for (const query of UNPARSEABLE) {
     assert.deepEqual(res.body, { error: "No kanji found." });
   });
 }
+
+// A recognised key with an unusable operand is NOT dropped — that silently broadened
+// ?grade=abc&ks=3 to ?ks=3. It reaches Mongo as a match-nothing clause and honestly
+// finds zero. Only the filter shape is asserted; the stub answers every find with docs.
+test("an unusable operand on a recognised key queries Mongo with a match-nothing clause", async () => {
+  const calls: object[] = [];
+  publicApi.init(countingDb(calls));
+  const res = captureRes();
+
+  await publicApi.advancedSearch(
+    { query: { grade: "abc" } } as unknown as Parameters<typeof publicApi.advancedSearch>[0],
+    res as unknown as Response
+  );
+
+  assert.deepEqual(calls, [{ grade: { $in: [] } }]);
+});
 
 test("a parseable advanced search still queries Mongo and returns results", async () => {
   const calls: object[] = [];

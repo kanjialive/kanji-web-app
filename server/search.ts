@@ -58,20 +58,23 @@ export const parseAdvancedQuery = (query: StringDict): ParsedQuery => {
     // (?grade[$ne]=1). A non-string operand must never reach Mongo.
     if (typeof raw !== "string") continue;
 
-    // "" and "n/a" mean "this kanji has no grade" — a real search (229 kanji).
-    // Gradeless kanji are stored as NaN, and Mongo matches NaN to NaN, so the
-    // filter { grade: NaN } is what finds them. Verified against the live
-    // collection 2026-07-12: 229 docs hold grade=NaN, 0 hold null or nothing.
+    // "" means "this kanji has no grade" — a real search (229 kanji), and the ONE
+    // spelling for absence across every key. Gradeless kanji are stored as NaN, and
+    // Mongo matches NaN to NaN, so { grade: NaN } is what finds them. Verified
+    // 2026-07-12: 229 docs hold grade=NaN, 0 hold null or nothing.
     // Do NOT rewrite this as a null/$exists check without re-checking the data.
-    if (raw === "" || raw.toLowerCase() === "n/a") {
+    if (raw === "") {
       parsed_query[numeric_keys[key]] = NaN;
       continue;
     }
 
-    const num = parseInt(raw, 10);
-    if (!isNaN(num)) {
-      parsed_query[numeric_keys[key]] = num;
-    }
+    // Full-string parse, and an unusable operand matches NOTHING — never dropped.
+    // parseInt alone truncates ("3abc" ran as 3), and dropping the term silently
+    // broadens a combined query to whatever survives. $in: [] forces an honest 0.
+    const num = raw.trim();
+    parsed_query[numeric_keys[key]] = /^\d+$/.test(num)
+      ? parseInt(num, 10)
+      : { $in: [] };
   }
 
   for (const key in string_keys) {
@@ -85,10 +88,19 @@ export const parseAdvancedQuery = (query: StringDict): ParsedQuery => {
   for (const key in array_keys) {
     if (Object.prototype.hasOwnProperty.call(query, key)) {
       if (typeof query[key] === "string") {
-        let array_key = array_keys[key];
-        array_key += !/[a-zA-Z0-9]/.test(query[key]) ? "_ja_search" : "_search";
+        const base = array_keys[key];
 
-        parsed_query[array_key] = { $in: [searchOperand(query[key])] };
+        // "" is an ABSENCE search and must bypass the suffix rule: it has no
+        // alphanumerics, so the rule would ask the Japanese index — which does not
+        // exist for meaning/rad_meaning (0 of 1,235 docs) and silently returns 0.
+        // The romaji index exists on all 1,235 and stores absence as "".
+        if (query[key] === "") {
+          parsed_query[base + "_search"] = { $in: [""] };
+          continue;
+        }
+
+        const suffix = !/[a-zA-Z0-9]/.test(query[key]) ? "_ja_search" : "_search";
+        parsed_query[base + suffix] = { $in: [searchOperand(query[key])] };
       }
     }
   }
