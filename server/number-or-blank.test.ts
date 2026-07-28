@@ -12,7 +12,7 @@ import { numberOrBlank } from "./html-routes";
  * `<%= doc.grade %>` printed the literal string "NaN" onto 229 detail pages until 2026-07-16.
  *
  * 🔴 The fix belongs HERE, in the view layer, and NOWHERE ELSE. The sentinel is load-bearing:
- *    search.ts turns `?grade=n/a` into `{ grade: NaN }` because Mongo matches NaN to NaN, and
+ *    search.ts turns `?grade=` into `{ grade: NaN }` because Mongo matches NaN to NaN, and
  *    that is a real search returning those 229 kanji. Removing NaN from the data would render
  *    the pages correctly and silently break the search.
  */

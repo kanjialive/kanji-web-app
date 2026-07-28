@@ -475,7 +475,7 @@
       <p class="strokes"><%= doc.kstroke %></p>
 
       <h3 class="grade">Grade</h3>
-      <%_ /* 229 kanji have no grade, stored as the NaN sentinel that `?grade=n/a` searches
+      <%_ /* 229 kanji have no grade, stored as the NaN sentinel that `?grade=` searches
               on. Production renders it blank (its NaN becomes null crossing JSON); print
               the raw value here and the student reads "NaN". 々 alone says "n/a" — it is
               not a kanji, so no grade can apply (maintainer's ruling, 2026-07-28). */ _%>
