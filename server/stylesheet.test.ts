@@ -139,6 +139,16 @@ const LOAD_BEARING: Array<[string, RegExp]> = [
   // get there; the search bar, Sort and the counter arrive by other routes.
   ["Info sits on the row-1 baseline", /\.info-button\s*\{[^}]*top:\s*3px/],
   ["branding sits on the row-1 baseline", /\.desktop-branding\s*\{[^}]*padding-top:\s*11px/],
+
+  // The radical grey is the maintainer's contrast pick (1.8:1 on white), not a WCAG value.
+  // A contrast sweep "fixing" it must fail here rather than change the page silently.
+  ["radical grey is the maintainer's 1.8:1 pick", /--color-radical:\s*#C1C1C1/],
+
+  // .ka-rad-anim has no box of its own (its frames are absolute), so the generic
+  // :focus-visible ring paints a collapsed strip in the wrong place. Suppressed on the
+  // container, painted on the frames — both halves are required.
+  ["the focus ring is suppressed on the boxless .ka-rad-anim", /\.ka-rad-anim:focus-visible\s*\{[^}]*outline:\s*none\s*;/],
+  ["the focus ring paints on the .ka-rad-anim frames", /\.ka-rad-anim:focus-visible\s+img\s*\{[^}]*outline:\s*2px\s+solid/],
 ];
 
 for (const [name, pattern] of LOAD_BEARING) {

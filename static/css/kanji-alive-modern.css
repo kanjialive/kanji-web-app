@@ -17,7 +17,7 @@
   --color-bg: #F6F6F6;            /* off-white - search bar */
   --color-bg-dark: #D0D0D0;       /* gray - body background */
   --color-bg-white: white;        /* container background */
-  --color-radical: #B7B7B7;       /* radical character color — 2.0:1 on white, his pick 2026-07-29 */
+  --color-radical: #C1C1C1;       /* radical character color — 1.8:1 on white, his pick 2026-07-29 */
   --color-kbd-text: #c7254e;      /* keyboard shortcut text */
   --color-kbd-bg: #f9f2f4;        /* keyboard shortcut background */
 
@@ -1688,6 +1688,19 @@ dialog:focus-visible {
   outline: 2px solid var(--color-primary);
   outline-offset: 2px;
   border-radius: 2px;
+}
+
+/* The ring must wrap the animation, not the container: .ka-rad-anim has no box
+   of its own (its frames are absolute), so the generic ring above paints a
+   collapsed strip in the wrong place. The frames share one 64x66 box; opacity
+   hides the outline on the transparent ones. */
+.ka-rad-anim:focus-visible {
+  outline: none;
+}
+
+.ka-rad-anim:focus-visible img {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
 }
 
 /* ============================================
