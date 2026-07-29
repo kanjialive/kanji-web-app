@@ -253,14 +253,32 @@ test("auto-repeat still suppresses the browser's own scrolling", () => {
   // Returning early on repeat must not skip preventDefault for the keys this page owns,
   // or a held ArrowDown scrolls the window instead of doing nothing.
   const guard = src.slice(src.indexOf("if (e.repeat) {"), src.indexOf("// 'r' — replay"));
-  for (const code of ["Space", "ArrowUp", "ArrowDown"]) {
+  for (const code of ["Space", "ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"]) {
     assert.match(
       guard,
       new RegExp(`'${code}'`),
-      `${code} is no longer preventDefault-ed on auto-repeat, so holding it will scroll the page`,
+      `${code} is no longer preventDefault-ed on auto-repeat, so holding it will scroll ` +
+        `the page — or, for a held Shift+Arrow in Safari, grow a text selection`,
     );
   }
   assert.match(guard, /e\.preventDefault\(\)/);
+});
+
+test("the arrow cases suppress Safari's text-selection default", () => {
+  // Safari extends a text selection on Shift+Arrow even with no caret (Chrome needs an
+  // existing anchor), so each typeface/stroke step also highlighted the page from the
+  // document edge. Both arrow cases must preventDefault.
+  for (const code of ["ArrowLeft", "ArrowRight"]) {
+    const start = src.indexOf(`case '${code}':`);
+    assert.ok(start !== -1, `case '${code}' is gone from views/pages/detail.ejs — update this test`);
+    const caseBody = src.slice(start, src.indexOf("break;", start));
+    assert.match(
+      caseBody,
+      /e\.preventDefault\(\)/,
+      `${code} no longer calls preventDefault — Shift+${code} will extend a text ` +
+        `selection across the page in Safari`,
+    );
+  }
 });
 
 // ── play/pause state (2026-07-26) ────────────────────────────────────────────────────

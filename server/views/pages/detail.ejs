@@ -185,7 +185,8 @@
           // where ArrowLeft/Right scroll and must repeat, these arrows step one kanji.
           // preventDefault still runs, or a held key scrolls the window instead.
           if (e.repeat) {
-            if (e.code === 'Space' || e.code === 'ArrowUp' || e.code === 'ArrowDown') {
+            if (e.code === 'Space' || e.code === 'ArrowUp' || e.code === 'ArrowDown' ||
+                e.code === 'ArrowLeft' || e.code === 'ArrowRight') {
               e.preventDefault();
             }
             return;
@@ -218,6 +219,10 @@
               this.detailMode = this.detailMode === 'video' ? 'typeface' : 'video';
               break;
             case 'ArrowLeft':
+              // Safari extends a text selection on Shift+Arrow even with no caret
+              // (Chrome needs an existing anchor) — without preventDefault each
+              // typeface step also highlights the page from the document edge.
+              e.preventDefault();
               if (e.shiftKey) {
                 if (this.detailMode === 'typeface') {
                   this.previousTypeface();
@@ -230,6 +235,7 @@
               }
               break;
             case 'ArrowRight':
+              e.preventDefault();
               if (e.shiftKey) {
                 if (this.detailMode === 'typeface') {
                   this.nextTypeface();
