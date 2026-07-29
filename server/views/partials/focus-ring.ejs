@@ -17,12 +17,14 @@
 
      Scoped to <button>: the custom scrollbar thumb (search.ejs) is a <div> that
      drags via @mousedown, and must keep its default behaviour.
+     [role="button"] is included for the radical-animation div (detail.ejs): a
+     tabindex="0" div takes click focus in every browser, including macOS.
 
      Delegated on `document` so it survives the fetch()+innerHTML and
      fetch()+replaceWith() swaps that rebuild the page's controls. -->
 <script>
   document.addEventListener('pointerdown', function (e) {
-    if (e.target instanceof Element && e.target.closest('button')) {
+    if (e.target instanceof Element && e.target.closest('button, [role="button"]')) {
       e.preventDefault();
     }
   });

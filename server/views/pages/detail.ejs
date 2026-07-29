@@ -355,8 +355,12 @@
       <div class="container-typeface-video">
         <!-- Video Mode -->
         <div class="video-container" x-show="detailMode === 'video'">
+          <%# Sibling, not a child of <video>: content inside <video> is fallback for
+              unsupported browsers and is not reliably exposed to the a11y tree. %>
+          <div id="video-label" class="visually-hidden">Stroke order animation for <span lang="ja"><%= doc.ka_utf %></span></div>
           <div class="video">
             <video x-ref="video"
+                   aria-labelledby="video-label"
                    @click="detailMode = 'typeface'"
                    poster="<%= doc.poster_video_source %>"
                    playsinline
@@ -372,7 +376,8 @@
             <button :class="playing ? 'icon-pause' : 'icon-play'"
                     class="ka-icon-gray pointer"
                     @click="togglePlayPause()"
-                    aria-label="Play/Pause"></button>
+                    :aria-label="playing ? 'Pause stroke order animation' : 'Play stroke order animation'"
+                    aria-label="Play stroke order animation"></button>
             <button class="icon-step-right ka-icon-gray pointer"
                     @click="stepForward()"
                     aria-label="Step forward"></button>
@@ -392,9 +397,9 @@
             <img x-show="typeface === 'suzumushi'" src="<%= doc.suzumushi_source %>" alt="Suzumushi typeface">
           </div>
           <div class="animation-controls">
-            <button @click="previousTypeface()" class="ka-typeface-left pointer">&#12296;</button>
-            <span class="typeface-name" x-html="typefaceDisplay"></span>
-            <button @click="nextTypeface()" class="ka-typeface-right pointer">&#12297;</button>
+            <button @click="previousTypeface()" class="ka-typeface-left pointer" aria-label="Previous typeface">&#12296;</button>
+            <span class="typeface-name" x-html="typefaceDisplay" aria-live="polite"></span>
+            <button @click="nextTypeface()" class="ka-typeface-right pointer" aria-label="Next typeface">&#12297;</button>
           </div>
         </div>
       </div>
@@ -406,23 +411,23 @@
     <div class="row1">
       <div class="recordCounter">
         <% if (prev) { %>
-          <a class="icon icon-left" href="<%= prevUrl %>" onclick="navigateKanji(this.href, event)">&#12296;</a>
+          <a class="icon icon-left" href="<%= prevUrl %>" onclick="navigateKanji(this.href, event)" aria-label="Previous kanji">&#12296;</a>
         <% } else { %>
-          <span class="icon icon-left disabled">&#12296;</span>
+          <span class="icon icon-left disabled" aria-hidden="true">&#12296;</span>
         <% } %>
         <span class="search">
           <% if (typeof lastSearch !== 'undefined' && lastSearch) { %>
-            <a href="<%= lastSearch %>"><%= idx + 1 %> of <%= total %></a>
+            <a href="<%= lastSearch %>" aria-label="Back to search results, kanji <%= idx + 1 %> of <%= total %>"><%= idx + 1 %> of <%= total %></a>
           <% } else { %>
             <%# production always renders the counter as a link (falls back to a
                 single-kanji search) — the .row1 a rule gives it 17px rust %>
-            <a href="/search?q=<%= encodeURIComponent(doc.ka_utf) %>">1 of 1</a>
+            <a href="/search?q=<%= encodeURIComponent(doc.ka_utf) %>" aria-label="Back to search">1 of 1</a>
           <% } %>
         </span>
         <% if (next) { %>
-          <a class="icon icon-right" href="<%= nextUrl %>" onclick="navigateKanji(this.href, event)">&#12297;</a>
+          <a class="icon icon-right" href="<%= nextUrl %>" onclick="navigateKanji(this.href, event)" aria-label="Next kanji">&#12297;</a>
         <% } else { %>
-          <span class="icon icon-right disabled">&#12297;</span>
+          <span class="icon icon-right disabled" aria-hidden="true">&#12297;</span>
         <% } %>
       </div>
     </div>
@@ -448,7 +453,7 @@
       <div class="border3"><div class="border-inner"></div></div>
 
       <h3 class="radical">Radical</h3>
-      <img class="radical-character" src="<%= doc.rad_char_source %>" alt="Radical character">
+      <img class="radical-character" src="<%= doc.rad_char_source %>" alt="Radical: <%= doc.rad_name_ja %>">
       <% if (doc.rad_position && doc.rad_position_file) { %>
         <img class="radical-position" src="<%= doc.rad_position_file %>" alt="Radical position">
       <% } %>
@@ -458,10 +463,16 @@
               production behaviour: blank. */ _%>
       <div class="radical-stroke"><%= numberOrBlank(doc.rad_stroke) %></div>
 
-      <div class="ka-rad-anim pointer" @click="startRadicalAnimation()">
-        <img :class="{'opaque': radicalFrame === 0}" src="<%= doc.rad_anim_frame_0 %>" alt="Radical animation frame 1">
-        <img :class="{'opaque': radicalFrame === 1}" src="<%= doc.rad_anim_frame_1 %>" alt="Radical animation frame 2">
-        <img :class="{'opaque': radicalFrame === 2}" src="<%= doc.rad_anim_frame_2 %>" alt="Radical animation frame 3">
+      <%# role="button" on the div, not a real <button>: a <button> picks up UA styling
+          (WebKit's asymmetric padding among it) and would move ink on a frozen UI. %>
+      <div class="ka-rad-anim pointer" role="button" tabindex="0"
+           aria-label="Play radical animation"
+           @click="startRadicalAnimation()"
+           @keydown.enter.prevent="startRadicalAnimation()"
+           @keydown.space.prevent="startRadicalAnimation()">
+        <img :class="{'opaque': radicalFrame === 0}" src="<%= doc.rad_anim_frame_0 %>" alt="">
+        <img :class="{'opaque': radicalFrame === 1}" src="<%= doc.rad_anim_frame_1 %>" alt="">
+        <img :class="{'opaque': radicalFrame === 2}" src="<%= doc.rad_anim_frame_2 %>" alt="">
       </div>
     </div>
   </div>
@@ -504,7 +515,7 @@
   <!-- Column 4: Branding + Examples -->
   <div class="col4">
     <div class="row1 desktop-branding">
-      <a href="https://kanjialive.com" target="_blank" rel="noopener">
+      <a href="https://kanjialive.com" target="_blank" rel="noopener" aria-label="Kanji alive website (opens in new tab)">
         <span class="ka-welcome-italic">Kanji alive</span>
       </a>
     </div>
@@ -518,10 +529,11 @@
               <div class="example-ja example-english"><%= example.english %></div>
             </div>
             <div class="example-audio">
+              <%# Text child, not aria-label: a flat label inherits one language, but the
+                  Japanese word must reach a Japanese voice and the verb an English one. %>
               <button class="icon-play audio-play ka-icon-gray pointer"
                       data-audio="<%= example.mp3 %>"
-                      onclick="playExampleAudio(this.dataset.audio)"
-                      aria-label="Play audio"></button>
+                      onclick="playExampleAudio(this.dataset.audio)"><span class="visually-hidden">Play pronunciation of <span lang="ja"><%= example.japanese %></span></span></button>
             </div>
           </div>
         <% }); %>
