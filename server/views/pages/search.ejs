@@ -80,6 +80,9 @@
         '<div class="search-results search-results-kanji" style="width: 266px">' +
         '<p class="no-results">Sorry, something went wrong. Please try again.</p>' +
         '</div></div>');
+
+      // The announcer listens for this event; an error swap must announce too.
+      document.dispatchEvent(new CustomEvent('results:loaded'));
     }
   };
   // LOAD-RESULTS-END
@@ -156,6 +159,27 @@
         var sRatio = maxSL > 0 ? scroller.scrollLeft / maxSL : 0;
         thumb.style.width = thumbW + 'px';
         thumb.style.left = (sRatio * (ow - thumbW)) + 'px';
+      },
+
+      // Compose a polite announcement from the freshly swapped DOM. Reads the
+      // DOM rather than component state so error and no-results swaps are
+      // announced with their own text.
+      _announceResults() {
+        var status = document.getElementById('a11y-status');
+        var c = this.$refs.resultsContainer;
+        if (!status || !c) return;
+        var message = c.querySelector('.no-results');
+        if (message) {
+          status.textContent = message.textContent;
+          return;
+        }
+        var n = c.querySelectorAll('a.ka').length;
+        var modeNames = {
+          kanji: 'sorted by kanji strokes',
+          rsort: 'grouped by radical strokes',
+          ksort: 'grouped by kanji strokes'
+        };
+        status.textContent = n + ' kanji found, ' + (modeNames[this.mode] || '');
       },
 
       _smoothScroll(el, target) {
@@ -287,7 +311,10 @@
         this.$refs.resultsContainer.addEventListener('scroll', this._scrollHandler, true);
 
         // Re-measure the custom scrollbar after new results are swapped in
-        this._settleHandler = function() { self._updateScrollThumb(); };
+        this._settleHandler = function() {
+          self._updateScrollThumb();
+          self._announceResults();
+        };
         document.addEventListener('results:loaded', this._settleHandler);
 
         // Initial update
@@ -422,6 +449,11 @@
       <div class="custom-scrollbar-thumb" x-ref="scrollThumb" @mousedown="startThumbDrag($event)"></div>
     </div>
   </main>
+
+  <!-- Announces result swaps to screen readers. OUTSIDE the swap target:
+       loadResults() replaces #search-results' children, and a live region
+       must pre-exist a mutation to be announced. -->
+  <div id="a11y-status" class="visually-hidden" role="status"></div>
 
   <!-- Help Modal -->
   <dialog x-ref="helpDialog" class="help-modal" @click.self="$refs.helpDialog.close()">

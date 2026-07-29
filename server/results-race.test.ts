@@ -326,4 +326,5 @@ test("a server error renders the error state and keeps the track", async () => {
   // it, and without the wrapper the message renders 23px high.
   assert.match(env.target.innerHTML, /class="scroller scroller-kanji"/);
   assert.deepEqual(env.target.childClasses(), ["custom-scrollbar-track"]);
+  assert.deepEqual(env.events, ["results:loaded"], "the error swap must notify the announcer");
 });
