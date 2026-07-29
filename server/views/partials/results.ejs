@@ -18,8 +18,9 @@ function buildDetailUrl(kanjiChar) {
   %>
   <div class="scroller scroller-kanji">
     <div class="search-results search-results-kanji" style="width: <%= kanjiGridWidth %>px">
-      <div id="kanji-count" class="ka-results-h1"><%= results.length %></div>
-      <div class="ka-results-h3">Kanji</div>
+      <div id="kanji-count" class="ka-results-h1" aria-hidden="true"><%= results.length %></div>
+      <div class="ka-results-h3" role="heading" aria-level="2"
+           aria-label="<%= results.length %> kanji">Kanji</div>
       <div class="ka-border-bottom">
         <div class="border-inner"></div>
       </div>
@@ -56,8 +57,9 @@ function buildDetailUrl(kanjiChar) {
             <%# numberOrBlank — a stroke count is a raw Mongo number and NaN is a real
                 sentinel in this data. No kanji holds kstroke: NaN today; the radical
                 branch below does, and these two headings must not drift apart. %>
-            <div class="ka-results-h1"><%= numberOrBlank(group.stroke) %></div>
-            <div class="ka-results-h3">Kanji Stroke<%= group.stroke !== 1 ? 's' : '' %></div>
+            <div class="ka-results-h1" aria-hidden="true"><%= numberOrBlank(group.stroke) %></div>
+            <div class="ka-results-h3" role="heading" aria-level="2"
+                 aria-label="<%= (numberOrBlank(group.stroke) + ' kanji stroke' + (group.stroke !== 1 ? 's' : '')).trim() %>">Kanji Stroke<%= group.stroke !== 1 ? 's' : '' %></div>
             <div class="ka-border-bottom">
               <div class="border-inner"></div>
             </div>
@@ -66,7 +68,13 @@ function buildDetailUrl(kanjiChar) {
                 <div class="grouped-column inline">
                   <% column.forEach(radical => { %>
                     <div>
+                      <%# Name + romaji ONLY, never the meaning: the app withholds easy
+                          answers so students must recognise the character themselves. %>
+                      <% if (radical.rad_name_ja && radical.rad_name && radical.rad_name !== "n/a") { %>
+                      <div class="ka-radical inline" lang="ja" role="img" aria-label="<%= radical.rad_name_ja %> (<%= radical.rad_name %>)"><%= radical.radical %></div>
+                      <% } else { %>
                       <div class="ka-radical inline" lang="ja"><%= radical.radical %></div>
+                      <% } %>
                       <div class="grouped-row-container inline" lang="ja">
                         <% radical.rows.forEach(row => { %>
                           <div class="grouped-row">
@@ -102,8 +110,9 @@ function buildDetailUrl(kanjiChar) {
                 blank (its NaN becomes null crossing JSON to Angular); so must this.
                 The label below deliberately still says "Strokes": NaN !== 1, exactly as
                 production's null !== 1. %>
-            <div class="ka-results-h1"><%= numberOrBlank(group.stroke) %></div>
-            <div class="ka-results-h3">Radical Stroke<%= group.stroke !== 1 ? 's' : '' %></div>
+            <div class="ka-results-h1" aria-hidden="true"><%= numberOrBlank(group.stroke) %></div>
+            <div class="ka-results-h3" role="heading" aria-level="2"
+                 aria-label="<%= (numberOrBlank(group.stroke) + ' radical stroke' + (group.stroke !== 1 ? 's' : '')).trim() %>">Radical Stroke<%= group.stroke !== 1 ? 's' : '' %></div>
             <div class="ka-border-bottom">
               <div class="border-inner"></div>
             </div>
@@ -112,7 +121,12 @@ function buildDetailUrl(kanjiChar) {
                 <div class="grouped-column inline">
                   <% column.forEach(radical => { %>
                     <div>
+                      <%# Name + romaji ONLY, never the meaning — see the ksort branch. %>
+                      <% if (radical.rad_name_ja && radical.rad_name && radical.rad_name !== "n/a") { %>
+                      <div class="ka-radical inline" lang="ja" role="img" aria-label="<%= radical.rad_name_ja %> (<%= radical.rad_name %>)"><%= radical.radical %></div>
+                      <% } else { %>
                       <div class="ka-radical inline" lang="ja"><%= radical.radical %></div>
+                      <% } %>
                       <div class="grouped-row-container inline" lang="ja">
                         <% radical.rows.forEach(row => { %>
                           <div class="grouped-row">

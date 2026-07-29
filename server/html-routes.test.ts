@@ -255,7 +255,7 @@ test("the rsort view renders a blank heading for 々, never the text NaN", async
     assert.equal(res.status, 200);
     const body = await res.text();
 
-    const headings = [...body.matchAll(/ka-results-h1">([^<]*)</g)].map((m) => m[1].trim());
+    const headings = [...body.matchAll(/ka-results-h1"[^>]*>([^<]*)</g)].map((m) => m[1].trim());
     assert.ok(headings.length > 0, "found no group headings — has the class name changed?");
     assert.deepEqual(
       headings.filter((h) => h === "NaN"),

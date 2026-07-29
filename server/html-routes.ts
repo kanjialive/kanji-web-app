@@ -226,6 +226,10 @@ async function searchKanji(
         rad_utf: 1,
         rad_stroke: 1,
         rad_order: 1,
+        // Names the grey radical glyph for screen readers (results.ejs). Without
+        // them in the projection the label silently never renders.
+        rad_name_ja: 1,
+        rad_name: 1,
       },
     })
     .toArray()) as unknown as grouping.KanjiSearchResult[];

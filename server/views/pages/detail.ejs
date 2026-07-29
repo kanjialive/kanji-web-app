@@ -314,6 +314,8 @@
 <div class="container">
 <div class="container2" x-data="detailPage()" data-stroketimes='<%= JSON.stringify(doc.stroketimes) %>' data-title="<%= doc.ka_utf %> - <%= doc.meaning %> - Kanji alive">
 
+  <h1 class="visually-hidden"><%= doc.ka_utf %> — <%= doc.meaning %></h1>
+
   <%
   // Navigation context (computed server-side from search results)
   const idx = typeof currentIndex !== 'undefined' ? currentIndex : 0;
@@ -339,6 +341,7 @@
                name="q"
                id="search-input"
                class="search-bar"
+               aria-label="Search for kanji"
                value="<%= typeof searchQuery !== 'undefined' ? searchQuery : '' %>"
                spellcheck="false"
                autocapitalize="off"

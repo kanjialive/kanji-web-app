@@ -340,6 +340,8 @@
 <div class="container">
 <div class="container2" x-data="searchPage()" data-mode="<%= typeof mode !== 'undefined' ? mode : 'kanji' %>" data-querystring="<%= typeof queryString !== 'undefined' ? queryString.replace(/"/g, '&quot;') : '' %>">
 
+  <h1 class="visually-hidden">Kanji alive — search for kanji</h1>
+
   <!-- Header Row -->
   <header class="header-row">
     <!-- Search Form -->
@@ -350,6 +352,7 @@
                  name="q"
                  id="search-input"
                  class="search-bar"
+                 aria-label="Search for kanji"
                  value="<%= typeof query !== 'undefined' ? query : '' %>"
                  spellcheck="false"
                  autocapitalize="off"

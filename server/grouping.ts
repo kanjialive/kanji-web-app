@@ -10,11 +10,16 @@ export interface KanjiSearchResult {
   rad_utf: string;
   rad_stroke: number;
   rad_order: number;
+  // Optional: only the grouped views project these, to name the grey radical glyph.
+  rad_name_ja?: string;
+  rad_name?: string;
   sortedIndex?: number;
 }
 
 export interface RadicalGroup {
   radical: string;
+  rad_name_ja: string;
+  rad_name: string;
   rows: KanjiSearchResult[][];
 }
 
@@ -104,6 +109,8 @@ function groupByStrokeAndRadical(
             // Need to move to a new column
             previousRadical = {
               radical: kanji.rad_utf,
+              rad_name_ja: kanji.rad_name_ja,
+              rad_name: kanji.rad_name,
               rows: [[kanji]],
             };
             currentGroup.columns.push([previousRadical]);
@@ -114,6 +121,8 @@ function groupByStrokeAndRadical(
         // Different radical character, create a new radical group
         previousRadical = {
           radical: kanji.rad_utf,
+          rad_name_ja: kanji.rad_name_ja,
+          rad_name: kanji.rad_name,
           rows: [[kanji]],
         };
 
@@ -136,6 +145,8 @@ function groupByStrokeAndRadical(
           [
             {
               radical: kanji.rad_utf,
+              rad_name_ja: kanji.rad_name_ja,
+              rad_name: kanji.rad_name,
               rows: [[kanji]],
             },
           ],
