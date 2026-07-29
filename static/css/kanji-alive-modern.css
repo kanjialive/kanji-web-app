@@ -17,7 +17,7 @@
   --color-bg: #F6F6F6;            /* off-white - search bar */
   --color-bg-dark: #D0D0D0;       /* gray - body background */
   --color-bg-white: white;        /* container background */
-  --color-radical: #CBCCD0;       /* radical character color */
+  --color-radical: #B7B7B7;       /* radical character color — 2.0:1 on white, his pick 2026-07-29 */
   --color-kbd-text: #c7254e;      /* keyboard shortcut text */
   --color-kbd-bg: #f9f2f4;        /* keyboard shortcut background */
 
@@ -326,6 +326,20 @@ h3 {
 /* Hide Alpine.js elements until initialized */
 [x-cloak] {
   display: none;
+}
+
+/* Screen-reader-only content. The clip pattern, not display:none — hidden
+   content must stay in the accessibility tree to be announced. */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }
 
 /* ============================================
@@ -1443,6 +1457,17 @@ div.examples {
   opacity: 1;
 }
 
+/* Keyboard equivalent of the hover reveal: Tab to a row's audio button swaps
+   in the English. Mouse clicks never trigger it — focus-ring.ejs suppresses
+   click-focus on buttons — so pointer behaviour is unchanged. */
+.example:focus-within .example-japanese {
+  opacity: 0;
+}
+
+.example:focus-within .example-english {
+  opacity: 1;
+}
+
 .example-ja {
   flex: 1;
 }
@@ -1651,12 +1676,14 @@ code {
    already shows a caret. Its `outline: none` above stands. */
 button:focus:not(:focus-visible),
 a:focus:not(:focus-visible),
+[role="button"]:focus:not(:focus-visible),
 dialog:focus:not(:focus-visible) {
   outline: none;
 }
 
 button:focus-visible,
 a:focus-visible,
+[role="button"]:focus-visible,
 dialog:focus-visible {
   outline: 2px solid var(--color-primary);
   outline-offset: 2px;
