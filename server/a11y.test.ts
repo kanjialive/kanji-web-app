@@ -400,11 +400,14 @@ test("the detail page labels its media controls and reaches the radical animatio
     // flat alt inherits one language. role="img" on both images: Safari otherwise
     // exposes the SVG file's INTERNAL tree as extra VoiceOver stops — its
     // Sketch-export <title>, empty layer groups, "Created with Sketch."
+    // aria-hidden: the span is a LABEL SOURCE, not content — without it VoiceOver
+    // stops on the span itself as a huge phantom selection before the image.
+    // aria-labelledby still resolves into hidden elements by spec.
     assert.ok(
       body.includes(
-        '<span id="radical-label" class="visually-hidden">Radical <span lang="ja">みず</span></span>'
+        '<span id="radical-label" class="visually-hidden" aria-hidden="true">Radical <span lang="ja">みず</span></span>'
       ),
-      "the radical image lost its split-language 'Radical + name' label"
+      "the radical image's label span lost aria-hidden — VoiceOver stops on it as a phantom item"
     );
     assert.match(
       body,

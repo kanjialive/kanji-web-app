@@ -493,8 +493,10 @@
           Sketch-export <title>, empty layer groups, "Created with Sketch." %>
       <% if (doc.rad_name_ja && doc.rad_name && doc.rad_name !== "n/a") { %>
         <%# Split-language name: "Radical" needs the English voice, the name the
-            Japanese one — a flat alt inherits a single language. %>
-        <span id="radical-label" class="visually-hidden">Radical <span lang="ja"><%= doc.rad_name_ja %></span></span>
+            Japanese one — a flat alt inherits a single language. aria-hidden: this
+            span is a label source, not content — without it VoiceOver stops on it
+            as a phantom item. aria-labelledby resolves into hidden elements. %>
+        <span id="radical-label" class="visually-hidden" aria-hidden="true">Radical <span lang="ja"><%= doc.rad_name_ja %></span></span>
         <img class="radical-character" role="img" aria-labelledby="radical-label" src="<%= doc.rad_char_source %>" alt="<%= doc.rad_name_ja %>">
       <% } else { %>
         <%# No role="img" here: alt="" hides the image, and an explicit role would
