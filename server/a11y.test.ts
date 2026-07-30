@@ -263,10 +263,12 @@ test("the grouped results view announces its headings and names only the radical
     // Pedagogical ruling: never the meaning. And the JAPANESE NAME ONLY, no romaji —
     // VoiceOver spoke the name, then re-read the romaji in English, a duplicate the
     // maintainer heard himself (2026-07-30). No "Radical" prefix: role=img says it.
+    // The glyph is aria-hidden: VoiceOver reads content past the label and appends
+    // its own English description of the character — his ruling: name only.
     assert.match(
       body,
-      /role="img" aria-label="みず"/,
-      "the grey radical glyph lost its Japanese-name label"
+      /role="img" aria-label="みず"><span aria-hidden="true">/,
+      "the grey radical glyph lost its Japanese-name label or its aria-hidden wrapper"
     );
     assert.ok(
       !/role="img" aria-label="[^"]*\(/.test(body),
@@ -291,8 +293,8 @@ test("the grouped results view announces its headings and names only the radical
     ).text();
     assert.match(
       ksort,
-      /role="img" aria-label="みず"/,
-      "the ksort radical glyph lost its Japanese-name label"
+      /role="img" aria-label="みず"><span aria-hidden="true">/,
+      "the ksort radical glyph lost its Japanese-name label or its aria-hidden wrapper"
     );
     assert.ok(
       !/role="img" aria-label="[^"]*\(/.test(ksort),

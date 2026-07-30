@@ -69,10 +69,12 @@ function buildDetailUrl(kanjiChar) {
                   <% column.forEach(radical => { %>
                     <div>
                       <%# Japanese name ONLY, never the meaning (the app withholds easy
-                          answers). No romaji either: VoiceOver speaks the name, then
-                          re-read the romaji in English — the same name twice. %>
+                          answers). No romaji: VoiceOver re-read it in English — the same
+                          name twice. The glyph is aria-hidden: VoiceOver reads content
+                          past the label and appends its own English description of the
+                          character. Both cuts are the maintainer's ruling, 2026-07-30. %>
                       <% if (radical.rad_name_ja && radical.rad_name && radical.rad_name !== "n/a") { %>
-                      <div class="ka-radical inline" lang="ja" role="img" aria-label="<%= radical.rad_name_ja %>"><%= radical.radical %></div>
+                      <div class="ka-radical inline" lang="ja" role="img" aria-label="<%= radical.rad_name_ja %>"><span aria-hidden="true"><%= radical.radical %></span></div>
                       <% } else { %>
                       <div class="ka-radical inline" lang="ja"><%= radical.radical %></div>
                       <% } %>
@@ -122,9 +124,9 @@ function buildDetailUrl(kanjiChar) {
                 <div class="grouped-column inline">
                   <% column.forEach(radical => { %>
                     <div>
-                      <%# Japanese name ONLY, no romaji or meaning — see the ksort branch. %>
+                      <%# Japanese name ONLY, glyph aria-hidden — see the ksort branch. %>
                       <% if (radical.rad_name_ja && radical.rad_name && radical.rad_name !== "n/a") { %>
-                      <div class="ka-radical inline" lang="ja" role="img" aria-label="<%= radical.rad_name_ja %>"><%= radical.radical %></div>
+                      <div class="ka-radical inline" lang="ja" role="img" aria-label="<%= radical.rad_name_ja %>"><span aria-hidden="true"><%= radical.radical %></span></div>
                       <% } else { %>
                       <div class="ka-radical inline" lang="ja"><%= radical.radical %></div>
                       <% } %>
