@@ -133,10 +133,38 @@ test("the search page names its field, has a heading, and owns a live region", a
     );
 
     // The live region reports the mode only after cycling; the button itself
-    // must tell a screen reader the CURRENT mode on landing.
+    // must tell a screen reader the CURRENT mode on landing. The welcome page
+    // has no active mode (`help` is not in modeNames), so the label needs a
+    // fallback or it announces a dangling "Sort — currently ".
     assert.ok(
-      body.includes(":aria-label=\"'Sort — currently '"),
+      body.includes("'Sort — currently ' + modeNames[mode]"),
       "the Sort button's state label is gone — it announces as just 'Sort'"
+    );
+    assert.ok(
+      body.includes("'Sort — no results to sort'"),
+      "the Sort label lost its welcome-page fallback — it trails off after 'currently'"
+    );
+    assert.equal(
+      (body.match(/:aria-disabled="!modeNames\[mode\]"/g) ?? []).length,
+      3,
+      "Sort and the scroll buttons no longer announce as unavailable on the welcome page"
+    );
+
+    // The dialog's name is the first thing announced on entering it.
+    assert.match(
+      body,
+      /<dialog[^>]*aria-labelledby="help-modal-title"/,
+      "the Quick Reference dialog lost its name — it opens announcing only 'dialog'"
+    );
+    assert.ok(
+      body.includes('id="help-modal-title"'),
+      "the help modal's heading lost the id its dialog's aria-labelledby points at"
+    );
+
+    assert.match(
+      body,
+      /<form[^>]*role="search"/,
+      "the search form lost its search landmark"
     );
 
     // Keyboard guards, string-matched from the shipped page: shortcuts must not
@@ -272,14 +300,21 @@ test("the detail page labels its media controls and reaches the radical animatio
     );
 
     // Text child, not aria-label: the Japanese word must reach a Japanese voice.
+    // Named via aria-labelledby to that child — name-from-content would prepend
+    // the CSS play glyph (a private-use character) to every announcement.
     assert.match(
       body,
-      /visually-hidden">Play pronunciation of <span lang="ja">/,
+      /audio-play[^>]*aria-labelledby="example-audio-label-0"/,
+      "an audio button no longer points at its label — the CSS glyph re-enters its name"
+    );
+    assert.match(
+      body,
+      /id="example-audio-label-0"[^>]*>Play pronunciation of <span lang="ja">/,
       "the example audio buttons lost their split-language name"
     );
     assert.ok(
-      !/audio-play[^>]*aria-label/.test(body),
-      "an aria-label came back on an audio button and overrides the split-language name"
+      !/audio-play[^>]*aria-label="/.test(body),
+      "a flat aria-label came back on an audio button and overrides the split-language name"
     );
 
     assert.ok(
@@ -300,6 +335,27 @@ test("the detail page labels its media controls and reaches the radical animatio
     assert.ok(
       body.includes('lang="ja">詳細は'),
       "the help modal's Japanese paragraph is unmarked and gets an English voice"
+    );
+
+    // Landmarks: without a <main>, the page is a run of generic containers.
+    assert.match(
+      body,
+      /<main class="container2"/,
+      "the detail page lost its main landmark"
+    );
+    assert.match(
+      body,
+      /<form[^>]*role="search"/,
+      "the search form lost its search landmark"
+    );
+    assert.match(
+      body,
+      /<dialog[^>]*aria-labelledby="help-modal-title"/,
+      "the Quick Reference dialog lost its name — it opens announcing only 'dialog'"
+    );
+    assert.ok(
+      body.includes('id="help-modal-title"'),
+      "the help modal's heading lost the id its dialog's aria-labelledby points at"
     );
 
     // navigateKanji() replaces .container2 wholesale, so its announcer must sit

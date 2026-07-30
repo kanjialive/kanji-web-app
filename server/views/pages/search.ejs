@@ -394,7 +394,7 @@
     <!-- Search Form -->
     <div class="col1">
       <div class="row1">
-        <form class="search-form" @submit.prevent="submitSearch()">
+        <form class="search-form" role="search" @submit.prevent="submitSearch()">
           <input type="text"
                  name="q"
                  id="search-input"
@@ -417,15 +417,19 @@
         <div class="recordCounter">
           <button class="icon icon-left"
                   @click="scrollBackward()"
+                  :aria-disabled="!modeNames[mode]"
                   aria-label="Scroll left">&#12296;</button>
           <span class="search">
             <%# The live region reports the mode after cycling; this tells a screen
-                reader the CURRENT mode on landing. %>
+                reader the CURRENT mode on landing. The welcome page has no active
+                mode (mode is 'help'), so fall back rather than trail off. %>
             <button @click="cycleMode(1)" class="sort-button"
-                    :aria-label="'Sort — currently ' + (modeNames[mode] || '')">Sort</button>
+                    :aria-disabled="!modeNames[mode]"
+                    :aria-label="modeNames[mode] ? 'Sort — currently ' + modeNames[mode] : 'Sort — no results to sort'">Sort</button>
           </span>
           <button class="icon icon-right"
                   @click="scrollForward()"
+                  :aria-disabled="!modeNames[mode]"
                   aria-label="Scroll right">&#12297;</button>
         </div>
       </div>
@@ -479,7 +483,7 @@
   <div id="a11y-status" class="visually-hidden" role="status"></div>
 
   <!-- Help Modal -->
-  <dialog x-ref="helpDialog" class="help-modal" @click.self="$refs.helpDialog.close()">
+  <dialog x-ref="helpDialog" class="help-modal" aria-labelledby="help-modal-title" @click.self="$refs.helpDialog.close()">
     <%- include('../partials/search-help-modal') %>
   </dialog>
 

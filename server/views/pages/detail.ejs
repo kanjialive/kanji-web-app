@@ -339,7 +339,9 @@
 <body>
 
 <div class="container">
-<div class="container2" x-data="detailPage()" data-stroketimes='<%= JSON.stringify(doc.stroketimes) %>' data-title="<%= doc.ka_utf %> - <%= doc.meaning %> - Kanji alive">
+<%# <main>, not <div>: the page's one main landmark. navigateKanji() and the CSS
+    select by .container2, so the tag change is invisible to both. %>
+<main class="container2" x-data="detailPage()" data-stroketimes='<%= JSON.stringify(doc.stroketimes) %>' data-title="<%= doc.ka_utf %> - <%= doc.meaning %> - Kanji alive">
 
   <%# tabindex="-1": navigateKanji() lands focus here after a swap. %>
   <h1 class="visually-hidden" tabindex="-1"><%= doc.ka_utf %> — <%= doc.meaning %></h1>
@@ -364,7 +366,7 @@
   <!-- Column 1: Search Form + Video/Typeface -->
   <div class="col1">
     <div class="row1">
-      <form class="search-form" action="/search" method="get">
+      <form class="search-form" role="search" action="/search" method="get">
         <input type="text"
                name="q"
                id="search-input"
@@ -567,10 +569,13 @@
             </div>
             <div class="example-audio">
               <%# Text child, not aria-label: a flat label inherits one language, but the
-                  Japanese word must reach a Japanese voice and the verb an English one. %>
+                  Japanese word must reach a Japanese voice and the verb an English one.
+                  aria-labelledby points at that child — name-from-content would prepend
+                  the CSS play glyph (a private-use character) to the announcement. %>
               <button class="icon-play audio-play ka-icon-gray pointer"
                       data-audio="<%= example.mp3 %>"
-                      onclick="playExampleAudio(this.dataset.audio)"><span class="visually-hidden">Play pronunciation of <span lang="ja"><%= example.japanese %></span></span></button>
+                      aria-labelledby="example-audio-label-<%= index %>"
+                      onclick="playExampleAudio(this.dataset.audio)"><span id="example-audio-label-<%= index %>" class="visually-hidden">Play pronunciation of <span lang="ja"><%= example.japanese %></span></span></button>
             </div>
           </div>
         <% }); %>
@@ -594,13 +599,13 @@
   </div>
 
   <!-- Help Modal -->
-  <dialog x-ref="helpDialog" class="help-modal" @click.self="$refs.helpDialog.close()">
+  <dialog x-ref="helpDialog" class="help-modal" aria-labelledby="help-modal-title" @click.self="$refs.helpDialog.close()">
     <%- include('../partials/detail-help-modal') %>
   </dialog>
 
   <!-- Version -->
   <div class="version"><p>v2.1</p></div>
-</div>
+</main>
 
 <!-- Announces prev/next swaps. OUTSIDE .container2: navigateKanji() replaces
      that node wholesale, and a live region must pre-exist the mutation. -->
