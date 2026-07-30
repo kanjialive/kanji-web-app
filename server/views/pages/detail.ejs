@@ -485,16 +485,20 @@
       <div class="border3"><div class="border-inner"></div></div>
 
       <h3 class="radical" aria-level="2">Radical</h3>
-      <%# Name + romaji, same shape as the results grid — the h3 above already
-          announces "Radical", so the alt needn't repeat the category. %>
+      <%# Japanese name only, same as the results grid (VoiceOver re-read the romaji
+          in English); the h3 above already announces "Radical". role="img": Safari
+          otherwise exposes the SVG file's internal tree as extra VoiceOver stops —
+          its Sketch-export <title>, empty layer groups, "Created with Sketch." %>
       <% if (doc.rad_name_ja && doc.rad_name && doc.rad_name !== "n/a") { %>
-        <img class="radical-character" src="<%= doc.rad_char_source %>" alt="<%= doc.rad_name_ja %> (<%= doc.rad_name %>)">
+        <img class="radical-character" role="img" src="<%= doc.rad_char_source %>" alt="<%= doc.rad_name_ja %>">
       <% } else { %>
+        <%# No role="img" here: alt="" hides the image, and an explicit role would
+            re-expose it as a nameless stop. %>
         <img class="radical-character" src="<%= doc.rad_char_source %>" alt="">
       <% } %>
       <% if (doc.rad_position && doc.rad_position_file) { %>
         <%# The icon depicts the LAST listed position — same derivation as its filename. %>
-        <img class="radical-position" src="<%= doc.rad_position_file %>" alt="Radical position: <%= doc.rad_position.split(",").pop().trim() %>">
+        <img class="radical-position" role="img" src="<%= doc.rad_position_file %>" alt="Radical position: <%= doc.rad_position.split(",").pop().trim() %>">
       <% } %>
       <div class="radical-name" lang="ja"><%= doc.rad_name_ja %></div>
       <div class="radical-meaning"><%= doc.rad_meaning %></div>

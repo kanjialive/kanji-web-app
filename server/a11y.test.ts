@@ -395,12 +395,14 @@ test("the detail page labels its media controls and reaches the radical animatio
       "the h1 lost tabindex=-1 — after a prev/next swap, keyboard focus restarts from <body>"
     );
 
-    // Name + romaji, the same shape the results grid uses; the h3 above the
-    // image already announces "Radical", so the alt must not repeat it.
+    // Japanese name only, same as the results grid (VoiceOver re-read the romaji
+    // in English); the h3 above already announces "Radical". role="img" on both:
+    // Safari otherwise exposes the SVG file's INTERNAL tree as extra VoiceOver
+    // stops — its Sketch-export <title>, empty layer groups, "Created with Sketch."
     assert.match(
       body,
-      /class="radical-character"[^>]*alt="みず \(mizu\)"/,
-      "the radical image lost its name + romaji alt"
+      /class="radical-character" role="img"[^>]*alt="みず"/,
+      "the radical image lost its Japanese-name alt or its role=img"
     );
     assert.ok(
       !body.includes('alt="Radical:'),
@@ -408,8 +410,8 @@ test("the detail page labels its media controls and reaches the radical animatio
     );
     assert.match(
       body,
-      /class="radical-position"[^>]*alt="Radical position: hen"/,
-      "the position icon's alt names only the category again, not the position it depicts"
+      /class="radical-position" role="img"[^>]*alt="Radical position: hen"/,
+      "the position icon lost its position-naming alt or its role=img"
     );
 
     assert.match(
