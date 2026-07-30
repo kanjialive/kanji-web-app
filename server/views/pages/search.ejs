@@ -146,6 +146,13 @@
 
       currentGroup: 0,
 
+      // Shared by the live-region announcement and the Sort button's label.
+      modeNames: {
+        kanji: 'sorted by kanji strokes',
+        rsort: 'grouped by radical strokes',
+        ksort: 'grouped by kanji strokes'
+      },
+
       _updateScrollThumb() {
         var scroller = this.$refs.resultsContainer?.querySelector('.scroller');
         var thumb = this.$refs.scrollThumb;
@@ -174,15 +181,16 @@
           return;
         }
         var n = c.querySelectorAll('a.ka').length;
-        var modeNames = {
-          kanji: 'sorted by kanji strokes',
-          rsort: 'grouped by radical strokes',
-          ksort: 'grouped by kanji strokes'
-        };
-        status.textContent = n + ' kanji found, ' + (modeNames[this.mode] || '');
+        status.textContent = n + ' kanji found, ' + (this.modeNames[this.mode] || '');
       },
 
       _smoothScroll(el, target) {
+        // Honour the OS "reduce motion" setting: same destination, no 900ms glide.
+        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+          el.scrollLeft = target;
+          return;
+        }
+
         if (_animFrame) {
           cancelAnimationFrame(_animFrame);
           _animFrame = null;
@@ -324,6 +332,10 @@
         this._keyHandler = (e) => {
           if (e.target.tagName === 'INPUT') return;
 
+          // The Quick Reference is modal: arrows must not cycle the sort mode
+          // (and announce the swap) behind it. Escape still closes it natively.
+          if (this.$refs.helpDialog.open) return;
+
           switch(e.code) {
             case 'ArrowUp':
               e.preventDefault();
@@ -399,7 +411,10 @@
                   @click="scrollBackward()"
                   aria-label="Scroll left">&#12296;</button>
           <span class="search">
-            <button @click="cycleMode(1)" class="sort-button">Sort</button>
+            <%# The live region reports the mode after cycling; this tells a screen
+                reader the CURRENT mode on landing. %>
+            <button @click="cycleMode(1)" class="sort-button"
+                    :aria-label="'Sort — currently ' + (modeNames[mode] || '')">Sort</button>
           </span>
           <button class="icon icon-right"
                   @click="scrollForward()"

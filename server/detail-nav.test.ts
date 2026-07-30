@@ -65,6 +65,7 @@ type Harness = {
   pushed: string[];
   titles: string[];
   hardNavigations: string[];
+  announcements: string[];
 };
 
 type FetchStub = (url: string, opts: { signal: AbortSignal }) => Promise<{ text(): Promise<string> }>;
@@ -76,6 +77,7 @@ function harness(fetchStub: FetchStub): Harness {
   const pushed: string[] = [];
   const titles: string[] = [];
   const hardNavigations: string[] = [];
+  const announcements: string[] = [];
 
   const makeContainer = (id: string): FakeContainer => ({
     id,
@@ -99,6 +101,19 @@ function harness(fetchStub: FetchStub): Harness {
     get title(): string {
       return titles[titles.length - 1] ?? "";
     },
+    // The live region navigateKanji() announces into. A write is recorded, not
+    // stored: what matters is which navigations announced, and how many times.
+    getElementById: (id: string): { textContent: string } | null =>
+      id === "a11y-status"
+        ? {
+            set textContent(v: string) {
+              announcements.push(v);
+            },
+            get textContent(): string {
+              return announcements[announcements.length - 1] ?? "";
+            },
+          }
+        : null,
   };
 
   class DOMParserStub {
@@ -146,7 +161,7 @@ function harness(fetchStub: FetchStub): Harness {
     AbortController,
   ) as Harness["nav"];
 
-  return { nav, current: () => current.id, pushed, titles, hardNavigations };
+  return { nav, current: () => current.id, pushed, titles, hardNavigations, announcements };
 }
 
 const ev = (): { preventDefault(): void } => ({ preventDefault: (): void => {} });
@@ -174,6 +189,11 @@ test("a stale navigation cannot replace the page or push its URL", async () => {
   assert.equal(h.current(), "火", "a superseded navigation replaced the page");
   assert.deepEqual(h.pushed, ["/火"], "a superseded navigation pushed its URL");
   assert.deepEqual(h.titles, ["火 title"], "a superseded navigation set the document title");
+  assert.deepEqual(
+    h.announcements,
+    ["火 title"],
+    "a superseded navigation announced itself — the screen reader hears a kanji the user already left",
+  );
 });
 
 test("an aborted navigation never triggers the hard-reload fallback", async () => {
@@ -224,6 +244,20 @@ test("a successful navigation swaps the page and pushes a clean URL", async () =
   assert.deepEqual(h.hardNavigations, []);
 });
 
+test("a successful navigation announces the new kanji to the live region", async () => {
+  // replaceWith destroys the node holding focus, so without an announcement a
+  // screen-reader user hears NOTHING when prev/next swaps the page.
+  const h = harness(async () => page("火"));
+
+  await h.nav("/火", ev());
+
+  assert.deepEqual(
+    h.announcements,
+    ["火 title"],
+    "navigateKanji no longer writes to #a11y-status — prev/next is silent for screen readers",
+  );
+});
+
 test("a response with no .container2 falls back rather than blanking the page", async () => {
   const h = harness(async () => page(""));
 
@@ -240,6 +274,29 @@ test("a response with no .container2 falls back rather than blanking the page", 
 // makes this the weaker kind of gate — it survives a rename and goes green while guarding
 // nothing. It is here because the failure is silent (a held key looks like a broken page,
 // not an error) and the guard is one easily-dropped line.
+test("Space on a focused control yields to that control", () => {
+  // Without this guard, Space on a Tab-focused audio or Info button is
+  // preventDefault-ed by the global handler and toggles the VIDEO instead —
+  // and on the radical-anim div it double-fires (its own handler plus this one).
+  assert.match(
+    src,
+    /e\.code === 'Space' && e\.target\.closest\('button, \[role="button"\], a'\)/,
+    "the Space-yield guard is gone from the detail keydown handler — a focused " +
+      "button's activation is swallowed and the video toggles instead",
+  );
+});
+
+test("shortcuts stand down while the help dialog is open", () => {
+  // ArrowLeft/Right would otherwise navigate away and replace .container2,
+  // destroying the open dialog mid-read.
+  assert.match(
+    src,
+    /this\.\$refs\.helpDialog\.open\) return;/,
+    "the modal guard is gone from the detail keydown handler — arrow keys " +
+      "navigate behind the open Quick Reference and destroy it",
+  );
+});
+
 test("the detail keydown handler ignores auto-repeat", () => {
   assert.match(
     src,

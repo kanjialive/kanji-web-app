@@ -149,6 +149,18 @@ const LOAD_BEARING: Array<[string, RegExp]> = [
   // container, painted on the frames — both halves are required.
   ["the focus ring is suppressed on the boxless .ka-rad-anim", /\.ka-rad-anim:focus-visible\s*\{[^}]*outline:\s*none\s*;/],
   ["the focus ring paints on the .ka-rad-anim frames", /\.ka-rad-anim:focus-visible\s+img\s*\{[^}]*outline:\s*2px\s+solid/],
+
+  // The sheet's only @media — motion accessibility, not responsive layout (which the
+  // sheet still deliberately avoids). Frames cut instead of dissolving for users who
+  // set the OS toggle; everyone else sees the maintainer's tuned cross-fade unchanged.
+  [
+    "reduce-motion cuts the radical cross-fade",
+    /@media \(prefers-reduced-motion: reduce\)\s*\{\s*\.ka-rad-anim img\s*\{[^}]*transition-duration/,
+  ],
+
+  // Row headers in the help tables: the UA sheet bolds and centres <th>, so without
+  // this reset the modals' look silently changes.
+  ["help-table row headers render like the cells they replaced", /\.help-table th\s*\{[^}]*font-weight:\s*normal/],
 ];
 
 for (const [name, pattern] of LOAD_BEARING) {

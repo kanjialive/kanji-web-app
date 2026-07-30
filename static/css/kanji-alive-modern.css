@@ -1345,6 +1345,15 @@ div.radical-meaning {
   opacity: 1;
 }
 
+/* Honour the OS "reduce motion" setting: the frames still land at the same
+   moments, but cut instead of dissolving. Invisible to anyone who has not set
+   the toggle — this is not a responsive @media, which the sheet still avoids. */
+@media (prefers-reduced-motion: reduce) {
+  .ka-rad-anim img {
+    transition-duration: 0.01s;
+  }
+}
+
 /* Strokes, Grade, References */
 h3.grade, p.grade, h3.nelson, p.nelson {
   left: 131px;
@@ -1624,10 +1633,18 @@ div.examples {
   margin-bottom: 10px;
 }
 
-.help-table td {
+.help-table td,
+.help-table th {
   padding: 5px;
   border: 1px solid #ddd;
   vertical-align: top;
+}
+
+/* Row headers must render exactly as the <td>s they replaced: the UA sheet
+   bolds and centres <th>, and the modals' look is frozen. */
+.help-table th {
+  font-weight: normal;
+  text-align: left;
 }
 
 /* Keyboard shortcuts / advanced-search keys (production styles these like code) */

@@ -90,7 +90,9 @@ function detailDoc(fields: Partial<KanjiDocument>): KanjiDocument {
     examples: [["水曜日", "Wednesday"]],
     kname: "mizu",
     mn_hint: "",
-    rad_position: "",
+    // Comma-separated romaji, as in the collection; the position icon (and its
+    // alt) must derive from the LAST entry, same as the filename.
+    rad_position: "hen",
     rad_name_file: "x",
     stroketimes: [],
     meaning: "water",
@@ -128,6 +130,30 @@ test("the search page names its field, has a heading, and owns a live region", a
     assert.ok(
       body.indexOf('id="a11y-status"') > body.indexOf("</main>"),
       "the live region moved INSIDE the swap target — the first search deletes it"
+    );
+
+    // The live region reports the mode only after cycling; the button itself
+    // must tell a screen reader the CURRENT mode on landing.
+    assert.ok(
+      body.includes(":aria-label=\"'Sort — currently '"),
+      "the Sort button's state label is gone — it announces as just 'Sort'"
+    );
+
+    // Keyboard guards, string-matched from the shipped page: shortcuts must not
+    // cycle the sort mode (and announce the swap) behind the open help dialog,
+    // and the eased scroll must respect the OS reduce-motion setting.
+    assert.ok(
+      body.includes("this.$refs.helpDialog.open) return;"),
+      "the modal guard is gone — arrows cycle sort modes behind the open Quick Reference"
+    );
+    assert.ok(
+      body.includes("prefers-reduced-motion"),
+      "the 900ms eased scroll no longer honours the OS reduce-motion setting"
+    );
+
+    assert.ok(
+      body.includes('<th scope="row">'),
+      "the help-modal tables lost their row headers — cells announce without context"
     );
   });
 });
@@ -224,6 +250,69 @@ test("the detail page labels its media controls and reaches the radical animatio
     assert.ok(
       body.includes('lang="ja">詳細は'),
       "the help modal's Japanese paragraph is unmarked and gets an English voice"
+    );
+
+    // navigateKanji() replaces .container2 wholesale, so its announcer must sit
+    // outside it — anchored here to the version div, the last child inside.
+    const statusAt = body.indexOf('id="a11y-status"');
+    assert.ok(statusAt !== -1, "the detail page lost its live region — prev/next announces nothing");
+    assert.ok(
+      statusAt > body.indexOf('<div class="version">'),
+      "the live region moved INSIDE .container2 — the first prev/next swap deletes it"
+    );
+
+    assert.match(
+      body,
+      /<h1 class="visually-hidden" tabindex="-1">/,
+      "the h1 lost tabindex=-1 — after a prev/next swap, keyboard focus restarts from <body>"
+    );
+
+    // Name + romaji, the same shape the results grid uses; the h3 above the
+    // image already announces "Radical", so the alt must not repeat it.
+    assert.match(
+      body,
+      /class="radical-character"[^>]*alt="みず \(mizu\)"/,
+      "the radical image lost its name + romaji alt"
+    );
+    assert.ok(
+      !body.includes('alt="Radical:'),
+      'the radical alt grew a "Radical" prefix back — the heading above it already says it'
+    );
+    assert.match(
+      body,
+      /class="radical-position"[^>]*alt="Radical position: hen"/,
+      "the position icon's alt names only the category again, not the position it depicts"
+    );
+
+    assert.match(
+      body,
+      /<h3 class="meaning" aria-level="2">/,
+      "the detail h3s lost aria-level=2 — heading navigation jumps from level 1 to 3"
+    );
+
+    // aria-disabled (never disabled, which restyles): the typeface chevrons must
+    // announce as unavailable at the ends instead of being silent no-ops.
+    assert.ok(
+      body.includes(':aria-disabled="typefaceIndex === 0"') &&
+        body.includes(':aria-disabled="typefaceIndex === typefaces.length - 1"'),
+      "the typeface chevrons no longer announce their disabled state at the ends"
+    );
+
+    assert.ok(
+      body.includes('<th scope="row">'),
+      "the help-modal tables lost their row headers — cells announce without context"
+    );
+
+    // Two keyboard guards, string-matched from the shipped page (the handler
+    // closes over `this` and cannot be lifted): Space must yield to a focused
+    // control, and no shortcut may act behind the open help dialog.
+    assert.ok(
+      body.includes("e.target.closest('button, [role=\"button\"], a')"),
+      "the Space-yield guard is gone — Space on a focused button toggles the video instead"
+    );
+    assert.ok(
+      body.includes("this.$refs.helpDialog.open) return;"),
+      "the modal guard is gone — shortcuts navigate behind the open Quick Reference"
     );
   });
 });

@@ -181,6 +181,16 @@
         const handler = (e) => {
           if (e.target.tagName === 'INPUT') return;
 
+          // A focused control owns Space: preventDefault below would swallow its
+          // activation (and the radical-anim div would fire twice — its own Space
+          // handler plus this one). Enter never reaches this switch, so only Space.
+          if (e.code === 'Space' && e.target.closest('button, [role="button"], a')) return;
+
+          // The Quick Reference is modal: no shortcut may act behind it. ArrowLeft/
+          // Right would even replace .container2 and destroy the open dialog.
+          // Escape still closes it natively.
+          if (this.$refs.helpDialog.open) return;
+
           // Nothing here wants auto-repeat: a held key fires ~33/sec. Unlike search.ejs,
           // where ArrowLeft/Right scroll and must repeat, these arrows step one kanji.
           // preventDefault still runs, or a held key scrolls the window instead.
@@ -292,6 +302,17 @@
       document.querySelector('.container2').replaceWith(nc);
       history.pushState(null, '', url.replace(/\?.*$/, ''));
       if (nc.dataset.title) document.title = nc.dataset.title;
+
+      // replaceWith destroyed the focused node: announce the new kanji and land
+      // focus on its heading, or keyboard users silently restart from <body>.
+      var status = document.getElementById('a11y-status');
+      if (status) {
+        var counter = document.querySelector('.recordCounter .search a');
+        status.textContent = (nc.dataset.title || '').replace(/ - Kanji alive$/, '') +
+          (counter ? ', ' + counter.textContent : '');
+      }
+      var heading = document.querySelector('.container2 h1');
+      if (heading) heading.focus();
     } catch(err) {
       // A superseded navigation is not a failure, and the fallback below is a HARD page
       // load — without this, aborting yanks the browser to a kanji already left.
@@ -320,7 +341,8 @@
 <div class="container">
 <div class="container2" x-data="detailPage()" data-stroketimes='<%= JSON.stringify(doc.stroketimes) %>' data-title="<%= doc.ka_utf %> - <%= doc.meaning %> - Kanji alive">
 
-  <h1 class="visually-hidden"><%= doc.ka_utf %> — <%= doc.meaning %></h1>
+  <%# tabindex="-1": navigateKanji() lands focus here after a swap. %>
+  <h1 class="visually-hidden" tabindex="-1"><%= doc.ka_utf %> — <%= doc.meaning %></h1>
 
   <%
   // Navigation context (computed server-side from search results)
@@ -356,7 +378,7 @@
       </form>
     </div>
     <div class="row2">
-      <h3 id="kanji">Kanji</h3>
+      <h3 id="kanji" aria-level="2">Kanji</h3>
 
       <div class="container-typeface-video">
         <!-- Video Mode -->
@@ -403,9 +425,11 @@
             <img x-show="typeface === 'suzumushi'" src="<%= doc.suzumushi_source %>" alt="Suzumushi typeface">
           </div>
           <div class="animation-controls">
-            <button @click="previousTypeface()" class="ka-typeface-left pointer" aria-label="Previous typeface">&#12296;</button>
+            <%# aria-disabled, not disabled: the ends must announce as unavailable
+                without picking up the UA's disabled styling. %>
+            <button @click="previousTypeface()" class="ka-typeface-left pointer" aria-label="Previous typeface" :aria-disabled="typefaceIndex === 0">&#12296;</button>
             <span class="typeface-name" x-html="typefaceDisplay" aria-live="polite"></span>
-            <button @click="nextTypeface()" class="ka-typeface-right pointer" aria-label="Next typeface">&#12297;</button>
+            <button @click="nextTypeface()" class="ka-typeface-right pointer" aria-label="Next typeface" :aria-disabled="typefaceIndex === typefaces.length - 1">&#12297;</button>
           </div>
         </div>
       </div>
@@ -438,10 +462,10 @@
       </div>
     </div>
     <div class="row2">
-      <h3 class="meaning">Meaning</h3>
+      <h3 class="meaning" aria-level="2">Meaning</h3>
       <p class="meaning"><%= doc.meaning %></p>
 
-      <h3 class="onyomi">Onyomi</h3>
+      <h3 class="onyomi" aria-level="2">Onyomi</h3>
       <%# lang="ja" is load-bearing, not decoration. The page is lang="en"; when font
           fallback reaches the generic, the browser picks the CJK face by DOCUMENT
           language — and macOS then hands back PingFang SC, i.e. CHINESE glyph forms
@@ -453,15 +477,22 @@
               statement of absence, so a mistakenly blank field can't print "n/a". */ _%>
       <p class="onyomi" lang="ja"><%= doc.onyomi === "n/a" ? "n/a" : doc.onyomi_ja %></p>
 
-      <h3 class="kunyomi">Kunyomi</h3>
+      <h3 class="kunyomi" aria-level="2">Kunyomi</h3>
       <p class="kunyomi" lang="ja"><%= doc.kunyomi_ka_display %></p>
 
       <div class="border3"><div class="border-inner"></div></div>
 
-      <h3 class="radical">Radical</h3>
-      <img class="radical-character" src="<%= doc.rad_char_source %>" alt="Radical: <%= doc.rad_name_ja %>">
+      <h3 class="radical" aria-level="2">Radical</h3>
+      <%# Name + romaji, same shape as the results grid — the h3 above already
+          announces "Radical", so the alt needn't repeat the category. %>
+      <% if (doc.rad_name_ja && doc.rad_name && doc.rad_name !== "n/a") { %>
+        <img class="radical-character" src="<%= doc.rad_char_source %>" alt="<%= doc.rad_name_ja %> (<%= doc.rad_name %>)">
+      <% } else { %>
+        <img class="radical-character" src="<%= doc.rad_char_source %>" alt="">
+      <% } %>
       <% if (doc.rad_position && doc.rad_position_file) { %>
-        <img class="radical-position" src="<%= doc.rad_position_file %>" alt="Radical position">
+        <%# The icon depicts the LAST listed position — same derivation as its filename. %>
+        <img class="radical-position" src="<%= doc.rad_position_file %>" alt="Radical position: <%= doc.rad_position.split(",").pop().trim() %>">
       <% } %>
       <div class="radical-name" lang="ja"><%= doc.rad_name_ja %></div>
       <div class="radical-meaning"><%= doc.rad_meaning %></div>
@@ -491,10 +522,10 @@
       </button>
     </div>
     <div class="row2">
-      <h3 class="strokes">Strokes</h3>
+      <h3 class="strokes" aria-level="2">Strokes</h3>
       <p class="strokes"><%= doc.kstroke %></p>
 
-      <h3 class="grade">Grade</h3>
+      <h3 class="grade" aria-level="2">Grade</h3>
       <%_ /* 229 kanji have no grade, stored as the NaN sentinel that `?grade=` searches
               on. Production renders it blank (its NaN becomes null crossing JSON); print
               the raw value here and the student reads "NaN". 々 alone says "n/a" — it is
@@ -503,15 +534,15 @@
 
       <div class="border4"><div class="border-inner"></div></div>
 
-      <h3 class="kodansha">Kodansha</h3>
+      <h3 class="kodansha" aria-level="2">Kodansha</h3>
       <p class="kodansha"><%= doc.dick %></p>
 
-      <h3 class="nelson">Classic Nelson</h3>
+      <h3 class="nelson" aria-level="2">Classic Nelson</h3>
       <p class="nelson"><%= doc.dicn %></p>
 
       <div class="border5"><div class="border-inner"></div></div>
 
-      <h3 class="hint">Hint</h3>
+      <h3 class="hint" aria-level="2">Hint</h3>
       <div class="hint" id="ka-hint"><%- doc.hint %></div>
 
       <div class="border6"><div class="border-inner"></div></div>
@@ -526,7 +557,7 @@
       </a>
     </div>
     <div class="row2">
-      <h3 class="examples">Examples</h3>
+      <h3 class="examples" aria-level="2">Examples</h3>
       <div class="examples">
         <% doc.examples.forEach((example, index) => { %>
           <div class="example">
@@ -570,6 +601,10 @@
   <!-- Version -->
   <div class="version"><p>v2.1</p></div>
 </div>
+
+<!-- Announces prev/next swaps. OUTSIDE .container2: navigateKanji() replaces
+     that node wholesale, and a live region must pre-exist the mutation. -->
+<div id="a11y-status" class="visually-hidden" role="status"></div>
 
 <!-- Logo -->
 <div class="logo">
