@@ -395,23 +395,52 @@ test("the detail page labels its media controls and reaches the radical animatio
       "the h1 lost tabindex=-1 — after a prev/next swap, keyboard focus restarts from <body>"
     );
 
-    // Japanese name only, same as the results grid (VoiceOver re-read the romaji
-    // in English); the h3 above already announces "Radical". role="img" on both:
-    // Safari otherwise exposes the SVG file's INTERNAL tree as extra VoiceOver
-    // stops — its Sketch-export <title>, empty layer groups, "Created with Sketch."
+    // The radical image announces "Radical" (English voice), the name (Japanese
+    // voice), "image" — a split-language hidden span via aria-labelledby, since a
+    // flat alt inherits one language. role="img" on both images: Safari otherwise
+    // exposes the SVG file's INTERNAL tree as extra VoiceOver stops — its
+    // Sketch-export <title>, empty layer groups, "Created with Sketch."
+    assert.ok(
+      body.includes(
+        '<span id="radical-label" class="visually-hidden">Radical <span lang="ja">みず</span></span>'
+      ),
+      "the radical image lost its split-language 'Radical + name' label"
+    );
     assert.match(
       body,
-      /class="radical-character" role="img"[^>]*alt="みず"/,
-      "the radical image lost its Japanese-name alt or its role=img"
-    );
-    assert.ok(
-      !body.includes('alt="Radical:'),
-      'the radical alt grew a "Radical" prefix back — the heading above it already says it'
+      /class="radical-character" role="img" aria-labelledby="radical-label"[^>]*alt="みず"/,
+      "the radical image no longer points at its split-language label"
     );
     assert.match(
       body,
       /class="radical-position" role="img"[^>]*alt="Radical position: hen"/,
       "the position icon lost its position-naming alt or its role=img"
+    );
+
+    // The stroke count announces what it is, not a bare digit.
+    assert.ok(
+      body.includes(
+        '<span class="visually-hidden">Radical strokes </span>4'
+      ),
+      "the radical stroke count announces as a bare number again"
+    );
+
+    // VoiceOver walks the panel in DOM order; the maintainer specified the visual
+    // reading order (2026-07-30): glyph, reading, meaning, strokes, position,
+    // animation. All absolutely positioned, so the DOM is free to follow speech.
+    const radOrder = [
+      'class="radical-character"',
+      'class="radical-name"',
+      'class="radical-meaning"',
+      'class="radical-stroke"',
+      'class="radical-position"',
+      'class="ka-rad-anim',
+    ].map((sel) => body.indexOf(sel));
+    assert.ok(
+      radOrder.every((at) => at !== -1) &&
+        radOrder.every((at, i) => i === 0 || at > radOrder[i - 1]),
+      "the radical panel's DOM order no longer matches the specified speech order " +
+        "(glyph, reading, meaning, strokes, position, animation)"
     );
 
     assert.match(

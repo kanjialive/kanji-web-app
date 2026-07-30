@@ -485,26 +485,32 @@
       <div class="border3"><div class="border-inner"></div></div>
 
       <h3 class="radical" aria-level="2">Radical</h3>
-      <%# Japanese name only, same as the results grid (VoiceOver re-read the romaji
-          in English); the h3 above already announces "Radical". role="img": Safari
-          otherwise exposes the SVG file's internal tree as extra VoiceOver stops —
-          its Sketch-export <title>, empty layer groups, "Created with Sketch." %>
+      <%# VoiceOver walks this panel in DOM order; the maintainer specified the
+          visual reading order (2026-07-30): glyph, reading, meaning, strokes,
+          position, animation. Every element is absolutely positioned, so the DOM
+          follows speech order without moving a pixel. role="img": Safari otherwise
+          exposes the SVG file's internal tree as extra VoiceOver stops — its
+          Sketch-export <title>, empty layer groups, "Created with Sketch." %>
       <% if (doc.rad_name_ja && doc.rad_name && doc.rad_name !== "n/a") { %>
-        <img class="radical-character" role="img" src="<%= doc.rad_char_source %>" alt="<%= doc.rad_name_ja %>">
+        <%# Split-language name: "Radical" needs the English voice, the name the
+            Japanese one — a flat alt inherits a single language. %>
+        <span id="radical-label" class="visually-hidden">Radical <span lang="ja"><%= doc.rad_name_ja %></span></span>
+        <img class="radical-character" role="img" aria-labelledby="radical-label" src="<%= doc.rad_char_source %>" alt="<%= doc.rad_name_ja %>">
       <% } else { %>
         <%# No role="img" here: alt="" hides the image, and an explicit role would
             re-expose it as a nameless stop. %>
         <img class="radical-character" src="<%= doc.rad_char_source %>" alt="">
       <% } %>
+      <div class="radical-name" lang="ja"><%= doc.rad_name_ja %></div>
+      <div class="radical-meaning"><%= doc.rad_meaning %></div>
+      <%_ /* Only 々 reaches this as NaN (it has no radical strokes). Same sentinel, same
+              production behaviour: blank — and no sr-only prefix announcing a blank. */ _%>
+      <% const radStroke = numberOrBlank(doc.rad_stroke); %>
+      <div class="radical-stroke"><% if (radStroke !== "") { %><span class="visually-hidden">Radical strokes </span><% } %><%= radStroke %></div>
       <% if (doc.rad_position && doc.rad_position_file) { %>
         <%# The icon depicts the LAST listed position — same derivation as its filename. %>
         <img class="radical-position" role="img" src="<%= doc.rad_position_file %>" alt="Radical position: <%= doc.rad_position.split(",").pop().trim() %>">
       <% } %>
-      <div class="radical-name" lang="ja"><%= doc.rad_name_ja %></div>
-      <div class="radical-meaning"><%= doc.rad_meaning %></div>
-      <%_ /* Only 々 reaches this as NaN (it has no radical strokes). Same sentinel, same
-              production behaviour: blank. */ _%>
-      <div class="radical-stroke"><%= numberOrBlank(doc.rad_stroke) %></div>
 
       <%# role="button" on the div, not a real <button>: a <button> picks up UA styling
           (WebKit's asymmetric padding among it) and would move ink on a frozen UI. %>
