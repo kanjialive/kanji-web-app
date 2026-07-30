@@ -4,7 +4,10 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="Kanji alive is a free web application designed to help Japanese language students of all levels learn to read and write kanji."/>
-  <title><%= typeof query !== 'undefined' && query ? 'Search: ' + query + ' - ' : '' %>Kanji alive Web Application</title>
+  <%# Query-first, matching the detail pages ("女 - woman - Kanji alive"): the
+      distinctive part survives tab truncation, and a bookmark is offered a
+      descriptive name. loadResults() keeps it current via the X-Title header. %>
+  <title><%= typeof query !== 'undefined' && query ? query + ' - Kanji alive' : 'Kanji alive Web Application' %></title>
 
   <!-- CSS -->
   <link href="/static/css/kanji-alive-modern.css" rel="stylesheet">
@@ -63,6 +66,11 @@
       // Show the full-page URL, not the partial endpoint
       var pushUrl = res.headers.get('X-Push-Url');
       if (pushUrl) history.pushState(null, '', pushUrl);
+
+      // Keep the tab/bookmark name in step with that URL. Percent-encoded on
+      // the wire — headers cannot carry raw Japanese.
+      var title = res.headers.get('X-Title');
+      if (title) document.title = decodeURIComponent(title);
 
       // Alpine's MutationObserver initialises the new subtree on its own; this
       // just tells the page component to re-measure the custom scrollbar.

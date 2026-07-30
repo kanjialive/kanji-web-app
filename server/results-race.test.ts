@@ -144,6 +144,7 @@ type Harness = {
   target: FakeTarget;
   pushed: string[];
   events: string[];
+  titles: string[];
   location: { href: string };
 };
 
@@ -151,6 +152,7 @@ function harness(fetchStub: FetchStub): Harness {
   const target = makeTarget();
   const pushed: string[] = [];
   const events: string[] = [];
+  const titles: string[] = [];
   const windowStub = {
     location: { href: "" },
     loadResults: undefined as unknown as (url: string) => Promise<void>,
@@ -161,6 +163,14 @@ function harness(fetchStub: FetchStub): Harness {
     dispatchEvent: (e: { type: string }): boolean => {
       events.push(e.type);
       return true;
+    },
+    // Records every document.title assignment: like the innerHTML writes above,
+    // WHICH responses set the title matters, not just the final value.
+    set title(v: string) {
+      titles.push(v);
+    },
+    get title(): string {
+      return titles[titles.length - 1] ?? "";
     },
   };
   const historyStub = {
@@ -195,7 +205,7 @@ function harness(fetchStub: FetchStub): Harness {
     AbortController, // the real one — Node has it, so there is no need to fake it
   ) as (url: string) => Promise<void>;
 
-  return { load, target, pushed, events, location: windowStub.location };
+  return { load, target, pushed, events, titles, location: windowStub.location };
 }
 
 // ── the race (#4) ────────────────────────────────────────────────────────────────────
@@ -207,7 +217,10 @@ test("a stale response cannot overwrite a newer one", async () => {
   // server, never the correctness guarantee — that is what the request stamp is for.
   const env = harness(async (url) => {
     await new Promise<void>((resolve) => release.push(resolve));
-    return response(`<p>${url}</p>`, { "X-Push-Url": url });
+    return response(`<p>${url}</p>`, {
+      "X-Push-Url": url,
+      "X-Title": encodeURIComponent(`${url} title`),
+    });
   });
 
   const first = env.load("/htmx/partials/results?mode=rsort");
@@ -232,6 +245,23 @@ test("a stale response cannot overwrite a newer one", async () => {
     "a superseded response pushed its URL, desynchronising the address bar from the view",
   );
   assert.deepEqual(env.events, ["results:loaded"]);
+  assert.deepEqual(
+    env.titles,
+    ["/htmx/partials/results?mode=ksort title"],
+    "a superseded response set document.title, naming a search the user already left",
+  );
+});
+
+test("the title header is percent-decoded before it reaches the tab", async () => {
+  // Headers cannot carry raw Japanese, so the server percent-encodes X-Title.
+  // Without the decode, a search for 水 titles the tab "%E6%B0%B4 - Kanji alive".
+  const env = harness(async () =>
+    response("<p>ok</p>", { "X-Title": encodeURIComponent("水 - Kanji alive") }),
+  );
+
+  await env.load("/htmx/partials/results?q=%E6%B0%B4");
+
+  assert.deepEqual(env.titles, ["水 - Kanji alive"]);
 });
 
 test("a stale response cannot navigate the browser", async () => {

@@ -432,6 +432,20 @@ router.get("/partials/results", async (req: Request, res: Response) => {
     basicQuery || isAdvanced ? "/search" + queryString : "/search";
   res.setHeader("X-Push-Url", pushUrl);
 
+  // And the matching tab/bookmark title — query-first like the detail pages,
+  // same string search.ejs renders into <title> on a full page load. Set for
+  // every outcome including zero results: the title names what was ASKED.
+  // Percent-encoded because headers cannot carry raw Japanese.
+  const displayQuery = isAdvanced
+    ? buildAdvancedSearchInput(req.query as Record<string, unknown>)
+    : basicQuery;
+  res.setHeader(
+    "X-Title",
+    encodeURIComponent(
+      displayQuery ? `${displayQuery} - Kanji alive` : "Kanji alive Web Application"
+    )
+  );
+
   try {
     if (!basicQuery && !isAdvanced) {
       return res.render("partials/welcome");

@@ -158,6 +158,56 @@ test("the search page names its field, has a heading, and owns a live region", a
   });
 });
 
+test("pages carry descriptive, query-first titles (WCAG 2.4.2)", async () => {
+  // The title is the bookmark's offered name and the tab's label. Query-first,
+  // matching the detail pages, so the distinctive part survives tab truncation.
+  // The welcome page alone keeps the application name.
+  const docs = [detailDoc({})];
+  await withServer(resultsDb(docs), async (base) => {
+    const welcome = await (await fetch(`${base}/search`, boundedFetch())).text();
+    assert.ok(
+      welcome.includes("<title>Kanji alive Web Application</title>"),
+      "the welcome page lost its application-name title"
+    );
+
+    const basic = await (await fetch(`${base}/search/tree`, boundedFetch())).text();
+    assert.ok(
+      basic.includes("<title>tree - Kanji alive</title>"),
+      "a basic search no longer titles the tab with the query"
+    );
+
+    const advanced = await (
+      await fetch(`${base}/search/advanced?ks=3&grade=1`, boundedFetch())
+    ).text();
+    assert.ok(
+      advanced.includes("<title>ks:3 grade:1 - Kanji alive</title>"),
+      "an advanced search no longer titles the tab with its colon syntax"
+    );
+
+    // The XHR path: loadResults() swaps results without a page load, so the
+    // title must travel as a header (percent-encoded — headers cannot carry
+    // raw Japanese) or it goes stale the moment the user searches in-page.
+    const partial = await fetch(
+      `${base}/partials/results?q=${encodeURIComponent("水")}`,
+      boundedFetch()
+    );
+    assert.equal(
+      decodeURIComponent(partial.headers.get("x-title") ?? ""),
+      "水 - Kanji alive",
+      "the results partial no longer carries X-Title — in-page searches leave the tab stale"
+    );
+
+    // The detail pages had this right all along; pin it while we are here.
+    const detail = await (
+      await fetch(`${base}/${encodeURIComponent("水")}`, boundedFetch())
+    ).text();
+    assert.ok(
+      detail.includes("<title>水 - water - Kanji alive</title>"),
+      "the detail page lost its kanji-first title"
+    );
+  });
+});
+
 test("the grouped results view announces its headings and names only the radicals", async () => {
   const docs = [
     kanjiDoc({}),
