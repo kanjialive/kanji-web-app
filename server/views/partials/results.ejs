@@ -68,10 +68,11 @@ function buildDetailUrl(kanjiChar) {
                 <div class="grouped-column inline">
                   <% column.forEach(radical => { %>
                     <div>
-                      <%# Name + romaji ONLY, never the meaning: the app withholds easy
-                          answers so students must recognise the character themselves. %>
+                      <%# Japanese name ONLY, never the meaning (the app withholds easy
+                          answers). No romaji either: VoiceOver speaks the name, then
+                          re-read the romaji in English — the same name twice. %>
                       <% if (radical.rad_name_ja && radical.rad_name && radical.rad_name !== "n/a") { %>
-                      <div class="ka-radical inline" lang="ja" role="img" aria-label="<%= radical.rad_name_ja %> (<%= radical.rad_name %>)"><%= radical.radical %></div>
+                      <div class="ka-radical inline" lang="ja" role="img" aria-label="<%= radical.rad_name_ja %>"><%= radical.radical %></div>
                       <% } else { %>
                       <div class="ka-radical inline" lang="ja"><%= radical.radical %></div>
                       <% } %>
@@ -121,9 +122,9 @@ function buildDetailUrl(kanjiChar) {
                 <div class="grouped-column inline">
                   <% column.forEach(radical => { %>
                     <div>
-                      <%# Name + romaji ONLY, never the meaning — see the ksort branch. %>
+                      <%# Japanese name ONLY, no romaji or meaning — see the ksort branch. %>
                       <% if (radical.rad_name_ja && radical.rad_name && radical.rad_name !== "n/a") { %>
-                      <div class="ka-radical inline" lang="ja" role="img" aria-label="<%= radical.rad_name_ja %> (<%= radical.rad_name %>)"><%= radical.radical %></div>
+                      <div class="ka-radical inline" lang="ja" role="img" aria-label="<%= radical.rad_name_ja %>"><%= radical.radical %></div>
                       <% } else { %>
                       <div class="ka-radical inline" lang="ja"><%= radical.radical %></div>
                       <% } %>

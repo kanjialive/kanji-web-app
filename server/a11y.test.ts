@@ -260,12 +260,17 @@ test("the grouped results view announces its headings and names only the radical
       "the bare count is exposed again and is read twice, once as stray text"
     );
 
-    // Pedagogical ruling: the radical carries name + romaji ONLY. No "Radical" prefix
-    // (role=img already announces a category), and never its meaning.
+    // Pedagogical ruling: never the meaning. And the JAPANESE NAME ONLY, no romaji —
+    // VoiceOver spoke the name, then re-read the romaji in English, a duplicate the
+    // maintainer heard himself (2026-07-30). No "Radical" prefix: role=img says it.
     assert.match(
       body,
-      /role="img" aria-label="[^"]+ \([^)]+\)"/,
-      "the grey radical glyph lost its name + romaji label"
+      /role="img" aria-label="みず"/,
+      "the grey radical glyph lost its Japanese-name label"
+    );
+    assert.ok(
+      !/role="img" aria-label="[^"]*\(/.test(body),
+      "romaji came back into the radical label — VoiceOver reads the name twice again"
     );
     assert.ok(
       !body.includes('aria-label="Radical'),
@@ -277,6 +282,21 @@ test("the grouped results view announces its headings and names only the radical
       !/class="ka"[^>]*aria-label/.test(body) &&
         !/aria-label[^>]*class="ka"/.test(body),
       "a kanji link grew a label — the app deliberately withholds the answer"
+    );
+
+    // The ksort view renders the radical label from a SEPARATE branch of the
+    // partial; pin it to the same shape or it drifts on its own.
+    const ksort = await (
+      await fetch(`${base}/partials/results?q=water&mode=ksort`, boundedFetch())
+    ).text();
+    assert.match(
+      ksort,
+      /role="img" aria-label="みず"/,
+      "the ksort radical glyph lost its Japanese-name label"
+    );
+    assert.ok(
+      !/role="img" aria-label="[^"]*\(/.test(ksort),
+      "romaji came back into the ksort radical label — VoiceOver reads the name twice again"
     );
   });
 });
