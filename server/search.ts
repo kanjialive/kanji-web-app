@@ -47,7 +47,35 @@ const array_keys: StringDict = {
  */
 const searchOperand = (value: string): string => value.toLowerCase();
 
-export const parseAdvancedQuery = (query: StringDict): ParsedQuery => {
+/**
+ * `text` (textbook) and `list` (study list) write to the SAME field, so the OPERAND
+ * decides which one a query really is — `?list=gen:c3` reached a licensed textbook
+ * through the unrestricted key. Study lists (`ap`, `mac`) are public; the other
+ * textbook codes are licence-restricted (CLAUDE.md "Key Patterns"), and the public
+ * API's published docs promise textbook search is unavailable there. A disallowed
+ * operand matches NOTHING, never drops — dropping silently broadens
+ * `?text=gen&grade=1` to `?grade=1`.
+ */
+const STUDY_LIST_OPERAND = /^(ap|mac)(:|$)/;
+
+export type SearchSurface = "app" | "public";
+
+const textbookOperandAllowed = (
+  key: string,
+  operand: string,
+  surface: SearchSurface
+): boolean => {
+  if (key === "text" && surface === "public") return false;
+  // "" is the absence search every advanced key supports.
+  if (operand === "") return true;
+  if (key === "list") return STUDY_LIST_OPERAND.test(operand);
+  return true;
+};
+
+export const parseAdvancedQuery = (
+  query: StringDict,
+  surface: SearchSurface = "app"
+): ParsedQuery => {
   const parsed_query: ParsedQuery = {};
 
   for (const key in numeric_keys) {
@@ -109,8 +137,9 @@ export const parseAdvancedQuery = (query: StringDict): ParsedQuery => {
     if (Object.prototype.hasOwnProperty.call(query, key)) {
       const textbook_value = query[key];
       if (typeof textbook_value === "string") {
+        const operand = searchOperand(textbook_value);
         parsed_query[textbook_keys[key]] = {
-          $in: [searchOperand(textbook_value)],
+          $in: textbookOperandAllowed(key, operand, surface) ? [operand] : [],
         };
       }
     }

@@ -181,6 +181,109 @@ test("a parseable advanced search still queries Mongo and returns results", asyn
   assert.equal((res.body as unknown[]).length, 3);
 });
 
+/**
+ * LICENCE-RESTRICTED fields (CLAUDE.md "Key Patterns"): mn_hint, hint_group,
+ * txt_books and textbook_search must never leave the public API — the published
+ * docs promise they are unavailable, and for years the ...doc spread shipped them
+ * anyway. Everything else keeps its shape: ~60 live RapidAPI consumers.
+ *
+ * Seen red: restoring the plain `...doc` spread fails the first test; removing the
+ * "public" surface argument from advancedSearch fails the text/list ones.
+ */
+const LICENSED_FIELDS = [
+  "mn_hint",
+  "hint_group",
+  "txt_books",
+  "textbook_search",
+];
+
+test("licensed fields never appear in the public kanji response", () => {
+  const leakyDoc = {
+    ...doc,
+    mn_hint: "Between the rivers…",
+    hint_group: 2,
+    txt_books: [{ chapter: "19", txt_bk: "txtGenki" }],
+    textbook_search: ["gen", "gen:c19"],
+  } as unknown as KanjiDocument;
+
+  const out = extendKanjiWithAssets(leakyDoc) as unknown as Record<
+    string,
+    unknown
+  >;
+  for (const field of LICENSED_FIELDS) {
+    assert.ok(!(field in out), `${field} must not leave the public API`);
+  }
+  // deletion, not a DTO: the rest of the document keeps its shape
+  assert.equal(out.ka_utf, "水");
+  assert.equal(out.kname, "water");
+  assert.equal(out.grade, 1);
+});
+
+test("both public kanji read paths project the licensed fields out at Mongo", async () => {
+  const projections: unknown[] = [];
+  const stubCollection = {
+    findOne: async (
+      _filter: object,
+      options?: { projection?: object }
+    ): Promise<KanjiDocument | null> => {
+      projections.push(options?.projection);
+      return null;
+    },
+    find: (_filter: object, options?: { projection?: object }): StubCursor => {
+      projections.push(options?.projection);
+      return { toArray: async (): Promise<KanjiDocument[]> => [] };
+    },
+  };
+  const stubDb = {
+    collection: (): typeof stubCollection => stubCollection,
+  } as unknown as Db;
+  publicApi.init(stubDb);
+
+  await publicApi.getKanjiWithCharacter(
+    { params: { character: "水" } } as unknown as Request,
+    captureRes() as unknown as Response
+  );
+  await publicApi.getAllKanji(
+    {} as Request,
+    captureRes() as unknown as Response
+  );
+
+  assert.equal(projections.length, 2, "both read paths must hit the stub");
+  for (const projection of projections) {
+    assert.deepEqual(projection, {
+      mn_hint: 0,
+      hint_group: 0,
+      txt_books: 0,
+      textbook_search: 0,
+    });
+  }
+});
+
+// The filter is a read primitive: even with a clean body, an accepted ?text= or
+// ?list= discloses the licensed mapping one query at a time. On the public route
+// text matches NOTHING (never dropped — dropping broadens a combined query), and
+// list accepts only the two public study lists.
+const TEXTBOOK_FILTER_CASES: [Record<string, string>, object][] = [
+  [{ text: "gen:c3" }, { textbook_search: { $in: [] } }],
+  [{ list: "gen:c3" }, { textbook_search: { $in: [] } }],
+  [{ list: "ap:c3" }, { textbook_search: { $in: ["ap:c3"] } }],
+];
+
+for (const [query, expected] of TEXTBOOK_FILTER_CASES) {
+  test(`public advanced search ${JSON.stringify(query)} filters as ${JSON.stringify(expected)}`, async () => {
+    const calls: object[] = [];
+    publicApi.init(countingDb(calls));
+    const res = captureRes();
+
+    await publicApi.advancedSearch(
+      { query } as unknown as Parameters<typeof publicApi.advancedSearch>[0],
+      res as unknown as Response
+    );
+
+    assert.deepEqual(calls, [expected]);
+  });
+}
+
 test("basic search is unaffected — its filter is never empty", async () => {
   const calls: object[] = [];
   publicApi.init(countingDb(calls));

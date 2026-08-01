@@ -16,13 +16,12 @@ export const init = (database: Db) => {
  * Fields excluded from every private-API response.
  *
  * `textbook_search` and `mn_hint` are both LICENCE-RESTRICTED and this endpoint is
- * unauthenticated — but this projection closes very little:
+ * unauthenticated — and this projection alone closes very little:
  *
- *   - public-api.ts returns both fields anyway: it spreads the whole document and
- *     projects nothing on either kanji read path.
- *   - The filter is the leak. search.ts maps text/list onto textbook_search, so an
- *     unauthenticated ?list=gen:19 returns exactly that chapter whether or not the
- *     field is in the body.
+ *   - The filter is the leak. search.ts maps text onto textbook_search, so an
+ *     unauthenticated ?text=gen:19 on THIS route returns exactly that chapter
+ *     whether or not the field is in the body. (The public route rejects it, and
+ *     ?list= now accepts only the two public study lists on every route.)
  *   - mn_hint cannot be dropped here at all: AngularJS renders the hint from JSON.
  *     Phase 7 closes that leak and no other.
  *

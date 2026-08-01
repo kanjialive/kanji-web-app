@@ -57,8 +57,16 @@ export interface KanjiDocument {
   txt_books: TxtBook[];
 }
 
+/** LICENCE-RESTRICTED (see CLAUDE.md "Key Patterns"): the mnemonic hint and the
+ * textbook/chapter mapping. None of these may appear on a public-API surface. */
+export type LicensedField =
+  | "mn_hint"
+  | "hint_group"
+  | "txt_books"
+  | "textbook_search";
+
 export interface SimpleExtendedKanjiDocument
-  extends Omit<KanjiDocument, "examples"> {
+  extends Omit<KanjiDocument, "examples" | LicensedField> {
   kanji: Kanji;
   radical: Radical;
   examples: Example[];

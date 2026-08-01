@@ -169,6 +169,60 @@ test("parseAdvancedQuery maps textbook key to textbook_search", () => {
   });
 });
 
+// `text` and `list` write to the SAME field, so the OPERAND decides which one a
+// query really is: ?list=gen:c3 reached a licensed textbook through the
+// unrestricted key. Study lists (ap, mac) are public; the other codes are
+// licence-restricted. A disallowed operand matches NOTHING, never drops.
+test("list accepts only study-list operands; anything else matches nothing", () => {
+  assert.deepEqual(parseAdvancedQuery({ list: "ap" }), {
+    textbook_search: { $in: ["ap"] },
+  });
+  assert.deepEqual(parseAdvancedQuery({ list: "ap:c3" }), {
+    textbook_search: { $in: ["ap:c3"] },
+  });
+  assert.deepEqual(parseAdvancedQuery({ list: "mac:c12" }), {
+    textbook_search: { $in: ["mac:c12"] },
+  });
+  assert.deepEqual(parseAdvancedQuery({ list: "gen:c3" }), {
+    textbook_search: { $in: [] },
+  });
+  // a bare prefix is not a study list
+  assert.deepEqual(parseAdvancedQuery({ list: "apx" }), {
+    textbook_search: { $in: [] },
+  });
+});
+
+// The published public-API docs promise textbook search is unavailable. On the
+// public surface `text` therefore matches nothing — for EVERY operand, so a
+// combined ?text=gen&grade=1 honestly finds zero instead of running grade alone.
+test("text matches nothing on the public surface, still works in the app", () => {
+  assert.deepEqual(parseAdvancedQuery({ text: "gen:c3" }, "public"), {
+    textbook_search: { $in: [] },
+  });
+  // even a study-list operand: list= is the documented public spelling
+  assert.deepEqual(parseAdvancedQuery({ text: "ap:c3" }, "public"), {
+    textbook_search: { $in: [] },
+  });
+  assert.deepEqual(parseAdvancedQuery({ text: "" }, "public"), {
+    textbook_search: { $in: [] },
+  });
+  // the app surface (private API, EJS, Angular) keeps its textbook search
+  assert.deepEqual(parseAdvancedQuery({ text: "gen:c3" }), {
+    textbook_search: { $in: ["gen:c3"] },
+  });
+});
+
+// ?list= stays the absence search (?key= is the ONE spelling for absence, on
+// every advanced key) — on every surface, since study-list data is public.
+test("?list= stays the absence search on both surfaces", () => {
+  assert.deepEqual(parseAdvancedQuery({ list: "" }), {
+    textbook_search: { $in: [""] },
+  });
+  assert.deepEqual(parseAdvancedQuery({ list: "" }, "public"), {
+    textbook_search: { $in: [""] },
+  });
+});
+
 test("parseAdvancedQuery returns an empty object for empty input", () => {
   assert.deepEqual(parseAdvancedQuery({}), {});
 });

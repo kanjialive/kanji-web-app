@@ -3,6 +3,7 @@ import { Request, Response } from "express";
 import * as search from "./search";
 import {
   Example,
+  LicensedField,
   SimpleExtendedKanjiDocument,
   Kanji,
   KanjiDocument,
@@ -21,6 +22,28 @@ let db: Db;
 
 export const init = (database: Db) => {
   db = database;
+};
+
+/**
+ * LICENCE-RESTRICTED fields (CLAUDE.md "Key Patterns") — the mnemonic hint and the
+ * textbook mapping must never leave the public API. Excluded at the Mongo read AND
+ * at the response spread, so neither a new read path nor a new spread leaks alone.
+ */
+const LICENSED_FIELDS_PROJECTION: Record<LicensedField, 0> = {
+  mn_hint: 0,
+  hint_group: 0,
+  txt_books: 0,
+  textbook_search: 0,
+};
+
+const withoutLicensedFields = (
+  doc: KanjiDocument
+): Omit<KanjiDocument, LicensedField> => {
+  const copy: Partial<KanjiDocument> = { ...doc };
+  for (const field of Object.keys(LICENSED_FIELDS_PROJECTION)) {
+    delete copy[field as LicensedField];
+  }
+  return copy as Omit<KanjiDocument, LicensedField>;
 };
 
 /**
@@ -82,7 +105,7 @@ export const advancedSearch = async (
   req: Request<Record<string, string>, unknown, unknown, search.StringDict>,
   res: Response
 ) => {
-  const query = search.parseAdvancedQuery(req.query);
+  const query = search.parseAdvancedQuery(req.query, "public");
   await getSearchResultsWithQuery(query, req, res);
 };
 
@@ -94,9 +117,10 @@ export const basicSearch = async (req: Request, res: Response) => {
 export const getKanjiWithCharacter = async (req: Request, res: Response) => {
   try {
     const collection: Collection<KanjiDocument> = db.collection("kanji");
-    const result: KanjiDocument | null = await collection.findOne({
-      ka_utf: req.params.character,
-    });
+    const result: KanjiDocument | null = await collection.findOne(
+      { ka_utf: req.params.character },
+      { projection: LICENSED_FIELDS_PROJECTION }
+    );
     if (result) {
       res.send(extendKanjiWithAssets(result));
     } else {
@@ -111,7 +135,9 @@ export const getKanjiWithCharacter = async (req: Request, res: Response) => {
 export const getAllKanji = async (req: Request, res: Response) => {
   try {
     const collection: Collection<KanjiDocument> = db.collection("kanji");
-    const results: KanjiDocument[] = await collection.find({}).toArray();
+    const results: KanjiDocument[] = await collection
+      .find({}, { projection: LICENSED_FIELDS_PROJECTION })
+      .toArray();
     const structured_results = results.map((doc) =>
       extendKanjiWithAssets(doc)
     );
@@ -276,7 +302,7 @@ export function extendKanjiWithAssets(
   }
 
   const extendedKanji: SimpleExtendedKanjiDocument = {
-    ...doc,
+    ...withoutLicensedFields(doc),
     kanji: kanji,
     radical: radical,
     references: references,
