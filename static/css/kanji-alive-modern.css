@@ -333,7 +333,11 @@ h3 {
 }
 
 /* Screen-reader-only content. The clip pattern, not display:none — hidden
-   content must stay in the accessibility tree to be announced. */
+   content must stay in the accessibility tree to be announced. font-size 1px:
+   clip hides the PAINT but the text still lays out at full width, and VoiceOver
+   draws its cursor around that invisible run — smearing the rectangle across
+   neighbouring content. Tiny text keeps the geometry inside the parent's box;
+   what is spoken is unaffected. */
 .visually-hidden {
   position: absolute;
   width: 1px;
@@ -344,6 +348,8 @@ h3 {
   clip: rect(0, 0, 0, 0);
   white-space: nowrap;
   border: 0;
+  font-size: 1px;
+  line-height: 1;
 }
 
 /* ============================================
