@@ -587,14 +587,14 @@
               <div class="example-ja example-english"><%= example.english %></div>
             </div>
             <div class="example-audio">
-              <%# Text child, not aria-label: a flat label inherits one language, but the
-                  Japanese word must reach a Japanese voice and the verb an English one.
-                  aria-labelledby points at that child — name-from-content would prepend
-                  the CSS play glyph (a private-use character) to the announcement. %>
+              <%# "Play pronunciation", nothing more — "of <word>" was cut as too
+                  verbose (his ruling, 2026-08-01): the word is the row just read.
+                  aria-label, not name-from-content: the label keeps the CSS play
+                  glyph (a private-use character) out of the announcement. %>
               <button class="icon-play audio-play ka-icon-gray pointer"
                       data-audio="<%= example.mp3 %>"
-                      aria-labelledby="example-audio-label-<%= index %>"
-                      onclick="playExampleAudio(this.dataset.audio)"><span id="example-audio-label-<%= index %>" class="visually-hidden">Play pronunciation of <span lang="ja"><%= example.japanese %></span></span></button>
+                      aria-label="Play pronunciation"
+                      onclick="playExampleAudio(this.dataset.audio)"></button>
             </div>
           </div>
         <% }); %>

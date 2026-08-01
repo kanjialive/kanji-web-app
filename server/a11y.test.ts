@@ -326,19 +326,18 @@ test("the detail page labels its media controls and reaches the radical animatio
     // Text child, not aria-label: the Japanese word must reach a Japanese voice.
     // Named via aria-labelledby to that child — name-from-content would prepend
     // the CSS play glyph (a private-use character) to every announcement.
+    // "Play pronunciation", nothing more — the maintainer cut "of <word>" as too
+    // verbose (2026-08-01): the word is the row VoiceOver just read. English-only,
+    // so a flat aria-label is safe (only mixed-language names need real text) and
+    // it keeps the CSS play glyph (a private-use character) out of the name.
     assert.match(
       body,
-      /audio-play[^>]*aria-labelledby="example-audio-label-0"/,
-      "an audio button no longer points at its label — the CSS glyph re-enters its name"
-    );
-    assert.match(
-      body,
-      /id="example-audio-label-0"[^>]*>Play pronunciation of <span lang="ja">/,
-      "the example audio buttons lost their split-language name"
+      /audio-play[^>]*aria-label="Play pronunciation"/,
+      "an audio button lost its name — the CSS glyph re-enters its announcement"
     );
     assert.ok(
-      !/audio-play[^>]*aria-label="/.test(body),
-      "a flat aria-label came back on an audio button and overrides the split-language name"
+      !/Play pronunciation of/.test(body),
+      "the verbose 'Play pronunciation of <word>' name came back on the audio buttons"
     );
 
     assert.ok(
