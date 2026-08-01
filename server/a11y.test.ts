@@ -434,17 +434,19 @@ test("the detail page labels its media controls and reaches the radical animatio
       ),
       "the radical name lost its hidden 'Radical name:' prefix or its lang=\"ja\" run"
     );
+    // &nbsp; after the colon, not a space: VoiceOver trims a run's trailing
+    // whitespace, so a plain space read as "Radical strokes:7".
     assert.ok(
       body.includes(
-        'class="radical-meaning"><span class="visually-hidden">Radical meaning: </span>'
+        'class="radical-meaning"><span class="visually-hidden">Radical meaning:&nbsp;</span>'
       ),
-      "the radical meaning lost its hidden 'Radical meaning:' prefix"
+      "the radical meaning lost its hidden 'Radical meaning:' prefix or its &nbsp;"
     );
     assert.ok(
       body.includes(
-        '<span class="visually-hidden">Radical strokes: </span>4'
+        '<span class="visually-hidden">Radical strokes:&nbsp;</span>4'
       ),
-      "the radical stroke count announces as a bare number again, or lost its colon"
+      "the radical stroke count announces as a bare number again, or lost its &nbsp;"
     );
 
     // VoiceOver walks the panel in DOM order; the maintainer specified the visual

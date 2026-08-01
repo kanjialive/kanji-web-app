@@ -509,11 +509,13 @@
           (his spec, 2026-08-01); the colon paces the speech. Prefixes are REAL text
           in the page language, the name a lang="ja" run — never aria-labels. %>
       <div class="radical-name"><span class="visually-hidden">Radical name: </span><span lang="ja"><%= doc.rad_name_ja %></span></div>
-      <div class="radical-meaning"><span class="visually-hidden">Radical meaning: </span><%= doc.rad_meaning %></div>
+      <%# &nbsp;, not a space: VoiceOver trims a text run's trailing whitespace, so
+          a plain space vanished and the caption read "Radical meaning:words". %>
+      <div class="radical-meaning"><span class="visually-hidden">Radical meaning:&nbsp;</span><%= doc.rad_meaning %></div>
       <%_ /* Only 々 reaches this as NaN (it has no radical strokes). Same sentinel, same
               production behaviour: blank — and no sr-only prefix announcing a blank. */ _%>
       <% const radStroke = numberOrBlank(doc.rad_stroke); %>
-      <div class="radical-stroke"><% if (radStroke !== "") { %><span class="visually-hidden">Radical strokes: </span><% } %><%= radStroke %></div>
+      <div class="radical-stroke"><% if (radStroke !== "") { %><span class="visually-hidden">Radical strokes:&nbsp;</span><% } %><%= radStroke %></div>
       <% if (doc.rad_position && doc.rad_position_file) { %>
         <%# The icon depicts the LAST listed position — same derivation as its filename. %>
         <img class="radical-position" role="img" src="<%= doc.rad_position_file %>" alt="Radical position: <%= doc.rad_position.split(",").pop().trim() %>">
