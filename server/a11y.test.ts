@@ -398,9 +398,11 @@ test("the detail page labels its media controls and reaches the radical animatio
       "the h1 lost tabindex=-1 — after a prev/next swap, keyboard focus restarts from <body>"
     );
 
-    // The radical image announces "Radical" (English voice), the name (Japanese
-    // voice), "image" — a split-language hidden span via aria-labelledby, since a
-    // flat alt inherits one language. role="img" on both images: Safari otherwise
+    // Every radical-panel element announces what it is before its value, matching
+    // "Radical position: hen" — the maintainer's spec, 2026-08-01. The image's
+    // label splits languages ("Radical image:" English, the name Japanese) via
+    // aria-labelledby, since a flat alt inherits one language. role="img" on both
+    // images: Safari otherwise
     // exposes the SVG file's INTERNAL tree as extra VoiceOver stops — its
     // Sketch-export <title>, empty layer groups, "Created with Sketch."
     // aria-hidden: the span is a LABEL SOURCE, not content — without it VoiceOver
@@ -408,9 +410,10 @@ test("the detail page labels its media controls and reaches the radical animatio
     // aria-labelledby still resolves into hidden elements by spec.
     assert.ok(
       body.includes(
-        '<span id="radical-label" class="visually-hidden" aria-hidden="true">Radical <span lang="ja">みず</span></span>'
+        '<span id="radical-label" class="visually-hidden" aria-hidden="true">Radical image: <span lang="ja">みず</span></span>'
       ),
-      "the radical image's label span lost aria-hidden — VoiceOver stops on it as a phantom item"
+      "the radical image's label span lost its 'Radical image:' prefix or its " +
+        "aria-hidden — VoiceOver stops on it as a phantom item without the latter"
     );
     assert.match(
       body,
@@ -423,12 +426,25 @@ test("the detail page labels its media controls and reaches the radical animatio
       "the position icon lost its position-naming alt or its role=img"
     );
 
-    // The stroke count announces what it is, not a bare digit.
+    // Name, meaning and stroke count announce what they are, not bare values. The
+    // colon is deliberate: it paces the spoken announcement (his wording).
     assert.ok(
       body.includes(
-        '<span class="visually-hidden">Radical strokes </span>4'
+        'class="radical-name"><span class="visually-hidden">Radical name: </span><span lang="ja">みず</span>'
       ),
-      "the radical stroke count announces as a bare number again"
+      "the radical name lost its hidden 'Radical name:' prefix or its lang=\"ja\" run"
+    );
+    assert.ok(
+      body.includes(
+        'class="radical-meaning"><span class="visually-hidden">Radical meaning: </span>'
+      ),
+      "the radical meaning lost its hidden 'Radical meaning:' prefix"
+    );
+    assert.ok(
+      body.includes(
+        '<span class="visually-hidden">Radical strokes: </span>4'
+      ),
+      "the radical stroke count announces as a bare number again, or lost its colon"
     );
 
     // VoiceOver walks the panel in DOM order; the maintainer specified the visual

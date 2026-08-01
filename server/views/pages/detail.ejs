@@ -498,19 +498,22 @@
             Japanese one — a flat alt inherits a single language. aria-hidden: this
             span is a label source, not content — without it VoiceOver stops on it
             as a phantom item. aria-labelledby resolves into hidden elements. %>
-        <span id="radical-label" class="visually-hidden" aria-hidden="true">Radical <span lang="ja"><%= doc.rad_name_ja %></span></span>
+        <span id="radical-label" class="visually-hidden" aria-hidden="true">Radical image: <span lang="ja"><%= doc.rad_name_ja %></span></span>
         <img class="radical-character" role="img" aria-labelledby="radical-label" src="<%= doc.rad_char_source %>" alt="<%= doc.rad_name_ja %>">
       <% } else { %>
         <%# No role="img" here: alt="" hides the image, and an explicit role would
             re-expose it as a nameless stop. %>
         <img class="radical-character" src="<%= doc.rad_char_source %>" alt="">
       <% } %>
-      <div class="radical-name" lang="ja"><%= doc.rad_name_ja %></div>
-      <div class="radical-meaning"><%= doc.rad_meaning %></div>
+      <%# Hidden English prefixes name each value, matching "Radical position: hen"
+          (his spec, 2026-08-01); the colon paces the speech. Prefixes are REAL text
+          in the page language, the name a lang="ja" run — never aria-labels. %>
+      <div class="radical-name"><span class="visually-hidden">Radical name: </span><span lang="ja"><%= doc.rad_name_ja %></span></div>
+      <div class="radical-meaning"><span class="visually-hidden">Radical meaning: </span><%= doc.rad_meaning %></div>
       <%_ /* Only 々 reaches this as NaN (it has no radical strokes). Same sentinel, same
               production behaviour: blank — and no sr-only prefix announcing a blank. */ _%>
       <% const radStroke = numberOrBlank(doc.rad_stroke); %>
-      <div class="radical-stroke"><% if (radStroke !== "") { %><span class="visually-hidden">Radical strokes </span><% } %><%= radStroke %></div>
+      <div class="radical-stroke"><% if (radStroke !== "") { %><span class="visually-hidden">Radical strokes: </span><% } %><%= radStroke %></div>
       <% if (doc.rad_position && doc.rad_position_file) { %>
         <%# The icon depicts the LAST listed position — same derivation as its filename. %>
         <img class="radical-position" role="img" src="<%= doc.rad_position_file %>" alt="Radical position: <%= doc.rad_position.split(",").pop().trim() %>">
