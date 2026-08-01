@@ -351,9 +351,10 @@ test("the detail page labels its media controls and reaches the radical animatio
     );
 
     assert.ok(
-      body.includes('id="video-label"') &&
+      body.includes('id="video-label" class="visually-hidden" aria-hidden="true"') &&
         body.includes('aria-labelledby="video-label"'),
-      "the stroke-order video lost its accessible name"
+      "the stroke-order video lost its accessible name, or its label source lost " +
+        "aria-hidden and VoiceOver stops on it as a phantom item"
     );
 
     assert.ok(

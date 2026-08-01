@@ -386,8 +386,10 @@
         <!-- Video Mode -->
         <div class="video-container" x-show="detailMode === 'video'">
           <%# Sibling, not a child of <video>: content inside <video> is fallback for
-              unsupported browsers and is not reliably exposed to the a11y tree. %>
-          <div id="video-label" class="visually-hidden">Stroke order animation for <span lang="ja"><%= doc.ka_utf %></span></div>
+              unsupported browsers and is not reliably exposed to the a11y tree.
+              aria-hidden: a label source, not content — without it VoiceOver stops
+              on it as a phantom item. aria-labelledby resolves into hidden elements. %>
+          <div id="video-label" class="visually-hidden" aria-hidden="true">Stroke order animation for <span lang="ja"><%= doc.ka_utf %></span></div>
           <div class="video">
             <video x-ref="video"
                    aria-labelledby="video-label"
