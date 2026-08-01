@@ -121,6 +121,48 @@ test("a database failure on the detail page returns 500", async () => {
 });
 
 /**
+ * /api/docs must carry the licensing restriction — the ONLY place it is
+ * written down anywhere public. The page was Angular-only (client-side
+ * routed from partials/docs.html) until 2026-08-01; this pins the EJS port
+ * so Phase 7 can delete Angular without deleting the restriction's one
+ * statement. brokenDb() proves the render needs no database: the docs must
+ * stay reachable during an outage.
+ *
+ * Seen red: removing the licensing paragraph from docs.ejs fails the wording
+ * asserts; removing the route 404s.
+ */
+test("/api/docs renders the licensing restriction, without touching the database", async () => {
+  await withServer(brokenDb(), async (base) => {
+    const res = await fetch(`${base}/api/docs`);
+    assert.equal(res.status, 200);
+
+    const body = await res.text();
+    assert.ok(
+      body.includes("API Documentation"),
+      "must be the API documentation page"
+    );
+    assert.ok(
+      body.includes(
+        "The only exceptions are searching for kanji by textbook and viewing the mnemonic hints"
+      ),
+      "must name BOTH restricted features: textbook search and mnemonic hints"
+    );
+    assert.ok(
+      body.includes(
+        "Due to licensing restrictions these features and data are not available in the public API"
+      ),
+      "must state the licensing restriction itself"
+    );
+    assert.ok(
+      body.includes(
+        "you cannot search for kanji by textbook (chapter)"
+      ),
+      "must repeat the restriction where advanced search is documented"
+    );
+  });
+});
+
+/**
  * Non-string query parameters must not reach string methods.
  *
  * Express parses `?q[$ne]=x` into an OBJECT and `?q=a&q=b` into an ARRAY, and every

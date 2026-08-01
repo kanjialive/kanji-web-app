@@ -490,6 +490,17 @@ router.get("/partials/results", async (req: Request, res: Response) => {
 });
 
 /**
+ * GET /api/docs — the API documentation page, at the same URL Angular's
+ * client-side router serves it in production. It is the ONLY place the
+ * licensing restriction on mnemonic hints and textbook search is written
+ * down, so it must exist server-side before Phase 7 deletes Angular.
+ * Static render, no database. Pinned by html-routes.test.ts.
+ */
+router.get("/api/docs", (_req: Request, res: Response) => {
+  res.render("pages/docs");
+});
+
+/**
  * GET /:character - Kanji detail page (canonical, same URL as the Angular app;
  * also served under the /htmx testing alias)
  */

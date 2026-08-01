@@ -1757,3 +1757,96 @@ dialog:focus-visible {
 /* No responsive rules: the legacy app renders a fixed 1188px sheet at every
    window size (html overflow-x:hidden clips), and reflowing the container
    changed how the sheet's box-shadow presents at narrow windows */
+
+/* ============================================
+   API documentation page (/api/docs)
+   Ported from Angular's partials/docs.html. Prose, not part of the frozen app
+   sheet — the Bootstrap-era look (bordered tables, grey pre blocks) is
+   recreated locally with Bootstrap's own values; nothing here is pinned to
+   production pixels. .container gives it the same white sheet and 1188px
+   width as the app pages; min-height lets it grow with the content.
+   ============================================ */
+.docs {
+  padding-top: 20px;
+  padding-bottom: 30px;
+}
+
+/* Same face as the app header's title row: green like every section heading,
+   17px SourceSansPro. An h1/h2 for semantics, production's h3 look. */
+.docs h1,
+.docs h2 {
+  font-family: var(--font-en);
+  font-size: 17px;
+  font-weight: 500;
+  color: var(--color-secondary);
+  margin: 20px 0 10px;
+  line-height: 1.1;
+}
+
+.docs h1 {
+  margin-top: 10px;
+}
+
+.docs em {
+  font-family: var(--font-en-italic);
+}
+
+/* The hairline under the title, standing in for the app header's border row */
+.docs-header {
+  border-bottom: 1px solid var(--color-border);
+  padding-bottom: 10px;
+}
+
+.docs-columns {
+  display: flex;
+  gap: 30px;
+  padding-top: 20px; /* production .docs-container's 30px, less the h2 margin */
+}
+
+.docs-col {
+  width: 50%;
+  min-width: 0; /* long <pre> lines scroll inside the column, never widen it */
+}
+
+.docs-col-left {
+  border-right: 1px solid var(--color-border);
+  padding-right: 30px;
+}
+
+/* Bootstrap's code/pre/table rendering, which production's docs page relied on */
+.docs code,
+.docs pre {
+  font-family: Menlo, Monaco, Consolas, "Courier New", monospace;
+}
+
+.docs code {
+  padding: 2px 4px;
+  font-size: 90%;
+  color: var(--color-kbd-text);
+  background-color: var(--color-kbd-bg);
+  border-radius: 4px;
+}
+
+.docs pre {
+  padding: 9.5px;
+  margin: 0 0 10px;
+  font-size: 13px;
+  line-height: 1.42857143;
+  color: #333;
+  background-color: #f5f5f5;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  overflow-x: auto;
+}
+
+.docs table {
+  width: 100%;
+  margin-bottom: 10px;
+  border-collapse: collapse;
+}
+
+.docs td {
+  padding: 5px;
+  border: 1px solid #ddd;
+  vertical-align: top;
+}
