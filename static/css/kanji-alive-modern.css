@@ -248,9 +248,11 @@
 
 html {
   max-width: 100%;
-  /* clip, not hidden: hidden leaves the page programmatically scrollable, so
-     Edge Read Aloud / Narrator could shift the sheet sideways with no way back. */
-  overflow-x: clip;
+  /* On the root element, clip degrades to hidden at the viewport (CSS Overflow §3.3),
+     so the page stays programmatically scrollable either way — Edge Read Aloud can
+     shift it sideways with no user input able to bring it back. The defence is that
+     nothing may overflow the sheet: see the .logo width. */
+  overflow-x: hidden;
 }
 
 body {
@@ -646,6 +648,10 @@ span.search {
   position: relative;
   top: -8px;
   left: 1074px;
+  /* Fit the img. Unset, this block is 1158px wide and the relative shift hangs
+     ~1060px of empty box past the sheet — scrollable overflow that let Edge
+     Read Aloud drag the whole page sideways. The image itself does not move. */
+  width: 54px;
 }
 
 .logo img {
