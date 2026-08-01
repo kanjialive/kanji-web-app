@@ -955,6 +955,9 @@ a.ka:active {
   font-family: var(--font-radicals);
   font-size: 22px;
   color: var(--color-radical);
+  /* Anchor the visually-hidden name span here, not at the scroller's corner —
+     VoiceOver draws its cursor around the union, smearing the box otherwise. */
+  position: relative;
 }
 
 /* ============================================

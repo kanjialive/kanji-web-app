@@ -2,7 +2,8 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { renderHint, mnemonicHintsPath } from "./kanji-assets";
 
-const img = (n: string) => `<img src="${mnemonicHintsPath}/${n}.svg" />`;
+const img = (n: string) =>
+  `<img src="${mnemonicHintsPath}/${n}.svg" alt="Image of kanji fragment" />`;
 
 // --- Behaviour that must NOT change (real data, ~1,000 hints in production) ---
 

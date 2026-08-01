@@ -65,9 +65,12 @@ export function renderHint(mnHint: string): string {
   for (const [pattern, replacement] of HINT_ALLOWED_MARKUP) {
     hint = hint.replace(pattern, replacement);
   }
+  // The alt is the maintainer's wording: no name for the fragment exists in the
+  // data (the token is only a file number), and without an alt VoiceOver reads
+  // the SVG filename aloud mid-sentence.
   return hint.replace(
     /\[([0-9]+)\]/g,
-    `<img src="${mnemonicHintsPath}/$1.svg" />`
+    `<img src="${mnemonicHintsPath}/$1.svg" alt="Image of kanji fragment" />`
   );
 }
 
