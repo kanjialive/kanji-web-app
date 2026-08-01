@@ -36,6 +36,18 @@
         'gothic': 'Gothic',
         'maru': 'Maru'
       },
+      // Spoken names, kana not kanji: kana pins the pronunciation — a TTS voice
+      // never has to guess a reading (his ruling, 2026-08-01).
+      typefaceNamesJa: {
+        'suzumushi': 'すずむし',
+        'kanteiryu': 'かんていりゅう',
+        'hiragino': 'ぎょうしょ',
+        'tensho': 'てんしょ',
+        'kyokasho': 'きょうかしょたい',
+        'mincho': 'みんちょう',
+        'gothic': 'ゴシック',
+        'maru': 'まるゴシック'
+      },
       radicalFrame: 0,
       radicalAnimating: false,
       // Radical animation timing. The cross-fade duration lives in CSS
@@ -47,6 +59,9 @@
 
       get typefaceDisplay() {
         return this.typefaceDisplayNames[this.typeface] || this.typeface;
+      },
+      get typefaceNameJa() {
+        return this.typefaceNamesJa[this.typeface] || this.typeface;
       },
 
       // Never set this.playing here — the listeners in init() own it.
@@ -442,20 +457,23 @@
                @click="showVideo(false)"
                @keydown.enter.prevent="showVideo(true)"
                @keydown.space.prevent="showVideo(true)">
-            <img x-show="typeface === 'tensho'" src="<%= doc.tensho_source %>" alt="Tensho typeface">
-            <img x-show="typeface === 'kyokasho'" src="<%= doc.kyokasho_source %>" alt="Kyokasho typeface">
-            <img x-show="typeface === 'maru'" src="<%= doc.maru_source %>" alt="Maru typeface">
-            <img x-show="typeface === 'mincho'" src="<%= doc.mincho_source %>" alt="Mincho typeface">
-            <img x-show="typeface === 'gothic'" src="<%= doc.gothic_source %>" alt="Gothic typeface">
-            <img x-show="typeface === 'hiragino'" src="<%= doc.hiragino_source %>" alt="Hiragino typeface">
-            <img x-show="typeface === 'kanteiryu'" src="<%= doc.kanteiryu_source %>" alt="Kanteiryu typeface">
-            <img x-show="typeface === 'suzumushi'" src="<%= doc.suzumushi_source %>" alt="Suzumushi typeface">
+            <img x-show="typeface === 'tensho'" src="<%= doc.tensho_source %>" alt="">
+            <img x-show="typeface === 'kyokasho'" src="<%= doc.kyokasho_source %>" alt="">
+            <img x-show="typeface === 'maru'" src="<%= doc.maru_source %>" alt="">
+            <img x-show="typeface === 'mincho'" src="<%= doc.mincho_source %>" alt="">
+            <img x-show="typeface === 'gothic'" src="<%= doc.gothic_source %>" alt="">
+            <img x-show="typeface === 'hiragino'" src="<%= doc.hiragino_source %>" alt="">
+            <img x-show="typeface === 'kanteiryu'" src="<%= doc.kanteiryu_source %>" alt="">
+            <img x-show="typeface === 'suzumushi'" src="<%= doc.suzumushi_source %>" alt="">
           </div>
           <div class="animation-controls">
             <%# aria-disabled, not disabled: the ends must announce as unavailable
                 without picking up the UA's disabled styling. %>
             <button @click="previousTypeface()" class="ka-typeface-left pointer" aria-label="Previous typeface" :aria-disabled="typefaceIndex === 0">&#12296;</button>
-            <span class="typeface-name" x-html="typefaceDisplay" aria-live="polite"></span>
+            <%# The visible romanized name is aria-hidden; a hidden lang="ja" kana
+                twin does the speaking — the Japanese voice, with the pronunciation
+                pinned. The live region announces the kana on each typeface step. %>
+            <span class="typeface-name" aria-live="polite"><span aria-hidden="true" x-html="typefaceDisplay"></span><span class="visually-hidden" lang="ja" x-text="typefaceNameJa"></span></span>
             <button @click="nextTypeface()" class="ka-typeface-right pointer" aria-label="Next typeface" :aria-disabled="typefaceIndex === typefaces.length - 1">&#12297;</button>
           </div>
         </div>

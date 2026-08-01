@@ -375,6 +375,25 @@ test("the detail page labels its media controls and reaches the radical animatio
       "keyboard activation no longer moves focus to the swapped-in surface"
     );
 
+    // Typeface names are SPOKEN in Japanese (his ruling, 2026-08-01): the visible
+    // romanized label is aria-hidden, a hidden lang="ja" kana twin speaks — kana,
+    // not romaji-tagged-ja, so no voice has to guess at Latin text. The images go
+    // alt="": the adjacent live label already names the typeface.
+    assert.match(
+      body,
+      /class="typeface-name" aria-live="polite"><span aria-hidden="true" x-html="typefaceDisplay"><\/span><span class="visually-hidden" lang="ja" x-text="typefaceNameJa"><\/span>/,
+      "the typeface label lost its hidden Japanese-speech twin or exposed the romaji to speech"
+    );
+    assert.ok(
+      body.includes("'tensho': 'てんしょ'") && body.includes("'kyokasho': 'きょうかしょたい'"),
+      "the kana name map is gone — the Japanese voice has nothing to speak"
+    );
+    assert.ok(
+      !/alt="Tensho typeface"/.test(body) &&
+        /x-show="typeface === 'tensho'"[^>]*alt=""/.test(body),
+      "a typeface image regrew an English alt — attribute text speaks in the page language"
+    );
+
     assert.ok(
       body.includes('lang="ja">詳細は'),
       "the help modal's Japanese paragraph is unmarked and gets an English voice"
