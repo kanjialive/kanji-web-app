@@ -140,6 +140,19 @@
         }, first + gap * 2);
       },
 
+      // viaKeyboard: hand focus to the swapped-in surface — the activated one goes
+      // display:none and focus would fall to the page top, stranding Tab. Mouse
+      // clicks pass false: pointerdown never focuses these (focus-ring guard), and
+      // moving focus on click would ring a control the user never Tabbed to.
+      showTypefaces(viaKeyboard) {
+        this.detailMode = 'typeface';
+        if (viaKeyboard) this.$nextTick(() => this.$refs.typefaceSurface && this.$refs.typefaceSurface.focus());
+      },
+      showVideo(viaKeyboard) {
+        this.detailMode = 'video';
+        if (viaKeyboard) this.$nextTick(() => this.$refs.videoSurface && this.$refs.videoSurface.focus());
+      },
+
       init() {
         this.stroketimes = JSON.parse(this.$el.dataset.stroketimes || '[]');
 
@@ -390,10 +403,16 @@
               aria-hidden: a label source, not content — without it VoiceOver stops
               on it as a phantom item. aria-labelledby resolves into hidden elements. %>
           <div id="video-label" class="visually-hidden" aria-hidden="true">Stroke order animation for <span lang="ja"><%= doc.ka_utf %></span></div>
-          <div class="video">
+          <%# The toggle surface is a keyboard control (role=button on the div, not a
+              real <button> — UA styling would move ink). The label names the ACTION;
+              the video keeps its descriptive name. Space/Enter: the global Space
+              shortcut already yields to a focused [role=button]. %>
+          <div class="video" x-ref="videoSurface" role="button" tabindex="0" aria-label="Show typefaces"
+               @click="showTypefaces(false)"
+               @keydown.enter.prevent="showTypefaces(true)"
+               @keydown.space.prevent="showTypefaces(true)">
             <video x-ref="video"
                    aria-labelledby="video-label"
-                   @click="detailMode = 'typeface'"
                    poster="<%= doc.poster_video_source %>"
                    playsinline
                    preload="metadata">
@@ -418,7 +437,11 @@
 
         <!-- Typeface Mode -->
         <div id="ka-typeface-container" x-show="detailMode === 'typeface'" x-cloak>
-          <div @click="detailMode = 'video'" class="ka-typefaces">
+          <%# Same shape as the video surface above. %>
+          <div class="ka-typefaces" x-ref="typefaceSurface" role="button" tabindex="0" aria-label="Show stroke order animation"
+               @click="showVideo(false)"
+               @keydown.enter.prevent="showVideo(true)"
+               @keydown.space.prevent="showVideo(true)">
             <img x-show="typeface === 'tensho'" src="<%= doc.tensho_source %>" alt="Tensho typeface">
             <img x-show="typeface === 'kyokasho'" src="<%= doc.kyokasho_source %>" alt="Kyokasho typeface">
             <img x-show="typeface === 'maru'" src="<%= doc.maru_source %>" alt="Maru typeface">

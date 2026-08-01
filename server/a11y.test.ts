@@ -356,6 +356,25 @@ test("the detail page labels its media controls and reaches the radical animatio
         "aria-hidden and VoiceOver stops on it as a phantom item"
     );
 
+    // The video/typeface mode toggle is reachable and operable by keyboard — both
+    // click surfaces are role=button Tab stops naming their action (his wording,
+    // 2026-08-01). Keyboard activation must hand focus to the swapped-in surface:
+    // the activated one goes display:none and focus would fall to the page top.
+    assert.match(
+      body,
+      /class="video"[^>]*role="button" tabindex="0" aria-label="Show typefaces"/,
+      "the video surface is no longer a keyboard control naming its action"
+    );
+    assert.match(
+      body,
+      /class="ka-typefaces"[^>]*role="button" tabindex="0" aria-label="Show stroke order animation"/,
+      "the typeface surface is no longer a keyboard control naming its action"
+    );
+    assert.ok(
+      /showTypefaces\(true\)/.test(body) && /showVideo\(true\)/.test(body),
+      "keyboard activation no longer moves focus to the swapped-in surface"
+    );
+
     assert.ok(
       body.includes('lang="ja">詳細は'),
       "the help modal's Japanese paragraph is unmarked and gets an English voice"
