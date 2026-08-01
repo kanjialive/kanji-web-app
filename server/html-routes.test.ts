@@ -231,6 +231,36 @@ function kanjiDoc(fields: Partial<KanjiDocument>): KanjiDocument {
 }
 
 /**
+ * The search box repaints an advanced search in the ORDER THE USER TYPED IT.
+ *
+ * The display string is rebuilt from req.query, and Express preserves the URL's
+ * parameter order — which is the typed order, because the colon-syntax redirect
+ * builds the URL in typed order too. Iterating the fixed ADVANCED_KEYS list
+ * instead repainted "grade:3 rs:5" as "rs:5 grade:3" the moment the results
+ * loaded (found by the maintainer within hours of the production swap).
+ *
+ * Seen red: rebuilding the string by iterating ADVANCED_KEYS fails the first case.
+ */
+test("the search box preserves the typed order of an advanced search", async () => {
+  const docs = [kanjiDoc({})];
+  await withServer(resultsDb(docs), async (base) => {
+    for (const [queryString, displayed] of [
+      ["grade=3&rs=5", "grade:3 rs:5"],
+      ["rs=5&grade=3", "rs:5 grade:3"],
+      ["kem=water&on=sui&ks=4", "kem:water on:sui ks:4"],
+    ]) {
+      const res = await fetch(`${base}/search?${queryString}`, hostileFetch());
+      assert.equal(res.status, 200);
+      const body = await res.text();
+      assert.ok(
+        body.includes(`value="${displayed}"`),
+        `?${queryString} must repaint the search box as "${displayed}"`
+      );
+    }
+  });
+});
+
+/**
  * An unrecognised ?mode= must never report zero results over a non-empty result set.
  *
  * partials/results.ejs branches on exactly 'kanji' / 'ksort' / 'rsort' and its final

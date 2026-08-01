@@ -130,7 +130,12 @@ function hasAdvancedParams(query: Record<string, unknown>): boolean {
  */
 function buildAdvancedSearchInput(query: Record<string, unknown>): string {
   const parts: string[] = [];
-  for (const key of ADVANCED_KEYS) {
+  // The QUERY's key order, not ADVANCED_KEYS order: Express preserves the URL's
+  // parameter order, which is the order the user typed — iterating the fixed key
+  // list repainted "grade:3 rs:5" as "rs:5 grade:3" in the search box. (Angular
+  // preserved order by string-replacing the raw query string.)
+  for (const key of Object.keys(query)) {
+    if (!ADVANCED_KEYS.includes(key)) continue;
     // Same qs hazard as queryParam(): `?on=a&on=b` is an array and `?on[$ne]=x` an
     // object. Neither crashes here, but both would paint "on:a,b" / "on:[object
     // Object]" into the visible search box for a parameter search.ts then DISCARDS.
