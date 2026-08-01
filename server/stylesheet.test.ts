@@ -173,6 +173,50 @@ for (const [name, pattern] of LOAD_BEARING) {
 }
 
 //
+// The APP sheet deliberately has no responsive rules (fixed 1188px at every window size —
+// see the departures index). The docs page is the ONE exception, by the maintainer's
+// instruction: its two columns stack on narrow viewports. This pins the boundary — any
+// @media that is not the reduce-motion one may contain only .docs-scoped selectors, so
+// a responsive rule can never quietly reach the app's frozen layout.
+//
+test("every @media is reduce-motion or scoped to the docs page", () => {
+  // Comments first, same lesson as scan(): "@media" in prose is not an at-rule.
+  const bare = css.replace(/\/\*[\s\S]*?\*\//g, "");
+  const mediaRe = /@media[^{]*\{/g;
+  const blocks: { prelude: string; body: string }[] = [];
+  let m: RegExpExecArray | null;
+  while ((m = mediaRe.exec(bare)) !== null) {
+    let depth = 1;
+    let i = mediaRe.lastIndex;
+    while (i < bare.length && depth > 0) {
+      if (bare[i] === "{") depth++;
+      else if (bare[i] === "}") depth--;
+      i++;
+    }
+    blocks.push({ prelude: m[0], body: bare.slice(mediaRe.lastIndex, i - 1) });
+  }
+  assert.ok(
+    blocks.length >= 2,
+    "extraction matched nothing — the sheet carries at least reduce-motion and the docs breakpoint",
+  );
+
+  for (const block of blocks) {
+    if (block.prelude.includes("prefers-reduced-motion")) continue;
+    const selectors = block.body.match(/[^{}]+(?=\{)/g);
+    assert.ok(selectors && selectors.length > 0, `empty @media block: ${block.prelude}`);
+    for (const selectorList of selectors) {
+      for (const selector of selectorList.split(",")) {
+        assert.ok(
+          selector.trim().startsWith(".docs"),
+          `non-docs selector "${selector.trim()}" inside ${block.prelude.trim()} — ` +
+            "the app sheet has no responsive rules; only the docs page reflows",
+        );
+      }
+    }
+  }
+});
+
+//
 // The grid identity. --content-width is not an independent number: it IS four columns and
 // three gutters. Everything downstream leans on that, but the consequence people trip over
 // is the sorted views' horizontal scroll. With the results columns on the same pitch and no

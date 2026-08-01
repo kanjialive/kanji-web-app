@@ -1825,6 +1825,7 @@ dialog:focus-visible {
   color: var(--color-kbd-text);
   background-color: var(--color-kbd-bg);
   border-radius: 4px;
+  overflow-wrap: anywhere; /* long endpoint URLs must wrap, not widen a narrow column */
 }
 
 .docs pre {
@@ -1849,4 +1850,31 @@ dialog:focus-visible {
   padding: 5px;
   border: 1px solid #ddd;
   vertical-align: top;
+}
+
+/* The docs page is responsive (maintainer's instruction, 2026-08-01) — the APP sheet
+   stays fixed-width with no responsive rules; stylesheet.test.ts pins that any
+   responsive @media contains only .docs-scoped selectors. .container.docs relaxes
+   the app's fixed width so the sheet can shrink with the viewport. */
+.container.docs {
+  /* 100%, not auto: .container is a flex item of body with auto margins, so
+     width:auto shrink-to-fits around the widest <pre> line and overflows a
+     narrow viewport instead of shrinking with it. */
+  width: 100%;
+  max-width: var(--container-width);
+}
+
+@media (max-width: 800px) {
+  .docs-columns {
+    flex-direction: column;
+  }
+
+  .docs-col {
+    width: auto;
+  }
+
+  .docs-col-left {
+    border-right: none;
+    padding-right: 0;
+  }
 }
