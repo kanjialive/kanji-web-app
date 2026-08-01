@@ -966,6 +966,15 @@ a.ka:active {
   position: relative;
 }
 
+/* VoiceOver's cursor wraps the element it reads — the hidden name, not the
+   aria-hidden glyph — at its minimum pill size. Centre the name's (tiny) text
+   on the glyph so the pill sits on the radical instead of off its corner. */
+.ka-radical .visually-hidden {
+  left: 50%;
+  top: 50%;
+  margin: 0;
+}
+
 /* ============================================
    Welcome Page
    ============================================ */
