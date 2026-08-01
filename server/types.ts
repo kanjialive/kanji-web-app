@@ -94,6 +94,9 @@ export interface ExtendedKanjiDocument extends Omit<KanjiDocument, "examples"> {
   rad_anim_frame_0: string;
   rad_anim_frame_1: string;
   rad_anim_frame_2: string;
+  /* False when the frames above are the CDN's "n/a" placeholder or blanks —
+     see RADICALS_WITHOUT_ANIMATION in kanji-assets.ts. */
+  rad_has_anim: boolean;
   hint: string;
 }
 

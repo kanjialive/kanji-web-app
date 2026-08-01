@@ -310,6 +310,22 @@ test("the radical-animation shortcut requires Shift", () => {
   );
 });
 
+test("startRadicalAnimation stands down when the radical has no animation", () => {
+  // 15 radicals render no frames (see RADICALS_WITHOUT_ANIMATION); without this
+  // guard Shift+R still schedules the frame cycle behind the empty slot.
+  assert.match(
+    src,
+    /if \(!this\.hasRadAnim\) return;/,
+    "the no-animation guard is gone from startRadicalAnimation — Shift+R cycles " +
+      "state behind an empty radical slot",
+  );
+  assert.match(
+    src,
+    /this\.hasRadAnim = this\.\$el\.dataset\.radHasAnim === 'true';/,
+    "init() no longer reads data-rad-has-anim, so the guard above never fires",
+  );
+});
+
 test("the detail keydown handler ignores auto-repeat", () => {
   assert.match(
     src,

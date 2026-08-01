@@ -75,6 +75,31 @@ export function renderHint(mnHint: string): string {
 }
 
 /**
+ * Radicals whose rad_frames files on the CDN are NOT animations: fourteen serve
+ * a shared "n/a" placeholder SVG, and "none" (々) three deliberately blank
+ * frames. The detail page renders no animation block for these — a blank slot,
+ * no control (maintainer's ruling, 2026-08-01). The fact lives only in the CDN
+ * assets; re-derive this set with offline/scripts/scope-no-rad-anim.mjs.
+ */
+export const RADICALS_WITHOUT_ANIMATION: ReadonlySet<string> = new Set([
+  "hanebou",
+  "ichi",
+  "iro",
+  "kan",
+  "keigamae",
+  "nabebuta",
+  "ni",
+  "no",
+  "nokanmuri",
+  "nomata",
+  "otsu",
+  "otsu-nine",
+  "tatebou",
+  "tsu",
+  "none",
+]);
+
+/**
  * Extends a kanji document with all asset URLs for the HTMX detail page.
  */
 export function extendKanjiWithAssets(doc: KanjiDocument): ExtendedKanjiDocument {
@@ -126,6 +151,7 @@ export function extendKanjiWithAssets(doc: KanjiDocument): ExtendedKanjiDocument
     rad_anim_frame_0: `${radAnimPath}/${doc.rad_name_file}0.svg`,
     rad_anim_frame_1: `${radAnimPath}/${doc.rad_name_file}1.svg`,
     rad_anim_frame_2: `${radAnimPath}/${doc.rad_name_file}2.svg`,
+    rad_has_anim: !RADICALS_WITHOUT_ANIMATION.has(doc.rad_name_file),
     hint,
   } as ExtendedKanjiDocument;
 }

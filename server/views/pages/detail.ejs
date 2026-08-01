@@ -50,6 +50,7 @@
       },
       radicalFrame: 0,
       radicalAnimating: false,
+      hasRadAnim: true,
       // Radical animation timing. The cross-fade duration lives in CSS
       // (.ka-rad-anim img, currently 1.375s) and is subtracted from the gap, so
       // an image is fully still for (gap - fade) = 250ms. Keep them in step.
@@ -141,6 +142,9 @@
         //   document.querySelectorAll('.ka-rad-anim img')
         //     .forEach(i => i.style.transitionDuration = '1.375s');
         //   document.querySelector('.ka-rad-anim').click();
+        // 15 radicals have no animation and the template renders no frames —
+        // Shift+R must stand down too, not cycle state behind an empty slot.
+        if (!this.hasRadAnim) return;
         if (this.radicalAnimating) return;
         this.radicalAnimating = true;
 
@@ -170,6 +174,7 @@
 
       init() {
         this.stroketimes = JSON.parse(this.$el.dataset.stroketimes || '[]');
+        this.hasRadAnim = this.$el.dataset.radHasAnim === 'true';
 
         // Persist the view mode and chosen typeface across kanji navigation.
         // Prev/next paging replaces .container2 with a freshly-initialised
@@ -371,7 +376,7 @@
 <div class="container">
 <%# <main>, not <div>: the page's one main landmark. navigateKanji() and the CSS
     select by .container2, so the tag change is invisible to both. %>
-<main class="container2" x-data="detailPage()" data-stroketimes='<%= JSON.stringify(doc.stroketimes) %>' data-title="<%= doc.ka_utf %> - <%= doc.meaning %> - Kanji alive">
+<main class="container2" x-data="detailPage()" data-stroketimes='<%= JSON.stringify(doc.stroketimes) %>' data-rad-has-anim="<%= doc.rad_has_anim %>" data-title="<%= doc.ka_utf %> - <%= doc.meaning %> - Kanji alive">
 
   <%# tabindex="-1": navigateKanji() lands focus here after a swap. %>
   <h1 class="visually-hidden" tabindex="-1"><%= doc.ka_utf %> — <%= doc.meaning %></h1>
@@ -564,6 +569,11 @@
         <img class="radical-position" role="img" src="<%= doc.rad_position_file %>" alt="Radical position: <%= doc.rad_position.split(",").pop().trim() %>">
       <% } %>
 
+      <%# 15 radicals have no animation — their CDN frames are an "n/a" placeholder
+          (or 々's blanks). The slot stays EMPTY for them: no image, no button, no
+          screen-reader stop (maintainer's ruling, 2026-08-01). Everything here is
+          absolutely positioned, so omitting the block moves nothing. %>
+      <% if (doc.rad_has_anim) { %>
       <%# role="button" on the div, not a real <button>: a <button> picks up UA styling
           (WebKit's asymmetric padding among it) and would move ink on a frozen UI. %>
       <div class="ka-rad-anim pointer" role="button" tabindex="0"
@@ -575,6 +585,7 @@
         <img :class="{'opaque': radicalFrame === 1}" src="<%= doc.rad_anim_frame_1 %>" alt="">
         <img :class="{'opaque': radicalFrame === 2}" src="<%= doc.rad_anim_frame_2 %>" alt="">
       </div>
+      <% } %>
     </div>
   </div>
 

@@ -536,3 +536,33 @@ test("the detail page labels its media controls and reaches the radical animatio
     );
   });
 });
+
+test("a radical with no animation renders an empty slot, not a fake control", async () => {
+  // 15 radicals (RADICALS_WITHOUT_ANIMATION) have only placeholder/blank CDN
+  // frames. Their pages must render NO animation block: no "n/a" image, no
+  // role=button promising an animation that never plays — and the component
+  // must be told, so Shift+R stands down instead of cycling an empty slot.
+  await withServer(resultsDb([detailDoc({ rad_name_file: "keigamae" })]), async (base) => {
+    const res = await fetch(`${base}/${encodeURIComponent("水")}`, boundedFetch());
+    assert.equal(res.status, 200);
+    const body = await res.text();
+
+    // Match the element and the label, not the bare string — "ka-rad-anim"
+    // legitimately appears in the component's shipped JS comments.
+    assert.ok(
+      !/class="ka-rad-anim/.test(body) && !body.includes("Play radical animation"),
+      "the animation block is back on a no-animation radical — a focusable " +
+        "'Play radical animation' button now fronts an empty slot"
+    );
+    assert.ok(
+      !body.includes("rad_frames/keigamae"),
+      "the placeholder frame URLs are being rendered again for a no-animation radical"
+    );
+    assert.match(
+      body,
+      /data-rad-has-anim="false"/,
+      "the component no longer learns the radical has no animation — Shift+R " +
+        "will cycle state behind the empty slot"
+    );
+  });
+});

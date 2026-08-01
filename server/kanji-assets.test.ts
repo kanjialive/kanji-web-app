@@ -1,6 +1,12 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { renderHint, mnemonicHintsPath } from "./kanji-assets";
+import {
+  renderHint,
+  mnemonicHintsPath,
+  extendKanjiWithAssets,
+  RADICALS_WITHOUT_ANIMATION,
+} from "./kanji-assets";
+import type { KanjiDocument } from "./types";
 
 const img = (n: string) =>
   `<img src="${mnemonicHintsPath}/${n}.svg" alt="Image of kanji fragment" />`;
@@ -67,4 +73,35 @@ test("renderHint only expands digit tokens, so no path traversal via [N]", () =>
   // The token regex is [0-9]+, so a crafted token is left as literal text.
   const out = renderHint("[../../etc/passwd] and [12]");
   assert.equal(out, `[../../etc/passwd] and ${img("12")}`);
+});
+
+// --- The radicals with no animation (blank slot on the detail page) ---
+
+const minimalDoc = (rad_name_file: string) =>
+  ({
+    ka_id: "kanji_1",
+    ka_utf: "水",
+    kname: "mizu",
+    kstroke: 1,
+    mn_hint: "",
+    rad_position: "",
+    rad_name: "mizu",
+    rad_name_file,
+    examples: [],
+  } as unknown as KanjiDocument);
+
+test("RADICALS_WITHOUT_ANIMATION is exactly the CDN-derived set", () => {
+  // 14 radicals serve the "n/a" placeholder plus "none" (々's blank frames).
+  // Re-derive with offline/scripts/scope-no-rad-anim.mjs before changing.
+  assert.deepEqual(
+    [...RADICALS_WITHOUT_ANIMATION].sort(),
+    ["hanebou", "ichi", "iro", "kan", "keigamae", "nabebuta", "ni", "no",
+     "nokanmuri", "nomata", "none", "otsu", "otsu-nine", "tatebou", "tsu"]
+  );
+});
+
+test("rad_has_anim is false for a placeholder radical and 々, true otherwise", () => {
+  assert.equal(extendKanjiWithAssets(minimalDoc("keigamae")).rad_has_anim, false);
+  assert.equal(extendKanjiWithAssets(minimalDoc("none")).rad_has_anim, false);
+  assert.equal(extendKanjiWithAssets(minimalDoc("mizu")).rad_has_anim, true);
 });
