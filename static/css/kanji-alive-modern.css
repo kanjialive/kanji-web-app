@@ -967,9 +967,10 @@ a.ka:active {
 }
 
 /* VoiceOver's cursor wraps the element it reads — the hidden name, not the
-   aria-hidden glyph — at its minimum pill size. Centre the name's (tiny) text
-   on the glyph so the pill sits on the radical instead of off its corner. */
-.ka-radical .visually-hidden {
+   aria-hidden glyph/romaji beside it — at its minimum pill size. Centre the
+   hidden text so the pill sits on the thing it names instead of off a corner. */
+.ka-radical .visually-hidden,
+.typeface-name .visually-hidden {
   left: 50%;
   top: 50%;
   margin: 0;
