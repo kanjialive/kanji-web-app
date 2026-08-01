@@ -297,6 +297,19 @@ test("shortcuts stand down while the help dialog is open", () => {
   );
 });
 
+test("the radical-animation shortcut requires Shift", () => {
+  // Bare 'r' is a printable-character shortcut and fails WCAG 2.1.4: dictation
+  // software emits spoken words as keystrokes, so any word with an r would fire
+  // the animation. The Shift modifier takes the shortcut out of the criterion's
+  // scope; dropping it silently reopens the gap.
+  assert.match(
+    src,
+    /e\.key\.toLowerCase\(\) === 'r' && e\.shiftKey/,
+    "the radical-animation shortcut no longer requires Shift — a bare printable " +
+      "character shortcut fails WCAG 2.1.4 (dictation input fires it mid-word)",
+  );
+});
+
 test("the detail keydown handler ignores auto-repeat", () => {
   assert.match(
     src,
@@ -309,7 +322,9 @@ test("the detail keydown handler ignores auto-repeat", () => {
 test("auto-repeat still suppresses the browser's own scrolling", () => {
   // Returning early on repeat must not skip preventDefault for the keys this page owns,
   // or a held ArrowDown scrolls the window instead of doing nothing.
-  const guard = src.slice(src.indexOf("if (e.repeat) {"), src.indexOf("// 'r' — replay"));
+  const markerEnd = src.indexOf("// Shift+R — replay");
+  assert.ok(markerEnd !== -1, "the Shift+R comment marker is gone from views/pages/detail.ejs — update this test");
+  const guard = src.slice(src.indexOf("if (e.repeat) {"), markerEnd);
   for (const code of ["Space", "ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"]) {
     assert.match(
       guard,

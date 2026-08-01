@@ -230,7 +230,7 @@
             return;
           }
 
-          // 'r' — replay the radical animation. The only feature with no key of
+          // Shift+R — replay the radical animation. The only feature with no key of
           // its own; the radical image was mouse-only in both frontends.
           //
           // Matched on e.key, NOT e.code like the cases below. e.code is the
@@ -238,10 +238,12 @@
           // on QWERTY — on Dvorak that is the key that types 'o'. A mnemonic
           // shortcut has to follow the character the user actually typed.
           //
-          // Modifiers are excluded so Cmd+R / Ctrl+R (reload) is never hijacked.
-          // No preventDefault: a bare 'r' has no default action to suppress, and
-          // startRadicalAnimation() already guards against re-entry.
-          if (e.key && e.key.toLowerCase() === 'r' && !e.metaKey && !e.ctrlKey && !e.altKey) {
+          // Shift is REQUIRED: a bare printable-character shortcut fails WCAG 2.1.4
+          // (dictation software can fire it mid-word); the modifier takes it out of
+          // scope. Cmd/Ctrl/Alt are excluded so Cmd+R / Ctrl+R (reload) is never
+          // hijacked. No preventDefault: Shift+R has no default action to suppress,
+          // and startRadicalAnimation() already guards against re-entry.
+          if (e.key && e.key.toLowerCase() === 'r' && e.shiftKey && !e.metaKey && !e.ctrlKey && !e.altKey) {
             this.startRadicalAnimation();
             return;
           }
