@@ -69,12 +69,13 @@ function buildDetailUrl(kanjiChar) {
                   <% column.forEach(radical => { %>
                     <div>
                       <%# Japanese name ONLY, never the meaning (the app withholds easy
-                          answers). No romaji: VoiceOver re-read it in English — the same
-                          name twice. The glyph is aria-hidden: VoiceOver reads content
-                          past the label and appends its own English description of the
-                          character. Both cuts are the maintainer's ruling, 2026-07-30. %>
+                          answers); no romaji: VoiceOver re-read it in English. The name
+                          is REAL hidden text, not an aria-label — NVDA speaks attributes
+                          in the page language, so a label never reached the Japanese
+                          voice; text inside the lang="ja" element does. The glyph stays
+                          aria-hidden: VoiceOver appends its own English description. %>
                       <% if (radical.rad_name_ja && radical.rad_name && radical.rad_name !== "n/a") { %>
-                      <div class="ka-radical inline" lang="ja" role="img" aria-label="<%= radical.rad_name_ja %>"><span aria-hidden="true"><%= radical.radical %></span></div>
+                      <div class="ka-radical inline" lang="ja"><span class="visually-hidden"><%= radical.rad_name_ja %></span><span aria-hidden="true"><%= radical.radical %></span></div>
                       <% } else { %>
                       <div class="ka-radical inline" lang="ja"><%= radical.radical %></div>
                       <% } %>
@@ -124,9 +125,9 @@ function buildDetailUrl(kanjiChar) {
                 <div class="grouped-column inline">
                   <% column.forEach(radical => { %>
                     <div>
-                      <%# Japanese name ONLY, glyph aria-hidden — see the ksort branch. %>
+                      <%# Japanese name as hidden text, glyph aria-hidden — see the ksort branch. %>
                       <% if (radical.rad_name_ja && radical.rad_name && radical.rad_name !== "n/a") { %>
-                      <div class="ka-radical inline" lang="ja" role="img" aria-label="<%= radical.rad_name_ja %>"><span aria-hidden="true"><%= radical.radical %></span></div>
+                      <div class="ka-radical inline" lang="ja"><span class="visually-hidden"><%= radical.rad_name_ja %></span><span aria-hidden="true"><%= radical.radical %></span></div>
                       <% } else { %>
                       <div class="ka-radical inline" lang="ja"><%= radical.radical %></div>
                       <% } %>
