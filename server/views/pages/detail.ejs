@@ -185,6 +185,14 @@
         video?.addEventListener('pause', () => { this.playing = false; });
         video?.addEventListener('ended', () => { this.playing = false; });
 
+        // Leaving the video view stops playback — a hidden video kept running, and the
+        // user came back mid-stroke. Pause, never reset: the position is where they were.
+        // Watched rather than done in showTypefaces(), because ArrowUp/Down assigns
+        // detailMode directly.
+        this.$watch('detailMode', (mode) => {
+          if (mode !== 'video') video?.pause();
+        });
+
         const handler = (e) => {
           if (e.target.tagName === 'INPUT') return;
 

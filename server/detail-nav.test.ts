@@ -413,3 +413,16 @@ test("togglePlayPause and seek never assign `playing` themselves", () => {
   // The rejection must be handled, or a blocked start becomes an unhandled rejection.
   assert.match(body("togglePlayPause"), /\.catch\(/, "video.play()'s rejection is unhandled");
 });
+
+// The typeface view hides the video with x-show, which does not stop it: playback ran on
+// behind the glyphs and the user returned mid-stroke. Watched on detailMode rather than
+// added to showTypefaces(), because ArrowUp/Down assigns detailMode directly.
+test("switching out of the video view pauses the video", () => {
+  const m = src.match(/this\.\$watch\('detailMode',\s*\(mode\)\s*=>\s*\{([\s\S]*?)\}\);/);
+  assert.ok(m, "the detailMode watcher is gone from views/pages/detail.ejs — a hidden video keeps playing");
+  assert.match(
+    m![1],
+    /mode\s*!==\s*'video'[\s\S]*pause\(\)/,
+    "the detailMode watcher no longer pauses the video when the typeface view takes over",
+  );
+});
