@@ -1,7 +1,6 @@
 /**
- * Kanji Alive - Modern CSS
- * Migrated from Bootstrap/AngularJS to HTMX/Alpine.js
- * Uses CSS Grid, Flexbox, and CSS Variables
+ * Kanji Alive — the stylesheet for the Alpine/EJS frontend.
+ * Hand-written, no build step. Guarded by server/stylesheet.test.ts.
  */
 
 /* ============================================
@@ -17,78 +16,49 @@
   --color-bg: #F6F6F6;            /* off-white - search bar */
   --color-bg-dark: #D0D0D0;       /* gray - body background */
   --color-bg-white: white;        /* container background */
-  --color-radical: #C1C1C1;       /* radical character color — 1.8:1 on white, his pick 2026-07-29 */
+  --color-radical: #C1C1C1;       /* radical character color — 1.8:1 on white, deliberate */
   --color-kbd-text: #c7254e;      /* keyboard shortcut text */
   --color-kbd-bg: #f9f2f4;        /* keyboard shortcut background */
 
   /* Fonts */
-  /* 🔴 NEVER put an INCOMPLETE font ahead of a complete one. CSS font fallback is
-     PER CHARACTER, so a font that covers only part of a script gets first refusal on
-     every glyph and silently hands back only the ones it has.
+  /* Never put an INCOMPLETE font ahead of a complete one: CSS fallback is PER CHARACTER,
+     so a part-coverage face takes the glyphs it has and lets the rest fall through —
+     kanji and kana in two different faces, on one line.
 
-     That is the bug this stack had until 2026-07-13. 'mplus-1m-light' — the webfont
-     Kanji alive has shipped since 2013 — was subsetted years ago to exactly the 1,235
-     kanji the app teaches, and the kana were left out by accident (verified: 1,253 CJK
-     ideographs, ZERO hiragana, 1 katakana, no Latin, no full-width parens). It sat at
-     position 2. On Windows that was harmless, because 'Yu Gothic Medium' sits ahead of
-     it and covers everything (verified in DevTools on stock Windows 11: one font, all
-     glyphs). On macOS/iOS/Android/Linux — none of which have Yu Gothic — the webfont
-     was the FIRST font the OS could supply, so it took the kanji and let every kana
-     fall through to Hiragino. Kanji and kana in two different faces, on one line.
-     The webfont is now gone, and its @font-face with it.
+     The order below is NOT a priority list. It is four INDEPENDENT per-platform groups;
+     each OS ships only its own faces, so Yu Gothic never competes with Hiragino.
 
-     ⚠️ The order below is NOT a priority list — it is four INDEPENDENT per-platform
-     choices. Each OS ships only its own faces, so 'Yu Gothic' never competes with
-     'Hiragino' on the same machine. Group them by platform and it stays legible.
+     The generic `sans-serif` must stay LAST and never appear mid-stack — which is why
+     --font-en can never be composed into these: its trailing generic would make every
+     family after it unreachable.
 
-     ⚠️ The generic `sans-serif` MUST stay LAST, and must never appear mid-stack (that
-     is why --font-en can never be composed into these — its trailing generic would
-     make every family after it unreachable).
-
-     ⚠️ Japanese content needs lang="ja" — and the named fonts below are what make that
-     merely a BACKSTOP rather than the load-bearing defence. `lang` does not choose the
-     font; the family list does. `lang` only steers the browser's LAST-RESORT face, the
-     one it reaches for after running off the end of this list. Verified on macOS: with
-     no Japanese family named and the page marked lang="en", the text renders in
-     PingFang SC — a 0.00% pixel match, i.e. CHINESE glyph forms. 直/骨/画/角 are drawn
-     differently in Chinese and this app teaches the Japanese strokes. Naming a real
-     Japanese font per platform means the generic is never reached at all; lang="ja" on
-     the purely-Japanese elements covers the platforms whose names we guessed wrong.
-     That is also why MIXED content (the search box, the hints) needs no lang: it is
-     protected by these names, and marking it "ja" would make a screen reader read an
-     English query aloud in Japanese. */
+     These names, not lang="ja", are the load-bearing defence. `lang` only steers the
+     browser's LAST-RESORT face; with no Japanese family named, macOS + lang="en" renders
+     PingFang SC, i.e. CHINESE forms — 直/骨/画/角 drawn with the wrong strokes, in an app
+     that teaches them. lang="ja" on purely-Japanese elements is the backstop for
+     platforms whose names we guessed wrong. MIXED content (search box, hints) needs no
+     lang: marking it "ja" would have a screen reader read an English query in Japanese. */
   --font-jp:
-    /* macOS / iOS. Hiragino leads because Windows can never have it — so leading with
-       it costs nothing and removes all ambiguity.
-         'Hiragino Sans W3' — the modern face (JIS2004 letterforms, which is what is
-           taught today) PINNED TO W3. ⚠️ Do not simplify this to 'Hiragino Sans':
-           font-weight:normal resolves to W4, which carries 16% MORE ink (measured) and
-           reads visibly darker than the Kaku Gothic Pro this app has always used.
-         'Hiragino Kaku Gothic ProN' — the safety net. 'Hiragino Sans W3' is a FULL FONT
-           NAME, not a family name; WebKit and Blink match it on macOS but iOS/Firefox
-           are unverified. ProN is a plain family name at the same W3 weight and also
-           JIS2004, so a name-match failure costs nothing.
-         'Hiragino Sans' — last resort. Correct forms, but the heavier W4.
-         'Hiragino Kaku Gothic Pro' — oldest; JIS90 (pre-2004) letterforms. */
+    /* macOS / iOS, pinned to W3 (JIS2004 forms). Don't simplify to 'Hiragino Sans':
+       font-weight:normal resolves to W4, 16% more ink and visibly darker. 'Hiragino
+       Sans W3' is a full font NAME, so ProN — a family name, same weight and era —
+       follows as the safety net; the last two are heavier W4 and JIS90 fallbacks. */
     'Hiragino Sans W3', 'Hiragino Kaku Gothic ProN', 'Hiragino Sans',
     'ヒラギノ角ゴ Pro W3', 'Hiragino Kaku Gothic Pro',
-    /* Windows 10/11 — default-installed. Medium is deliberate: Yu Gothic Regular renders
-       notoriously thin on Windows, and Medium is verified as what Windows renders today
-       (DevTools, stock Win11). 'Yu Gothic UI'/'Yu Gothic' follow because 'Yu Gothic
-       Medium' is a STYLE name: Chrome matches it, but a browser that matches only family
-       names would fall past it — and the generic on Windows is the bitmapped MS PGothic. */
+    /* Windows 10/11. Medium is deliberate — Yu Gothic Regular renders notoriously thin.
+       It is a STYLE name, so the two family names follow for engines that match only
+       families; the Windows generic is the bitmapped MS PGothic. */
     'Yu Gothic Medium', 'Yu Gothic UI', 'Yu Gothic',
-    /* Windows — only if the optional "Japanese Supplemental Fonts" pack is installed.
-       NOT on a stock English Windows 11 any more, so this is a genuine fallback now. */
+    /* Windows, only with the optional "Japanese Supplemental Fonts" pack. */
     'メイリオ', 'Meiryo',
-    /* Android / Linux / ChromeOS — previously unnamed; reached only via the generic. */
+    /* Android / Linux / ChromeOS. */
     'Noto Sans CJK JP', 'Noto Sans JP',
     sans-serif;
   /* Latin face first, then the identical JP chain. Latin glyphs inside a JP font sit on
      full-width em boxes and look wrong, so EN must precede JP — never the reverse. */
   --font-base: 'SourceSansPro-Regular', 'Hiragino Sans W3', 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', 'ヒラギノ角ゴ Pro W3', 'Hiragino Kaku Gothic Pro', 'Yu Gothic Medium', 'Yu Gothic UI', 'Yu Gothic', 'メイリオ', 'Meiryo', 'Noto Sans CJK JP', 'Noto Sans JP', sans-serif;
   /* --font-base with the search box's metric-corrected face in front (see @font-face).
-     The JP names here are what keep a typed kanji out of PingFang SC — no lang needed. */
+     The JP names keep a typed kanji out of PingFang SC — no lang needed. */
   --font-searchbar: 'KA Search Sans', 'Hiragino Sans W3', 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', 'ヒラギノ角ゴ Pro W3', 'Hiragino Kaku Gothic Pro', 'Yu Gothic Medium', 'Yu Gothic UI', 'Yu Gothic', 'メイリオ', 'Meiryo', 'Noto Sans CJK JP', 'Noto Sans JP', sans-serif;
   --font-en: 'SourceSansPro-Regular', sans-serif;
   --font-en-italic: 'SourceSansPro-It', 'SourceSansPro-Regular', sans-serif;
@@ -99,79 +69,49 @@
   /* Sizing */
   --container-width: 1188px;
   --container-min-height: 658px;
-  /* 🔴 THE GRID IS TRUE (2026-07-14). Four equal columns, three equal gutters:
-       4 x 258 + 3 x 24 = 1104 = --content-width.
-     Production's is NOT: its content block is 1103px, one pixel short of what a 258/24
-     grid needs, so it absorbed the shortfall by pushing col4 +2px and narrowing it to
-     255px — gutters 24/24/26, and everything in the Examples column sitting 2px right of
-     the grid's own rhythm. We widened the block by 1px instead, which lets every column
-     be 258 and every gutter 24. Maintainer's decision, 2026-07-14; a deliberate departure
-     from the frozen UI, not a parity bug. Do not "restore" 1103/255.
-     ⚠️ --col-width now applies to ALL FOUR columns. Sizing to 100% inside a column is
-     still the right habit (it tracks the column), but col4 is no longer a special case. */
+  /* THE GRID IS TRUE: 4 x 258 + 3 x 24 = 1104 = --content-width. Production's content
+     block is 1103px, one pixel short, so it narrows col4 to 255 and widens a gutter to
+     26. A deliberate departure, not a parity bug — do not "restore" 1103/255.
+     --col-width applies to ALL FOUR columns; col4 is no longer a special case. */
   --col-width: 258px;
   --gutter: 24px;
   /* Width of every horizontal rule, the version line, and the results scroller. */
   --content-width: 1104px;
   --row-height: 32px;
   --content-height: 445px;
-  /* The detail page's media "stage": the video and the typeface gallery are the same
-     248px square and must stay so — 4 rules depend on it. (The artwork DRAWN inside is
-     offset: the video carries margin-left:6px and the 220px typeface image sits at
-     margin-left:20px, so both are drawn centred on x=130, not on the box's centre 124.
-     Anything that should line up under the kanji lines up with 130.) */
+  /* The detail page's media "stage": video and typeface gallery are the same 248px
+     square and must stay so — 4 rules depend on it. The artwork drawn inside is offset
+     (video margin-left:6px, 220px typeface image at 20px) so both centre on x=130, not
+     the box's centre 124. Anything aligning under the kanji aligns to 130. */
   --stage-size: 248px;
   /* Where results content begins, under the results header. Derived from the header
      stack, not chosen: .ka-results-h1 top -6 / .ka-results-h3 top 36 / rule at 64. */
   --results-content-top: 79px;
 
-  /* Spacing. Only these two survive — --spacing-xs/-md/-lg were declared and never
-     referenced (-lg's one user, .help-footer, matched no element in either modal). */
+  /* Spacing */
   --spacing-sm: 8px;
   --spacing-xl: 42px;
 }
 
-/* 🔎 NOT tokenised, on purpose: the 17px that appears in eight rules (h3, .row1 a/button,
-   .sort-button, .ka-results-h1/-h3, .modal-header h2, .ka-welcome-text, .search-bar). It
-   IS one constant — the legacy sheet's UI text size — but a custom property here would be
-   a lever that looks safe and is not: .search-bar's 17px is load-bearing ARITHMETIC. Its
-   caret height and text baseline are solved against ka-search-sans's ascent/descent, which
-   were baked into the font file AT 17px (tools/build-searchbar-font.py). Changing a shared
-   token would silently break the caret and require regenerating a font. The UI is frozen —
-   schools depend on it — so the token would buy nothing and cost that. Left literal. */
+/* The 17px UI text size in eight rules is NOT tokenised, on purpose. .search-bar's 17px
+   is load-bearing arithmetic — its caret and baseline are solved against ka-search-sans's
+   metrics, which were baked into the font file at 17px (tools/build-searchbar-font.py).
+   A shared token would look like a safe lever, silently break the caret, and require
+   regenerating a font. Left literal. */
 
 /* ============================================
    Font Faces
    ============================================ */
-/* 'mplus-1m-light' was declared here and is DELETED (2026-07-13). It was a kanji-only
-   subset with no kana — see the note on --font-jp. Removing it also drops a 299 KB
-   download from every page load. Its original 2013 justification (Windows defaulted to
-   the bitmapped MS Gothic) expired: Windows has shipped Yu Gothic as the default
-   Japanese face since Windows 10.
+/* EVERY font is SELF-HOSTED from static/fonts/. Never add a font by URL.
+   Webfonts are CORS-restricted and media is not, so one Cloudflare header
+   (access-control-allow-origin) is load-bearing for the fonts and nothing else. Lose it
+   and the CDN stays healthy — images, video and audio all load — while every font is
+   silently rejected: play buttons gone, radicals turned to tofu, nothing in the logs.
+   A same-origin font cannot fail that way.
 
-   'mplus-1m-icons' below is a DIFFERENT font (the UI icon glyphs). Do not remove it. */
-
-/* 🔴 EVERY font is SELF-HOSTED from static/fonts/ (2026-07-13). They used to come from
-   media.kanjialive.com. Do not move them back, and never add a font by URL.
-
-   The reason is NOT outage resilience — if the media CDN is down the app is useless
-   anyway (no video, no strokes, no audio). It is that **webfonts are CORS-restricted and
-   media is not**. Verified against the CDN:
-
-       font  -> access-control-allow-origin: *     (REQUIRED, or the browser rejects it)
-       image -> no CORS header at all              (not required)
-
-   So that one Cloudflare header is load-bearing for the fonts and for nothing else in the
-   app. Lose it — a tightened rule, Hotlink Protection (which media-cdn notes already say
-   never to enable), any config drift — and the CDN stays perfectly healthy: every image,
-   video and audio file keeps loading, while EVERY font is silently rejected. The play
-   buttons vanish, the Sort view's radicals turn to tofu, and nothing in the logs explains
-   why. A same-origin font cannot have that failure, ever: no header, no config, no risk.
-
-   Cost of self-hosting: 47 KB in the repo, and the fonts need their own cache headers —
-   see the /static/fonts mount in server/index.ts. Do not fold that mount back into the
-   general /static one: CSS and JS MUST keep revalidating or a deploy would not take
-   effect for a month. */
+   The fonts need their own cache headers — see the /static/fonts mount in
+   server/index.ts. Do not fold it into the general /static one: CSS and JS must keep
+   revalidating or a deploy would not take effect for a month. */
 @font-face {
   font-family: 'SourceSansPro-Regular';
   src: url('../fonts/sourcesanspro-regular-webfont.woff2') format('woff2'),
@@ -180,26 +120,20 @@
   font-display: swap;
 }
 
-/* Same outlines as SourceSansPro-Regular above, with the vertical metrics REPAIRED.
-   The CDN webfont's metrics are clamped to 0.75/0.25 em (the real face is
-   0.984/0.273) — and a text caret is drawn from the font's ascent to its descent,
-   so in the search box the caret cleared the top of an "H" by 0.9px while still
-   hanging 4px below the baseline. It looked sunken; in TextEdit, which uses the real
-   desktop font, the same string looks right.
+/* SourceSansPro-Regular's outlines with the vertical metrics REPAIRED — the shipped
+   webfont clamps them to 0.75/0.25em (the real face is 0.984/0.273), and a caret is
+   drawn from ascent to descent, so the search box's caret sat visibly sunken.
 
-   Used by .search-bar ONLY. Correcting the metrics app-wide would move the strut and
-   shift baselines on every page, undoing the 0px parity sweep.
+   Used by .search-bar ONLY: correcting the metrics app-wide would move the strut and
+   shift baselines on every page. Ascent 16px / descent 4px at 17px solve both
+     caret    = ascent + descent          = 20px
+     baseline = 16 + (ascent-descent)/2   = 22px  (production's baseline, unmoved)
+   and 4px is the face's deepest descender ink, so the caret still covers a "g". Both
+   depend on `line-height: 17px` staying pinned on .search-bar.
 
-   Metrics are tuned (ascent 16px / descent 4px at 17px) so that BOTH:
-     caret  = ascent + descent           = 20px   (maintainer's pick, 2026-07-12)
-     baseline = 16 + (ascent-descent)/2  = 22px   = production's baseline, unmoved
-   4px is also the deepest descender ink in the face (g = 3.81px), so the caret still
-   covers a "g". These depend on `line-height: 17px` being pinned on .search-bar.
-
-   Chrome/Firefox could do this in CSS with ascent-override; Safari 26 drops the
-   descriptor (verified), so the fix has to live in the file. Rebuild with
-   `tools/build-searchbar-font.py`. Renamed from "Source ..." because OFL's Reserved
-   Font Name forbids a modified version carrying it — don't rename it back. */
+   Not doable in CSS: Safari 26 drops ascent-override, so the fix lives in the file.
+   Rebuild with tools/build-searchbar-font.py. Renamed from "Source ..." because OFL's
+   Reserved Font Name forbids a modified version carrying it — don't rename it back. */
 @font-face {
   font-family: 'KA Search Sans';
   src: url('../fonts/ka-search-sans.woff2') format('woff2'),
@@ -248,10 +182,9 @@
 
 html {
   max-width: 100%;
-  /* On the root element, clip degrades to hidden at the viewport (CSS Overflow §3.3),
-     so the page stays programmatically scrollable either way — Edge Read Aloud can
-     shift it sideways with no user input able to bring it back. The defence is that
-     nothing may overflow the sheet: see the .logo width. */
+  /* On the root element clip degrades to hidden (CSS Overflow §3.3), so the page stays
+     programmatically scrollable either way and Edge Read Aloud can shift it sideways
+     with no way back. The real defence is that nothing overflows the sheet — see .logo. */
   overflow-x: hidden;
 }
 
@@ -332,12 +265,10 @@ h3 {
   display: none;
 }
 
-/* Screen-reader-only content. The clip pattern, not display:none — hidden
-   content must stay in the accessibility tree to be announced. font-size 1px:
-   clip hides the PAINT but the text still lays out at full width, and VoiceOver
-   draws its cursor around that invisible run — smearing the rectangle across
-   neighbouring content. Tiny text keeps the geometry inside the parent's box;
-   what is spoken is unaffected. */
+/* Screen-reader-only content. The clip pattern, not display:none — hidden content must
+   stay in the accessibility tree to be announced. font-size 1px because clip hides the
+   paint but the text still LAYS OUT at full width, and VoiceOver draws its cursor around
+   that invisible run, smearing it across neighbouring content. Speech is unaffected. */
 .visually-hidden {
   position: absolute;
   width: 1px;
@@ -355,17 +286,13 @@ h3 {
 /* ============================================
    Layout: Container
    ============================================ */
-/* `margin: auto` (was `55px auto`) centres the sheet on BOTH axes: body is a
-   column flex container, so auto top/bottom margins absorb the spare vertical
-   space, and auto left/right margins still centre horizontally as before.
+/* `margin: auto` centres the sheet on both axes — body is a column flex container, so
+   auto top/bottom margins absorb the spare vertical space.
 
-   ⚠️ Do NOT "simplify" this to `justify-content: center` on body. The sheet is
-   768px tall (55 + 658 + 55) and a laptop's content area is often shorter —
-   centring by justify-content overflows in BOTH directions, pushing the top of
-   the sheet above the scroll origin where it cannot be scrolled back into view.
-   Auto margins are defined to resolve to 0 when the free space is negative, so
-   a short viewport falls back to exactly the old layout: flush under body's
-   55px padding, scrolling down normally. */
+   Do NOT simplify to `justify-content: center` on body. The sheet is 768px tall and a
+   laptop's content area is often shorter; justify-content overflows in both directions,
+   pushing the top above the scroll origin where it cannot be reached. Auto margins
+   resolve to 0 when free space is negative, so a short viewport just scrolls normally. */
 .container {
   width: var(--container-width);
   min-height: var(--container-min-height);
@@ -376,14 +303,12 @@ h3 {
   box-shadow: 0 3px 6px rgba(100, 100, 100, 0.3);
 }
 
-/* 🔴 27px CENTRES the content block, and that is arithmetic, not taste:
-     .container is 1188px with 15px padding  ->  inner width 1158px
-     (1158 - 1104) / 2 = 27px               ->  equal insets, left and right
-   Production uses 25px, which leaves 25 left / 30 right — the whole sheet's content, every
-   horizontal rule and all four columns sit 2.5px LEFT of centre, and it is why no other
-   measurement in this app ever lands on a round number. Fixed 2026-07-14 (maintainer's
-   decision) together with the 1103->1104 content block; the two only work as a pair.
-   ⚠️ If --content-width or .container's width/padding ever change, re-derive this. */
+/* 27px CENTRES the content block. Arithmetic, not taste:
+     .container 1188px - 2 x 15px padding = 1158px inner
+     (1158 - 1104) / 2 = 27px  ->  equal insets left and right
+   Production's 25px leaves 25 left / 30 right, putting every rule and column 2.5px left
+   of centre. Paired with the 1103 -> 1104 content block; the two only work together.
+   Re-derive this if --content-width or .container's width/padding ever change. */
 .container2 {
   margin-left: 27px;
   margin-top: var(--spacing-xl);
@@ -399,10 +324,9 @@ h3 {
   position: absolute;
 }
 
-/* Each column starts one (--col-width + --gutter) = 282px after the last. All four are
-   258px and all three gutters are 24px; the last column's right edge lands exactly on
-   --content-width (846 + 258 = 1104), so the Examples column is flush with every rule.
-   Production is 0 / 282 / 564 / 848 with col4 at 255px — see --col-width. */
+/* Each column starts (--col-width + --gutter) = 282px after the last, so the fourth
+   ends exactly on --content-width (846 + 258 = 1104) and the Examples column is flush
+   with every rule. Production is 0/282/564/848 with col4 at 255px — see --col-width. */
 .col1 { left: 0; }
 .col2 { left: 282px; }
 .col3 { left: 564px; }
@@ -426,16 +350,9 @@ h3 {
   user-select: none;
 }
 
-/* UA button padding shifted the Info label 6px right of production's <a>; the `top` matches
-   the button-baseline offset (see .sort-button).
-
-   3px, not 2px: at 2px `Info` sat exactly 1.00px ABOVE the other three things in row 1 —
-   the search-bar text, Sort, and the record counter all share a baseline, and Info did not
-   (pixel-scanned; "Sort" and "Info" have no descenders, so ink bottom IS the baseline).
-   Production has the same 1px error. The cause is `span.search`, which carries
-   `padding-top: 1px` and therefore pushes Sort AND the counter down a pixel — Info lives
-   outside that span, so it never got it. Three of four agreed; Info was the outlier, so
-   Info is what moved. (2026-07-14, maintainer's decision — a departure from production.) */
+/* `top` matches the button-baseline offset (see .sort-button). 3px, not 2px: everything
+   else in row 1 gets a pixel from span.search's `padding-top: 1px`, and Info sits outside
+   that span. A deliberate departure — production leaves Info 1px high. */
 .info-button {
   padding: 0;
   position: relative;
@@ -469,31 +386,20 @@ h3 {
   align-items: center;
 }
 
-/* ⚠️ These four declarations are a SOLVED SYSTEM — change one and the others break.
-   The caret's height and the text's baseline are both functions of the font's
-   ascent/descent (see the 'KA Search Sans' @font-face above), the padding and the
-   line-height:
+/* These four declarations are a SOLVED SYSTEM — change one and the others break. Caret
+   height and text baseline are both functions of the font's ascent/descent (see the
+   'KA Search Sans' @font-face), the padding and the line-height:
 
-     caret height  = ascent + descent            = 20px
-     text baseline = padding-derived line top + ascent - half-leading
-                   = 16 + (ascent - descent)/2   = 22px  ← production's baseline
+     caret height  = ascent + descent           = 20px
+     text baseline = 16 + (ascent - descent)/2  = 22px   (production's baseline)
 
-   Production pads 4px/1px, which is what put the text — and the caret with it — 1.5px
-   below the field's optical centre. Symmetric 2px/2px centres the line box; the text
-   would normally rise 1.5px with it, but the corrected font metrics put the baseline
-   back at 22px, so the text does NOT move. That is the whole point: we get the caret
-   without paying for it in text position.
+   Symmetric 2px/2px padding centres the line box where production's 4px/1px sank it,
+   and the corrected metrics hold the baseline at 22px — so the caret is fixed without
+   the text moving. `line-height: 17px` is load-bearing and NOT inherited: WebKit gives
+   form controls `line-height: normal`.
 
-   `line-height: 17px` is load-bearing (the arithmetic above assumes it) and is NOT
-   inherited: WebKit gives form controls `line-height: normal`; they do not take
-   body's 1.42857143. Production computes 24.285715px here only because Bootstrap adds
-   `input,button,select,textarea{line-height:inherit}` — invisible either way, since
-   WebKit's centring absorbs it.
-
-   Still NOT fixable, so don't try: the caret's gap to the previous letter (that
-   glyph's side bearing — there is no CSS offset for it). `caret-color` is the only
-   caret property that ships; `caret-shape`/`caret-animation` are CSS.supports()-false
-   in Safari 26. */
+   Not fixable, don't try: the caret's gap to the previous letter is that glyph's side
+   bearing, and `caret-shape`/`caret-animation` are unsupported in Safari 26. */
 .search-bar {
   border: 0;
   outline: none;
@@ -545,51 +451,33 @@ h3 {
   padding: 0;
 }
 
-/* 🔴 font-family is NOT optional here, and its absence was a live trapdoor.
-   These two glyphs are 〈 U+3008 and 〉 U+3009 — CJK brackets. SourceSansPro-Regular is
-   unicode-range'd to Latin, so they fell through the family list to whatever the OS chose:
-   production (whose sheet names no Japanese family) lands on the bare `sans-serif` generic
-   and renders them in PingFang SC — CHINESE bracket forms. We were saved only by
-   --font-base's Japanese names, i.e. by luck, and the shape still varied per platform.
-
-   mplus-1m-icons exists for exactly this: a 4-glyph icon font already used by the typeface
-   chevrons two columns over, whose ink is EXACTLY mirrored — 〈 ink centre 14.507, 〉 5.493,
-   both about the same 20.00px advance's centre at 10.0. Naming it makes these deterministic
-   on every OS and browser, and makes the two pairs of chevrons in the app the same shape. */
+/* font-family is NOT optional here. These glyphs are 〈 U+3008 and 〉 U+3009, CJK brackets;
+   SourceSansPro-Regular is unicode-range'd to Latin, so unnamed they fall through to
+   whatever the OS picks — PingFang SC's Chinese bracket forms on macOS, and a different
+   shape per platform. mplus-1m-icons has them exactly mirrored (ink centres 14.507 /
+   5.493 about the same 20px advance), which also matches the typeface chevrons. */
 .recordCounter .icon-left,
 .recordCounter .icon-right {
   font-family: var(--font-icons);
   font-size: 20px;
   color: var(--color-primary);
-  /* ⚠️ Load-bearing, and it REPLACES a `top: -1.9px` nudge that used to sit on the
-     <button> form (the search header renders these as <button>s, the detail header as
-     <a>s). That nudge looked like an engine quirk and was not: WebKit gives form controls
-     `line-height: normal`, so a <button> does NOT inherit body's 1.42857143 — it resolves
-     its line box out of THE FONT'S OWN metrics (30px under Hiragino, 20px under
-     mplus-1m-icons) while the <a> takes the inherited 28.57px. The nudge was tuned against
-     Hiragino's 30px, so naming the icon font above threw it 6px out.
-
-     Pinning the line box to the anchor's own value (20px x body's 1.42857143) makes the two
-     forms identical BY CONSTRUCTION, for any font and in any engine — which matters here
-     because WebKit's UA <button> padding is asymmetric (2px/3px) where Chrome's is 1px/1px,
-     so no single `top:` offset could ever have been right in both. Same lesson as the
-     example-audio triangle: don't nudge, match the line box. */
+  /* Load-bearing. These render as <button>s in the search header and <a>s in the detail
+     header; WebKit gives form controls `line-height: normal`, so the button resolves its
+     line box from the FONT's metrics while the anchor takes body's inherited 28.57px.
+     Pinning it to the anchor's value (20px x 1.42857143) makes the two identical by
+     construction, in any font and any engine. No `top:` nudge can do that — WebKit's UA
+     button padding is asymmetric (2/3px) where Chrome's is 1/1. Don't nudge; match the
+     line box. */
   line-height: 28.571429px;
 }
 
-/* Both chevrons are absolutely positioned — a line box's baseline placement is not
-   deterministic here, an absolute offset is. The position they land on is DELIBERATE and
-   was chosen by eye: a tip-at-search-box-midline variant was tried and rejected — it read
-   as too high next to the counter text.
+/* Absolutely positioned — a line box's baseline placement is not deterministic here, an
+   absolute offset is. The position was chosen by eye and is deliberate.
 
-   `top: -2.4px` HOLDS that chosen position across the icon-font change above. It is not a
-   fudge: a glyph's baseline sits where its font's metrics put it, and mplus-1m-icons draws
-   these 2.41px lower in the same line box than the Hiragino face they used to fall through
-   to (pixel-scanned, not estimated). Without it the chevrons would drop ~2.4px and go
-   bottom-heavy in the 25px counter — a position change nobody asked for, riding along with
-   a shape change that was. So: the glyph looks different now; it has not MOVED.
-
-   ⚠️ This number is paired with the font. Change --font-icons and it must be re-measured. */
+   `top: -2.4px` holds that position against the icon font: mplus-1m-icons draws these
+   2.41px lower in the same line box than the face they used to fall through to
+   (pixel-scanned). Without it they drop and go bottom-heavy in the 25px counter.
+   The number is PAIRED WITH THE FONT — change --font-icons and re-measure it. */
 .recordCounter .icon-left {
   position: absolute;
   left: -10px;
@@ -601,10 +489,6 @@ h3 {
   left: 121px;
   top: -2.4px;
 }
-
-/* The `top: -1.9px` that used to live here — on button.icon-left/.icon-right — is GONE.
-   See the line-height note above: it was compensating for a font metric, not for Safari,
-   and the two forms now land identically without it. Don't reintroduce it. */
 
 .recordCounter .icon-left.disabled,
 .recordCounter .icon-right.disabled {
@@ -624,17 +508,11 @@ span.search {
 /* ============================================
    Branding
    ============================================ */
-/* padding-top is 11px, not the 10px it inherits from .row1, and that 1px is the whole point.
-   Everything in row 1 sits on baseline 69:
-     - the search-bar TEXT, by its own solved metrics (input top 47 + 22 — see .search-bar)
-     - `Sort` and the record counter, because span.search carries `padding-top: 1px`
-     - `Info`, since it was corrected to match (see .info-button)
-   `Kanji alive` is a plain inline in .row1, so it got neither, and landed on the natural 68
-   — 1px high, which the maintainer spotted by eye. Production has the same 1px error, on
-   BOTH Info and the branding; correcting only Info left this one as the last item out of
-   line, which is what made it newly visible. (2026-07-14.)
-   ⚠️ Nothing to do with the italic face: sourcesanspro-italic's metrics are clamped to
-   0.751/-0.250, i.e. within 0.001em of the regular's — read from the font, not assumed. */
+/* padding-top is 11px, not the 10px inherited from .row1, and that 1px is the point:
+   everything else in row 1 sits on baseline 69 (the search text by its own metrics, Sort
+   and the counter via span.search, Info via .info-button). `Kanji alive` is a plain
+   inline and got none of them, landing 1px high. A deliberate departure.
+   Nothing to do with the italic face — its metrics are within 0.001em of the regular's. */
 .desktop-branding {
   display: block;
   padding-top: 11px;
@@ -654,9 +532,9 @@ span.search {
   position: relative;
   top: -8px;
   left: 1074px;
-  /* Fit the img. Unset, this block is 1158px wide and the relative shift hangs
-     ~1060px of empty box past the sheet — scrollable overflow that let Edge
-     Read Aloud drag the whole page sideways. The image itself does not move. */
+  /* Fit the img. Unset, this block is 1158px wide and the relative shift hangs ~1060px
+     of empty box past the sheet — scrollable overflow that let Edge Read Aloud drag the
+     page sideways. The image itself does not move. */
   width: 54px;
 }
 
@@ -741,10 +619,9 @@ span.search {
   display: none;
 }
 
-/* Custom scrollbar (replaces perfect-scrollbar). Visibility is pure CSS —
-   fade in on container hover like production (rail opacity .6) — because
-   Alpine x-show + class transitions proved unreliable inside the HTMX swap
-   target. The thumb is draggable via the searchPage component. */
+/* Hand-written scrollbar. Visibility is pure CSS (fade in on container hover, rail
+   opacity .6) because Alpine x-show + class transitions never fire inside the results
+   swap target. The thumb is draggable via the searchPage component. */
 .custom-scrollbar-track {
   position: absolute;
   bottom: 8px;
@@ -763,7 +640,7 @@ span.search {
 .custom-scrollbar-thumb {
   position: absolute;
   height: 5px;
-  background: #000; /* legacy overrides perfect-scrollbar's thumb to black */
+  background: #000; /* black, matching the legacy sheet's thumb */
   border-radius: 3px;
   cursor: pointer;
 }
@@ -811,50 +688,32 @@ span.search {
   position: absolute;
 }
 
-/* Kanji characters in results — 25px, the largest Japanese on the page.
-   🔴 These are DELIBERATELY LIGHTER than the 16px body text. That is OPTICAL SIZING, not an
-   inconsistency: the same weight reads heavier at display size, so the big kanji are drawn
-   lighter to match. Production does exactly this on BOTH platforms — mplus-1m-light on macOS
-   (a LIGHT face) and 'Yu Gothic Regular' on Windows (the light weight, vs Medium elsewhere).
+/* Results kanji, 25px — the largest Japanese on the page, and DELIBERATELY LIGHTER than
+   the body text. That is optical sizing, not an inconsistency: the same weight reads
+   heavier at display size. Production does the same on both platforms.
 
-   ⚠️ It looks like a bug and it is not. It was "fixed" once (2026-07-13) by dropping the
-   lighter faces so these followed --font-jp; the grid came out **+31% heavier** and the
-   maintainer caught it immediately. Restored the same day. Don't do it again.
-
-   W2 is the macOS stand-in for the deleted mplus-1m-light: +11% ink against it, where the
-   W3 used everywhere else is +31%. Yu Gothic Regular keeps Windows lighter than its Medium.
-   The var(--font-jp) tail carries every other platform (and the Chinese-forms protection —
-   see the note on --font-jp). */
+   It looks like a bug and is not. Dropping the light faces so these follow --font-jp
+   makes the grid +31% heavier. W2 is the macOS light face (+11% ink, where W3 is +31%)
+   and Yu Gothic Regular keeps Windows lighter than its Medium; the --font-jp tail carries
+   every other platform and the Chinese-forms protection. */
 .kanji {
   font-family: 'Hiragino Sans W2', 'Yu Gothic Regular', var(--font-jp);
   font-size: 25px;
 }
 
-/* 🔴 The grid's COLUMN PITCH is declared here (25px kanji + 12.5px pad = 37.5px). It
-   used to be a FONT METRIC, and that is the bug this pair of rules exists to kill.
+/* The grid's COLUMN PITCH is declared here: 25px kanji + 12.5px pad = 37.5px. It must
+   never go back to being a FONT METRIC. The gap was once a literal space in the markup,
+   so its width was whatever the first font said a space was — and substituting a face
+   with a narrower space (0.333em vs 0.5em) dropped the pitch to 33.33px, fitting 8 kanji
+   where 7 belong. The inline `max(ceil(N/12),7) * 38px` width in results.ejs assumes
+   37.5px; it is what fills 12 rows top-to-bottom before extending right into the scroll.
 
-   The gap between two kanji was a literal space character in the markup, so its width
-   was whatever the first font in a.ka's stack said a space was. mplus-1m-light — the
-   webfont the app shipped from 2013 until 2026-07-13 — is MONOSPACED: space = 0.5em =
-   12.50px at 25px, giving a 37.50px pitch. The inline `max(ceil(N/12),7) * 38px` width
-   in results.ejs is sized to exactly that: it is what makes results fill 12 rows
-   top-to-bottom and then extend RIGHT into the horizontal scroll.
+     font-size: 0   collapses the whitespace text nodes EJS emits between the anchors.
+                    a.ka re-declares 25px, so neither the kanji nor the row pitch moves.
+     padding-right  restates the 12.5px gap as layout, where no font can reach it.
 
-   Retiring that webfont (correctly — it had no kana) substituted Hiragino Sans W2,
-   whose space is 0.333em = 8.32px. Pitch fell to 33.33px, 8 kanji fitted where 7
-   should, and the grid came out 8 x 10 with a dead band underneath. The substitution
-   was chosen to match the face's INK; nobody checked its ADVANCES.
-
-     font-size: 0   collapses the whitespace text nodes EJS emits between the anchors
-                    (Angular's ng-repeat did not emit them) — same trick as .grouped-row.
-                    a.ka re-declares 25px, so the kanji are unaffected, and the line box
-                    is still set by the anchors, so the row pitch does not move either.
-     padding-right  restates the 12.5px gap as layout. Now no font can move it.
-
-   ⚠️ padding-RIGHT, not the padding-LEFT .grouped-row uses. Grouped rows are separate
-   <div>s, so a left pad indents each row uniformly — deliberate there. These kanji WRAP,
-   so a left pad would indent the first kanji of every row and slide the whole grid
-   12.5px right. The gap has to trail the glyph. */
+   padding-RIGHT, not the padding-LEFT .grouped-row uses: these kanji WRAP, so a left pad
+   would indent the first kanji of every row and slide the whole grid right. */
 p.kanji {
   position: absolute;
   top: var(--results-content-top);
@@ -906,45 +765,36 @@ a.ka:active {
   display: flex;
 }
 
-/* 258px is CORRECT here — a results column, not the detail page's col4 (255px). */
-/* 🔴 THE GUTTER IS var(--gutter) = 24px, NOT production's 25px (2026-07-17). This was the
-   last place in the sheet still off the true grid, and the 1px cost more than it looks.
+/* 258px is a RESULTS column here, not the detail page's col4.
 
-   A viewport is --content-width = 1104px = 4 x 258 + 3 x 24, so four columns and three
-   gutters fit it EXACTLY. At 25px gutters they need 1107px — 3px more than exists — so the
-   scroll could never rest with four whole columns framed, and each group heading drifted a
-   further 1px off the sheet grid: group 3's heading sat 3px right of `Kanji alive` directly
-   above it (891 vs 888). At 24px every heading lands on 42 + n x 282, under the header
-   control it belongs to.
+   The gutter is var(--gutter) = 24px, NOT production's 25px. --content-width is
+   4 x 258 + 3 x 24 = 1104, so four columns and three gutters fit a viewport exactly; at
+   25px they need 1107 and every group heading drifts a further 1px off the sheet grid.
 
-   The trailing gutter below is the other half. Together they make the maximum scroll
+   With the trailing gutter dropped below, the maximum scroll becomes
 
        maxScroll = (N x 282 - 24) - (4 x 282 - 24) = (N - 4) x 282
 
-   an exact multiple of the pitch for ANY N >= 4 — the trailing gutters cancel. So the scroll
-   ALWAYS ends with a column flush at the left inset, and there is no position past the last
-   aligned column. That is why this needs no scroll clamp and no scroll-snap: the alignment
-   falls out of the arithmetic, and a clamp would only hide a grid that was still wrong.
-   Before this, every sorted view overscrolled by exactly 28px (= 25 trailing + 3 pitch),
-   regardless of the query — the constant is the fingerprint of the mismatch. */
+   an exact multiple of the pitch for any N >= 4 — the trailing gutters cancel. The scroll
+   therefore always ends with a column flush at the left inset. Never add a scroll clamp
+   or scroll-snap: the alignment falls out of the arithmetic, and a clamp would only hide
+   a grid that was still wrong. */
 .grouped-column {
   width: var(--col-width);
   margin-right: var(--gutter);
   display: inline-table;
 }
 
-/* The last column's trailing gutter is NOT content, but it counts toward scrollWidth — it
-   was 25 of the 28px of overscroll. Scoped to the last column of the LAST group: every
-   other group keeps its trailing gutter, which is what holds the groups' bottom rules
-   contiguous (.ka-border-bottom is width:100% of its group). Verified: adjacent rules still
-   meet with 0px gaps, and the final rule's right edge lands on the content edge (1146 rel
-   .container) rather than 24px short of it. */
+/* The last column's trailing gutter is not content but counts toward scrollWidth. Scoped
+   to the last column of the LAST group: every other group keeps its trailing gutter,
+   which is what holds the groups' bottom rules contiguous (.ka-border-bottom is 100% of
+   its group). */
 .results-group:last-child .grouped-column:last-child {
   margin-right: 0;
 }
 
-/* font-size:0 collapses the whitespace text nodes between links (EJS emits
-   them; Angular's ng-repeat didn't) so the kanji pitch is exactly 37px */
+/* font-size:0 collapses the whitespace text nodes EJS emits between links, so the
+   kanji pitch is exactly 37px */
 .grouped-row {
   font-size: 0;
 }
@@ -1055,21 +905,18 @@ video[poster] {
   margin-left: 6px; /* see --stage-size: this is what draws the video centred on 130 */
 }
 
-/* Legacy pins the three video-control icons absolutely (left 63/122/175 within
-   the column) rather than flex-centering them.
+/* The three video-control icons are pinned absolutely (left 63/122/175) rather than
+   flex-centred.
 
-   🔴 DO NOT "even out" 63/122/175 — the uneven gaps are an OPTICAL CORRECTION, and
-   this is the single most dangerous false positive in the sheet. The play glyph is a
-   hollow triangle, so its ink's centre of MASS sits 2.50px left of its bounding box
-   (the other icons are balanced to ±0.03px). Measured in centroids, production's play
-   button is optically centred between its neighbours to 0.01px. A bounding-box audit
-   "finds" a 5px asymmetry here and breaks working code. Measure the ink, not the box.
+   DO NOT "even out" 63/122/175 — the uneven gaps are an OPTICAL CORRECTION and the most
+   dangerous false positive in this sheet. The play glyph is a hollow triangle, so its
+   centre of MASS sits 2.50px left of its bounding box (the other icons balance to
+   ±0.03px); by centroid the play button is optically centred to 0.01px. A bounding-box
+   audit "finds" a 5px asymmetry here and breaks working code. Measure the ink.
 
-   ⚠️ `text-align: left` is load-bearing. These boxes are 20px but the glyphs advance
-   18.125 / 17.5 / 18.125px, and a <button> gets `text-align: center` from the UA sheet
-   — production's <a> did not. So each icon's INK drifted right by half its own slack
-   (+1.00 / +1.25 / +1.00px) while the BOXES stayed identical at 63/122/175. That is
-   exactly why the 0px parity sweep missed it: it measured getBoundingClientRect(). */
+   `text-align: left` is load-bearing: the boxes are 20px but the glyphs advance
+   18.125/17.5/18.125px, and a <button> gets `text-align: center` from the UA sheet where
+   production's <a> did not — so each icon's INK drifts right while the BOXES stay put. */
 .animation-controls {
   margin-top: 16px;
 }
@@ -1123,14 +970,9 @@ h3#kanji {
 .icon-pause:before { content: "\e006"; }
 .icon-step-right:before { content: "\e005"; }
 
-/* Hover feedback on the play / step / audio icons. Production carries TWO classes on
-   each control — `ka-icon-gray gray-out` — and greys on hover via `.gray-out:hover`.
-   The EJS port kept `ka-icon-gray` (which has no rule anywhere, in either sheet) and
-   dropped `gray-out`, so this rule matched nothing and the icons went dead: the whole
-   affordance was gone, silently, with no CSS error and nothing to see in a diff.
-
-   Pointed at the class the templates ACTUALLY apply rather than restoring the second
-   one — one class, one rule, nothing left to fall out of sync. */
+/* Hover feedback on the play / step / audio icons. Keyed to `ka-icon-gray`, the class
+   the templates actually apply — production greys via a second class the views don't
+   carry, and a rule pointed at that one matches nothing and fails silently. */
 .ka-icon-gray:hover {
   color: gray;
 }
@@ -1181,56 +1023,35 @@ h3#kanji {
   font-size: 15px;
 }
 
-/* ═══ Meaning, Readings — and the one rule that governs every heading→value gap ═══
+/* Meaning, Readings — the rule governing every heading-to-value gap.
  *
- * 🔴 EVERY VALUE'S `top` IS DERIVED, NOT CHOSEN. The invariant is:
+ * EVERY VALUE'S `top` IS DERIVED, NOT CHOSEN:
  *
- *     baseline gap (heading → value) = 31.5px, for ALL EIGHT pairs
- *     value_top = heading_effective_top + 31.5 − d(value's font)
+ *     baseline gap (heading -> value) = 31.5px, for ALL EIGHT pairs
+ *     value_top = heading_effective_top + 31.5 - d(value's font)
  *
- * where d is how much LOWER the value's baseline sits inside its line box than the h3's:
+ * where d is how much lower the value's baseline sits in its line box than the h3's:
  *
- *     d = 0.5   value is 15px SourceSansPro   (Meaning, Onyomi, Kunyomi)
- *     d = 1.5   value is 16px SourceSansPro   (Strokes, Grade, Kodansha, Nelson)
- *     d = 3.5   value is 16px Hiragino / JP   (Examples)
+ *     d = 0.5   15px SourceSansPro       (Meaning, Onyomi, Kunyomi)
+ *     d = 1.5   16px SourceSansPro       (Strokes, Grade, Kodansha, Nelson)
+ *     d = 3.5   16px Hiragino / JP       (Examples)
  *
- * WHY the values need different tops to look aligned: a baseline sits at
- * (half-leading + the font's ascent) inside its line box, so three fonts put it in three
- * places. Production gives all four row-1 values the SAME top:60px — which is why their
- * baselines came out staggered 148 / 149 / 149 / 151, a 3px drift across four adjacent
- * columns. The CSS was consistent; the RENDERING was not.
+ * The values need different tops to look aligned because a baseline sits at
+ * (half-leading + ascent) inside its line box, so three fonts put it in three places.
+ * Production gives all four row-1 values the same top:60px, and their baselines come out
+ * staggered across 3px. Never give two values the same `top` just because they line up in
+ * the CSS, and never change a value's font-size without re-deriving its top.
  *
- * 🔎 The 2px between the Latin values and the Japanese one is not Hiragino being odd — it
- * is SourceSansPro's ascent being CLAMPED to 0.75em by the webfont generator (the real face
- * is 0.984). Same clamp that sank the search caret; see the 'KA Search Sans' @font-face.
- * If those metrics are ever repaired app-wide, d(15px)/d(16px) change and EVERY top below
- * must be re-derived. That is the one thing that can break this.
+ * The 2px between the Latin and Japanese values is SourceSansPro's ascent being clamped
+ * to 0.75em by the webfont generator (see the 'KA Search Sans' @font-face). If those
+ * metrics are ever repaired app-wide, d(15px)/d(16px) change and every top below must be
+ * re-derived. That is the one thing that can break this.
  *
- * ⚠️ So: never give two values the same `top` just because they line up in the CSS, and
- * never change a value's font-size without re-deriving its top from the formula.
- * Verified with a zero-height baseline probe, cross-checked against a pixel scan of the
- * descender-free strings ("read", "14", "2") — probe and ink agreed exactly.
- * (2026-07-14, maintainer's decision: unify at 31.5, the top row's gap.)
- *
- * ═══ KNOWN AND ACCEPTED: the OPTICAL gaps are NOT equal, and that is deliberate ═══
- *
- * The BASELINES are equal (31.5px, all 8). The WHITESPACE is not. Latin ink rises ~10.5px
- * above its baseline (cap/ascender height, ~0.68em); kana rises ~12.2px and kanji ~13.6px,
- * because CJK glyphs nearly fill the em box (~0.81–0.85em). So the three JAPANESE values —
- * Onyomi, Kunyomi, and the Examples compounds — sit about 2.2px TIGHTER to their headings:
- *
- *     gap from heading baseline to the value's INK   (pixel-scanned at 2x DPR)
- *       Latin    (read / 14 / 2 / 1038)      20.80 .. 21.24px
- *       Japanese (読者… / ドク… / よ)          17.90 .. 19.35px
- *
- * You CANNOT have both in a mixed-script column: equalise the ink and the baselines stagger;
- * equalise the baselines and the ink gaps stagger. The maintainer chose BASELINES
- * (2026-07-14), which is also the standard typographic convention.
- *
- * 🔎 Production's "wrong" staggered baselines (148/149/149/151) were in fact COMPENSATING for
- * this — its row-1 optical gaps came out to a 1.4px spread, better than our 3.3px. Removing
- * the stagger removed the compensation. Both facts are true; the maintainer weighed them.
- * **This is measured and settled — do not "fix" the 2-3px as if it were a bug.**
+ * KNOWN AND ACCEPTED: the baselines are equal, the OPTICAL gaps are not. CJK ink rises
+ * higher above the baseline than Latin (~0.81-0.85em of the em box vs ~0.68em), so the
+ * Japanese values sit ~2.2px tighter to their headings. In a mixed-script column you can
+ * equalise the ink or the baselines, never both; baselines is the choice here, and the
+ * standard typographic convention. Measured and settled — not a bug to fix.
  */
 
 /* Row 1 headings — effective top = 10 + 20 = 30 */
@@ -1308,18 +1129,15 @@ h3.radical, h3.hint {
   font-size: 16px;
 }
 
-/* Bottom edge sits on the radical-stroke digit's BASELINE, which is where the
-   digit's ink ends (digits are flat-bottomed, no descender).
+/* Bottom edge sits on the radical-stroke digit's baseline, where the digit's ink ends
+   (digits are flat-bottomed):
 
-     digit baseline = .radical-stroke top (335) + half-leading (3.43) + ascent (12)
-                    = 350.43   [16px text, line-height 1.42857, webfont ascent 0.75em]
+     digit baseline = top (335) + half-leading (3.43) + ascent (12) = 350.43
      image bottom   = top + 12  ->  top = 338.43, rounded to 338.5
 
-   Production's 338 leaves the graphic 0.42px high — about one device pixel on a
-   Retina screen, which is exactly how it reads. The .5 is deliberate: at 2x DPR
-   both edges land on whole device pixels, so the SVG is not resampled.
-   ⚠️ The ashi.svg family fills its box edge to edge (verified), so the box
-   bottom IS the visual bottom — no ink padding to compensate for. */
+   The .5 is deliberate — at 2x DPR both edges land on whole device pixels, so the SVG is
+   not resampled. The ashi.svg family fills its box edge to edge, so the box bottom IS
+   the visual bottom; no ink padding to compensate for. */
 img.radical-position {
   top: 338.5px;
   position: absolute;
@@ -1355,14 +1173,10 @@ div.radical-meaning {
   position: absolute;
   top: 291px;
   right: 1px;
-  /* Cross-fade duration. Legacy (kanji-alive.css:373) and production use 1s;
-     1.375s is a deliberate choice by the maintainer (2026-07-12) — the fade IS
-     the animation, so it gets most of the frame.
-
-     This trades directly against the still period: detail.ejs waits
-     radicalFrameGap (1625ms) between frames, so an image is FULLY still for
-     (gap - fade) = 250ms. Raise the fade without raising the gap and the
-     stillness shrinks; once fade >= gap it vanishes and the fades overlap.
+  /* Cross-fade duration; production uses 1s. The fade IS the animation, so it gets most
+     of the frame — but it trades directly against the still period: detail.ejs waits
+     radicalFrameGap (1625ms) between frames, so an image is fully still for
+     (gap - fade) = 250ms. Once fade >= gap the stillness vanishes and the fades overlap.
      CHANGE THE TWO TOGETHER. */
   transition: opacity 1.375s ease-in-out;
   opacity: 0;
@@ -1372,9 +1186,8 @@ div.radical-meaning {
   opacity: 1;
 }
 
-/* Honour the OS "reduce motion" setting: the frames still land at the same
-   moments, but cut instead of dissolving. Invisible to anyone who has not set
-   the toggle — this is not a responsive @media, which the sheet still avoids. */
+/* Honour the OS "reduce motion" setting: the frames land at the same moments but cut
+   instead of dissolving. Not a responsive @media — the app sheet still has none. */
 @media (prefers-reduced-motion: reduce) {
   .ka-rad-anim img {
     transition-duration: 0.01s;
@@ -1391,29 +1204,20 @@ div.hint {
   top: 294px;
 }
 
-/* Hand-drawn kanji components inline in the mnemonic hint (github issue #8:
-   "increase size of small image components"). Production caps them at 12px.
-   They read as tiny because each SVG is a SQUARE canvas but most components are
-   WIDE AND SHORT: the ink fills only 20%–99% of the canvas height (median 87%,
-   measured across all 181 files). Capping both axes at 12px therefore renders
-   e.g. ⺌ (36.svg) at 8.0 x 3.7px and 一 (4.svg) at 10.6 x 2.5px.
+/* Hand-drawn kanji components inline in the mnemonic hint; production caps them at 12px.
+   They read as tiny because each SVG is a SQUARE canvas while most components are wide
+   and short — the ink fills only 20-99% of the canvas height (median 87% across all 181
+   files). 18px is the hard ceiling: above that the image collides with the descender ink
+   of the line above.
 
-   14px chosen by the maintainer 2026-07-13 from a slider comparing 12–18 against
-   real hints. 18px is the hard ceiling (the image's bottom sits on the text
-   baseline and the line above has its deepest descender ink 18.07px up), but 18
-   was "too big a jump" — 14 is the gentlest step that visibly helps.
+   `margin-top: -2px` keeps the LINE PITCH IDENTICAL and is not an arbitrary nudge. A
+   replaced inline contributes its MARGIN box to the line box, so the invariant is that
+   the image offers 12px above the baseline, i.e. margin-top = 12px - cap. Retune BOTH
+   together or every line holding a component drifts from the one above it. The image
+   still paints at full height; margins do not clip.
 
-   `margin-top: -2px` keeps the LINE PITCH IDENTICAL, and it is NOT an arbitrary
-   nudge: a replaced inline element contributes its MARGIN box to the line box, so
-   the invariant is that the image offers 12px above the baseline — exactly what
-   the 12px version offered. Hence margin-top = 12px − cap. Retune BOTH together
-   or every line holding a component drifts away from the one above it. The image
-   still PAINTS at its full height; margins do not clip.
-
-   Line pitch cannot move, but WRAPPING can — a wider image takes more of the line.
-   At 14px, 5 hints of 1,235 gain a line (磁 遅 募 楽 商). Verified harmless: the
-   tallest hint block is 85.7px (4 lines) at every cap 12–18, i.e. unchanged from
-   today, and .border6 leaves 97px. Nothing overflows. */
+   Pitch cannot move but WRAPPING can — at 14px, 5 hints of 1,235 gain a line. Harmless:
+   the tallest hint block is 85.7px at every cap 12-18 and .border6 leaves 97px. */
 .hint img {
   max-width: 14px;
   max-height: 14px;
@@ -1446,20 +1250,14 @@ img.ka-breakdown:hover {
 }
 
 /* Examples */
-/* ⚠️ These two widths are `100%` ON PURPOSE — do not restate a pixel number here.
-   They used to say 258px, which was a COPY of --col-width, and the copy was wrong for the
-   column it lived in: before the grid was made true (see --col-width), col4 was 255px, so
-   the row was 3px wider than the column that held it and `justify-content: space-between`
-   pushed the audio button to the row's edge instead of the column's.
-
-   100% resolves against .row2, which is 100% of .col4 — whatever col4 happens to be. It
-   cannot drift out of step with the column the way a second copy of the number can, and it
-   survived the 255 -> 258 change without an edit. That is the point.
-   (.grouped-column's 258px is a RESULTS column, unrelated to this one.)
+/* These two widths are `100%` ON PURPOSE — never restate a pixel number here. 100%
+   resolves against .row2, which is 100% of .col4, so it tracks whatever col4 is; a copied
+   number drifts out of step with the column and pushes the audio button to the row's edge
+   instead of the column's. (.grouped-column's 258px is a RESULTS column, unrelated.)
    `div.` is load-bearing: <h3 class="examples"> shares the class.
 
-   ⚠️ This width is only HALF of what puts the play triangle's tip on the rule — the other
-   half is `padding: 0` on .audio-play. See the note there; the two are a matched pair. */
+   This width is only HALF of what puts the play triangle's tip on the rule — the other
+   half is `padding: 0` on .audio-play. The two are a matched pair. */
 div.examples {
   width: 100%;
 }
@@ -1517,69 +1315,34 @@ div.examples {
   flex-shrink: 0;
 }
 
-/* The triangle must sit on the optical middle of the Japanese compound to its left.
-   It is centred here by CONSTRUCTION, not by a nudge — an earlier `top: 1.8px` fudge
-   was right in Chrome/Firefox and ~2px low in Safari, because the thing it corrected
-   for is itself engine-specific:
+/* The triangle sits on the optical middle of the Japanese compound to its left, centred
+   by CONSTRUCTION — never by a `top:` nudge. No single offset can work: WebKit's UA button
+   padding is asymmetric (2/3px) where Chrome's is 1/1, so the glyph's line box starts at a
+   different y per engine. Instead the button's line box is made identical to the Japanese
+   text's, and half-leading does the centring — ka-multimedia's ascent/descent ARE its glyph
+   bbox, CJK ink likewise centres on its line box, and `.example` is align-items:flex-start
+   so both share a top edge. Nothing here depends on the visitor's installed fonts.
 
-     - `<button>` carries UA padding, and it is ASYMMETRIC in WebKit: Safari says
-       2px top / 3px bottom, Chrome 1px / 1px. So the glyph's line box already starts
-       from a different y in each engine.
-     - `line-height: normal` (inherited from .icon-play) then resolves the baseline out
-       of the font's own metrics, which each engine rounds its own way.
+   So `line-height` must track .example-japanese's line box: 16px x body's 1.42857143.
 
-   No single offset can serve both, so don't reach for one. Instead make the button's
-   line box IDENTICAL to the Japanese text's, and let half-leading do the centring:
+   `padding: 0` on ALL FOUR SIDES is load-bearing and PAIRED WITH `.example`'s width.
+   As an invariant, not pixels:
 
-     - ka-multimedia's ascent (+480) and descent (-32) ARE the glyph bbox (yMax/yMin).
-       The ink is therefore exactly centred between them, so a glyph of this font always
-       lands ink-centred on its own line box, whatever the line-height.
-     - CJK ink likewise centres on its line box (glyph centred in the em box, em box
-       centred in the line box by half-leading) — in Yu Gothic, Hiragino and Noto alike.
-     - `.example` is `align-items: flex-start`, so both boxes already share a top edge.
-
-   Same top edge + same line box => same centre. Neither side depends on the visitor's
-   installed fonts (Windows renders this text in Yu Gothic Medium, macOS/iOS Hiragino,
-   Android/Linux Noto), and there is no number here to re-tune.
-
-   ⚠️ `line-height` must track .example-japanese's LINE BOX: 16px x body's 1.42857143.
-   Change one, change the other.
-
-   🔴 `padding: 0` — ALL FOUR SIDES — is load-bearing, and it is PAIRED WITH `.example`'s
-   width. Together they are what lands the triangle's TIP on the rule. State it as an
-   invariant, not as pixels, because the grid has moved once already:
-
-     .example is 100%          -> the row's right edge IS the column's right edge
-     .audio-play has no padding -> the button's box is 13.13px, the bare glyph advance,
-                                   so its BOX edge is its INK edge (0.12px side bearing)
+     .example is 100%           -> the row's right edge IS the column's right edge
+     .audio-play has no padding -> the box is 13.13px, the bare glyph advance, so its
+                                   BOX edge is its INK edge (0.12px side bearing)
      => the tip lands on the column's right edge, which is the rule's right edge.
 
-   Production's control is an <a>: 13.13px, no padding, box edge == ink edge. Ours is a
-   <button>, which the UA sheet gives 6px of padding on each side. An earlier note here said
-   that padding was "deliberately left alone" because zeroing it slid the triangle ~6px
-   right — true at the time, because `.example` then restated a width 3px WIDER than its
-   column, and the two errors were partly cancelling. Fix the width without the padding (or
-   the padding without the width) and the tip misses by 3-6px in one direction or the other.
-   Change one, change the other.
+   The UA sheet gives a <button> 6px of padding per side, where production's <a> had none.
+   Change the width without the padding, or the padding without the width, and the tip
+   misses by 3-6px. A box-based audit cannot see this and gets it backwards: by
+   getBoundingClientRect() the padded button looks like it OVERHANGS the rule while its ink
+   sits inside it. Measure the ink.
 
-   Vertical is unaffected (top/bottom padding were already 0), so the centring above holds.
-
-   ⚠️ A box-based audit CANNOT see any of this, and one got it exactly backwards: measured
-   by getBoundingClientRect() the padded button looked like it OVERHUNG the rule by 3px,
-   while its ink actually sat 3px INSIDE it. Measure the ink.
-
-   Residual: the triangle lands 0.5px high in Chrome and 0.5px low in Safari (was 1px
-   in both, in the same opposite directions). That last half-pixel is NOT ours to fix:
-   at font-size 16px, where this font's ascent/descent are integral and no engine has
-   anything to round, Chrome goes to exactly 0.000 but Safari still reads +0.50 — so it
-   is the engines disagreeing about the JAPANESE face's metrics, not about the triangle.
-   Don't chase it per-engine; `ascent-override` would be the tool and Safari drops it
-   (see the search-font note above).
-
-   Re-derive, don't eyeball: pixel-scan the rendered ink. The DOM lies here — a baseline
-   probe inside the button perturbs its line box, and a canvas fed the raw font stack
-   resolves it differently than the DOM does. Both gave wrong answers before the pixel
-   scan settled it. */
+   Residual: 0.5px high in Chrome, 0.5px low in Safari — the engines disagreeing about the
+   JAPANESE face's metrics, not about the triangle. Not ours to fix; `ascent-override`
+   would be the tool and Safari drops it. To re-derive, pixel-scan the rendered ink: the
+   DOM lies here, because a baseline probe inside the button perturbs its line box. */
 .audio-play {
   font-size: 15px;
   padding: 0;
@@ -1701,23 +1464,16 @@ code {
 /* ============================================
    Keyboard focus
    ============================================ */
-/* Production's controls are href-less <a>s (partials/search.html:15), which are
-   unfocusable — no browser ever drew a focus ring on them, and Tab skipped them
-   entirely. The EJS port uses real <button>s, which ARE focusable. That is an
-   improvement (the controls are now keyboard-reachable), but it means they
-   inherit the user-agent focus ring: a heavy black double-rectangle on
-   Chromium/Windows, a faint blue glow on macOS. Hence "only broken in Edge".
+/* Production's controls are href-less <a>s, which are unfocusable — Tab skipped them
+   entirely. The EJS port uses real <button>s, so they are keyboard-reachable and inherit
+   the UA focus ring (heavy on Chromium/Windows, a faint glow on macOS).
 
-   Applied to every button and link, not a hand-picked list: an indicator that
-   shows on some controls and not others is worse than none, because a keyboard
-   user learns to trust it and then it silently vanishes.
+   Applied to every button and link, not a hand-picked list: an indicator that shows on
+   some controls and not others is worse than none. `outline` paints outside the box
+   model, so it cannot shift layout.
 
-   `outline` is painted outside the box model and cannot shift layout, so the
-   0px geometric parity with production is preserved.
-
-   NOT applied to .search-bar: a text input matches :focus-visible even on a
-   mouse click (per spec), so it would sprout a ring on every click — and it
-   already shows a caret. Its `outline: none` above stands. */
+   NOT applied to .search-bar: a text input matches :focus-visible even on a mouse click
+   (per spec), so it would sprout a ring on every click, and it already shows a caret. */
 button:focus:not(:focus-visible),
 a:focus:not(:focus-visible),
 [role="button"]:focus:not(:focus-visible),
@@ -1754,17 +1510,14 @@ dialog:focus-visible {
   cursor: pointer;
 }
 
-/* No responsive rules: the legacy app renders a fixed 1188px sheet at every
-   window size (html overflow-x:hidden clips), and reflowing the container
-   changed how the sheet's box-shadow presents at narrow windows */
+/* No responsive rules: the app renders a fixed 1188px sheet at every window size
+   (html overflow-x:hidden clips), and reflowing the container changes how the
+   sheet's box-shadow presents at narrow windows */
 
 /* ============================================
    API documentation page (/api/docs)
-   Ported from Angular's partials/docs.html. Prose, not part of the frozen app
-   sheet — the Bootstrap-era look (bordered tables, grey pre blocks) is
-   recreated locally with Bootstrap's own values; nothing here is pinned to
-   production pixels. .container gives it the same white sheet and 1188px
-   width as the app pages; min-height lets it grow with the content.
+   Prose, not part of the frozen app sheet — nothing here is pinned to production
+   pixels. .container gives it the same white sheet and 1188px width as the app pages.
    ============================================ */
 .docs {
   padding-top: 20px;
@@ -1852,10 +1605,9 @@ dialog:focus-visible {
   vertical-align: top;
 }
 
-/* The docs page is responsive (maintainer's instruction, 2026-08-01) — the APP sheet
-   stays fixed-width with no responsive rules; stylesheet.test.ts pins that any
-   responsive @media contains only .docs-scoped selectors. .container.docs relaxes
-   the app's fixed width so the sheet can shrink with the viewport. */
+/* The docs page is responsive; the APP sheet is not. stylesheet.test.ts pins that any
+   responsive @media contains only .docs-scoped selectors. .container.docs relaxes the
+   app's fixed width so the sheet can shrink with the viewport. */
 .container.docs {
   /* 100%, not auto: .container is a flex item of body with auto margins, so
      width:auto shrink-to-fits around the widest <pre> line and overflows a

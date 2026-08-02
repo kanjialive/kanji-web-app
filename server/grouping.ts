@@ -1,6 +1,5 @@
 /**
- * Server-side grouping logic for kanji search results.
- * Ported from static/js/services.js to TypeScript.
+ * Server-side grouping for the sorted (ksort / rsort) search views.
  */
 
 export interface KanjiSearchResult {
@@ -31,24 +30,19 @@ export interface StrokeGroup {
 /**
  * Order two stroke counts, either of which may be the NaN sentinel.
  *
- * 🔴 `a - b` is NOT safe here. 々 holds `rad_stroke: NaN` meaning "no radical strokes"
- * (see html-routes.ts → numberOrBlank), and every comparison against it yields NaN.
- * `Array.prototype.sort` reads a NaN result as "not greater than zero", so the
- * comparator becomes INCONSISTENT: TimSort leaves runs unmerged and the sorted array
- * comes back in pieces. With 々 anywhere in a 229+ result set the rsort view printed
- * its stroke headings 1…17, NaN, then 1…17 all over again.
+ * `a - b` is NOT safe here. 々 holds `rad_stroke: NaN` meaning "no radical strokes", and
+ * every comparison against it yields NaN. `Array.prototype.sort` reads a NaN result as
+ * "not greater than zero", making the comparator INCONSISTENT: TimSort leaves runs
+ * unmerged and the array comes back in pieces, so the rsort view restarts its stroke
+ * headings mid-list. Reproduce at real size — V8 insertion-sorts below 22 elements, so a
+ * small fixture passes while the page is wrong.
  *
- * Production never had to solve this: its data reaches AngularJS as JSON, NaN becomes
- * null, and `null - null` is 0 — a consistent comparator by accident. Rendering from
- * the Mongo document directly loses that accident, exactly as it does for display.
+ * Do NOT "fix" this by cleaning NaN out of the data. The sentinel is load-bearing:
+ * search.ts turns `?rs=` into `{ rad_stroke: NaN }` because Mongo matches NaN to NaN,
+ * and that is a real search.
  *
- * ⚠️ Do NOT "fix" this by cleaning NaN out of the data. The sentinel is load-bearing:
- * search.ts turns `?rs=` into `{ rad_stroke: NaN }` because Mongo matches NaN to
- * NaN, and that is a real search.
- *
- * NaN sorts LAST — "no radical strokes" belongs after every known count, not before
- * the 1-stroke radicals. Ties (both NaN) compare equal, which keeps the comparator
- * transitive and lets the caller's stable sort break them.
+ * NaN sorts LAST — "no radical strokes" belongs after every known count. Ties compare
+ * equal, keeping the comparator transitive so the caller's stable sort breaks them.
  */
 function compareStrokes(a: number, b: number): number {
   const aUnknown = Number.isNaN(a);
@@ -61,18 +55,12 @@ function compareStrokes(a: number, b: number): number {
 }
 
 /**
- * Groups kanji by stroke count (either kanji strokes or radical strokes),
- * then subdivides by radical character.
+ * Group by stroke count, then subdivide by radical, into the grid the sorted views
+ * render: one group per stroke count, each group a series of columns, each column up to
+ * 10 rows of radicals, each radical up to 6 kanji per row.
  *
- * The algorithm creates a grid layout:
- * - Each stroke count is a group
- * - Within each group, kanji are organized into columns
- * - Each column contains up to 10 rows of radicals
- * - Each radical can have up to 6 kanji per row
- *
- * @param data - Array of kanji search results
- * @param strokeKey - 'kstroke' for kanji strokes, 'rad_stroke' for radical strokes
- * @returns Array of stroke groups with nested columns and rows
+ * `data` must already be sorted — this walks it once and starts a new group whenever the
+ * stroke value changes.
  */
 function groupByStrokeAndRadical(
   data: KanjiSearchResult[],
@@ -89,24 +77,19 @@ function groupByStrokeAndRadical(
 
     const strokeValue = kanji[strokeKey];
 
-    // Check if we're still in the same stroke group.
-    // Object.is, not ===, so the NaN sentinel groups with itself instead of
-    // starting a fresh heading for every document that carries it.
+    // Object.is, not ===, so the NaN sentinel groups with itself instead of starting a
+    // fresh heading for every document that carries it.
     if (currentGroup && Object.is(strokeValue, currentGroup.stroke)) {
-      // Check if radical character is the same as the previous one
       if (previousRadical && previousRadical.radical === kanji.rad_utf) {
         const lastRow = previousRadical.rows[previousRadical.rows.length - 1];
 
-        // Try to add to the last row (max 6 kanji per row)
         if (lastRow.length < 6) {
           lastRow.push(kanji);
         } else {
-          // Last row is full, try to create a new row
           if (rowCount < 10) {
             previousRadical.rows.push([kanji]);
             rowCount++;
           } else {
-            // Need to move to a new column
             previousRadical = {
               radical: kanji.rad_utf,
               rad_name_ja: kanji.rad_name_ja,
@@ -118,7 +101,6 @@ function groupByStrokeAndRadical(
           }
         }
       } else {
-        // Different radical character, create a new radical group
         previousRadical = {
           radical: kanji.rad_utf,
           rad_name_ja: kanji.rad_name_ja,
@@ -127,18 +109,15 @@ function groupByStrokeAndRadical(
         };
 
         if (rowCount < 10) {
-          // Add to the current column
           const lastColumn = currentGroup.columns[currentGroup.columns.length - 1];
           lastColumn.push(previousRadical);
           rowCount++;
         } else {
-          // Need to move to a new column
           currentGroup.columns.push([previousRadical]);
           rowCount = 1;
         }
       }
     } else {
-      // New stroke group
       currentGroup = {
         stroke: strokeValue,
         columns: [
@@ -162,14 +141,12 @@ function groupByStrokeAndRadical(
 }
 
 /**
- * Groups kanji by radical stroke count.
- * Results should be pre-sorted by rad_stroke, rad_order.
+ * Group by radical stroke count, then radical order.
+ * compareStrokes(), not a bare subtraction — 々's rad_stroke is the NaN sentinel.
  */
 export function groupByRadicalStrokes(
   data: KanjiSearchResult[]
 ): StrokeGroup[] {
-  // Sort by radical strokes, then by radical order.
-  // compareStrokes(), not a bare subtraction — 々's rad_stroke is NaN.
   const sorted = [...data].sort(
     (a, b) =>
       compareStrokes(a.rad_stroke, b.rad_stroke) ||
@@ -180,13 +157,11 @@ export function groupByRadicalStrokes(
 }
 
 /**
- * Groups kanji by kanji stroke count.
- * Results should be pre-sorted by kstroke, rad_order.
+ * Group by kanji stroke count, then radical order.
+ * No kanji holds kstroke: NaN today, but compareStrokes() is used anyway so a future
+ * sentinel in this field cannot reopen the split-list bug in the ksort view.
  */
 export function groupByKanjiStrokes(data: KanjiSearchResult[]): StrokeGroup[] {
-  // Sort by kanji strokes, then by radical order.
-  // No kanji currently holds kstroke: NaN, but the same comparator is used so a
-  // future sentinel in this field cannot reopen the rsort bug in the ksort view.
   const sorted = [...data].sort(
     (a, b) =>
       compareStrokes(a.kstroke, b.kstroke) ||

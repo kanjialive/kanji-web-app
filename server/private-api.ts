@@ -7,7 +7,7 @@ import { extendKanjiWithAssets } from "./kanji-assets";
 let db: Db;
 
 // Sync, like public-api's and html-routes'. index.ts does not await it, so a rejection
-// would bypass the startup retry entirely and terminate the process.
+// would bypass the startup retry and terminate the process.
 export const init = (database: Db) => {
   db = database;
 };
@@ -16,16 +16,14 @@ export const init = (database: Db) => {
  * Fields excluded from every private-API response.
  *
  * `textbook_search` and `mn_hint` are both LICENCE-RESTRICTED and this endpoint is
- * unauthenticated — and this projection alone closes very little:
+ * unauthenticated, so this projection alone closes very little:
  *
- *   - The filter is the leak. search.ts maps text onto textbook_search, so an
- *     unauthenticated ?text=gen:19 on THIS route returns exactly that chapter
- *     whether or not the field is in the body. (The public route rejects it, and
- *     ?list= now accepts only the two public study lists on every route.)
+ *   - The FILTER is the leak. search.ts maps `text` onto textbook_search, so an
+ *     unauthenticated ?text=gen:19 here returns exactly that chapter whether or not the
+ *     field is in the body. (The public route rejects it, and ?list= accepts only the two
+ *     public study lists on every route.)
  *   - mn_hint cannot be dropped here at all: AngularJS renders the hint from JSON.
  *     Phase 7 closes that leak and no other.
- *
- * See offline/durability-plan-2026-07-12.md.
  */
 const LICENSED_FIELDS_PROJECTION = { textbook_search: 0 } as const;
 

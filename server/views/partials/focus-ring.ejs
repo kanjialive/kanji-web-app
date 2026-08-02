@@ -1,27 +1,17 @@
-<!-- Keep the keyboard focus ring keyboard-only.
+<%# Keeps the focus ring keyboard-only.
 
-     On Windows/Linux, a mouse click on a <button> focuses it. (macOS browsers
-     deliberately do not, which is why this was invisible on Chrome/FF/Safari
-     there and showed up only in Edge.) The button then *keeps* focus — and this
-     app binds global keyboard shortcuts, so the user's next keypress makes
-     Chromium re-evaluate :focus-visible against the still-focused button and
-     paint a ring around a control they clicked ten seconds ago. That is the
-     "Sort" and typeface-chevron rectangle.
+    On Windows/Linux a mouse click focuses a <button> and it KEEPS focus; this app binds
+    global keyboard shortcuts, so the next keypress re-evaluates :focus-visible and rings
+    a control clicked ten seconds ago. (macOS does not focus buttons on click, which is
+    why this only ever showed up in Edge.)
 
-     Suppressing the default action of `pointerdown` stops a button taking focus
-     from a pointer. Per the Pointer Events spec this does NOT suppress `click`,
-     so every handler still runs; it only prevents focus and the compatibility
-     `mousedown`. Keyboard activation (Enter/Space) fires no pointer event at
-     all, so Tab users are untouched and still get the ring from
-     kanji-alive-modern.css.
+    Suppressing `pointerdown`'s default stops a pointer taking focus. Per the Pointer
+    Events spec it does NOT suppress `click`, so every handler still runs, and keyboard
+    activation fires no pointer event at all — Tab users keep the ring.
 
-     Scoped to <button>: the custom scrollbar thumb (search.ejs) is a <div> that
-     drags via @mousedown, and must keep its default behaviour.
-     [role="button"] is included for the radical-animation div (detail.ejs): a
-     tabindex="0" div takes click focus in every browser, including macOS.
-
-     Delegated on `document` so it survives the fetch()+innerHTML and
-     fetch()+replaceWith() swaps that rebuild the page's controls. -->
+    Scoped to button/[role="button"]: the scrollbar thumb is a <div> dragged via
+    @mousedown and must keep its default. Delegated on `document` so it survives the
+    fetch()+innerHTML and fetch()+replaceWith() swaps that rebuild the controls. %>
 <script>
   document.addEventListener('pointerdown', function (e) {
     if (e.target instanceof Element && e.target.closest('button, [role="button"]')) {

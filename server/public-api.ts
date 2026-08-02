@@ -47,17 +47,16 @@ const withoutLicensedFields = (
 };
 
 /**
- * 🔴 An empty filter is NOT "match everything" — it means the caller gave us nothing
- * we could parse, and the honest answer is "no kanji found".
+ * An empty filter is NOT "match everything". It means the caller gave us nothing we could
+ * parse, and the honest answer is "no kanji found".
  *
- * parseAdvancedQuery() silently drops every parameter it does not recognise or cannot
- * coerce, so `?foo=bar`, `?grade=abc` and a bare `/api/public/search/advanced` all
- * arrive here as `{}`. Passing that to find() returned the ENTIRE collection — 1,235
- * documents — as though every kanji had matched a search that specified nothing. (The
- * public API is FREE — an API key gates access, it does not bill for it.)
+ * parseAdvancedQuery() silently drops every parameter it cannot recognise or coerce, so
+ * `?foo=bar`, `?grade=abc` and a bare `/api/public/search/advanced` all arrive as `{}` —
+ * and find({}) returns all 1,235 documents as though everything matched a search that
+ * specified nothing.
  *
- * private-api.ts has had this guard all along; the public copy never got it. Same
- * response shape as the private one, and as this file's own not-found paths.
+ * private-api.ts guards this too. KEEP THE TWO IN STEP; the public copy lacked it for
+ * years because nobody diffed them.
  */
 const getSearchResultsWithQuery = async (
   query: object,
@@ -84,7 +83,6 @@ const getSearchResultsWithQuery = async (
 
     const structured_results = results.map((doc) => ({
       kanji: {
-        //'id':doc['ka_id'],
         character: doc["ka_utf"],
         stroke: doc["kstroke"],
       },
@@ -157,7 +155,7 @@ export function extendKanjiWithAssets(
     stroke_images.push(strokesPath + "/" + doc.kname + "_" + i + ".svg");
   }
 
-  /// setup kanji
+  // Kanji
   const kanji: Kanji = {
     character: doc.ka_utf,
     meaning: {
@@ -183,18 +181,8 @@ export function extendKanjiWithAssets(
     },
   };
 
-  //kanji['typefaces'] = {
-  //    'kyokasho'  :typeface_path + "kyokasho-svg/kyokasho_Page_" + paddedID + '.svg',
-  //    'mincho'    :typeface_path + "mincho-svg/mincho_Page_" + paddedID + '.svg',
-  //    'gothic'    :typeface_path + "gothic-svg/gothic_Page_" + paddedID + '.svg',
-  //    'maru'      :typeface_path + "maru-svg/maru_Page_" + paddedID + '.svg',
-  //    'tensho'    :typeface_path + 'tensho-svg/tensho_Page_' + paddedID + '.svg',
-  //    'gyosho'  :typeface_path + "hiragino-svg/hiragino_Page_" + paddedID + '.svg',
-  //    'kanteiryu'  :typeface_path + "kanteiryu-svg/kanteiryu_Page_" + paddedID + '.svg',
-  //    'contemporary'  :typeface_path + "suzumushi-svg/suzumushi_Page_" + paddedID + '.svg'
-  //};
 
-  /// setup radical
+  // Radical
   let rad_position_file = "";
   if (doc.rad_position.length > 0) {
     const rad_positions = doc.rad_position.split(",");
@@ -225,14 +213,14 @@ export function extendKanjiWithAssets(
     ],
   };
 
-  /// setup references
+  // References
   const references = {
     grade: doc.grade,
     kodansha: doc.dick,
     classic_nelson: doc.dicn,
   };
 
-  /// setup examples
+  // Examples
   const alpha = [
     "a",
     "b",

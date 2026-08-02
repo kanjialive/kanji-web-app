@@ -6,19 +6,16 @@
   <meta name="description" content="<%= doc.ka_utf %> - <%= doc.meaning %>. Learn to read and write this kanji with Kanji alive."/>
   <title><%= doc.ka_utf %> - <%= doc.meaning %> - Kanji alive</title>
 
-  <!-- CSS -->
+  <%# CSS %>
   <link href="/static/css/kanji-alive-modern.css" rel="stylesheet">
 
-  <!-- Alpine.js — served from this app, NOT a CDN. A vendored, pinned copy cannot
-       become un-fetchable if a package registry disappears, and browsers do not
-       break backwards compatibility, so it keeps working regardless of upstream. -->
+  <%# Vendored, NOT a CDN: a pinned local copy cannot become un-fetchable. %>
   <script src="/static/js/libs/alpinejs-3.15.12.min.js" defer></script>
 
   <%- include('../partials/focus-ring') %>
 
-  <!-- Alpine component + page navigation (runs once, survives content swaps) -->
+  <%# Alpine component + page navigation. In <head> so it survives content swaps. %>
   <script>
-  // Register the detail page component once, before Alpine starts
   document.addEventListener('alpine:init', function() {
     Alpine.data('detailPage', () => ({
       detailMode: 'video',
@@ -36,8 +33,8 @@
         'gothic': 'Gothic',
         'maru': 'Maru'
       },
-      // Spoken names, kana not kanji: kana pins the pronunciation — a TTS voice
-      // never has to guess a reading (his ruling, 2026-08-01).
+      // Spoken names in kana, not kanji: kana pins the pronunciation, so a TTS
+      // voice never has to guess a reading.
       typefaceNamesJa: {
         'suzumushi': 'すずむし',
         'kanteiryu': 'かんていりゅう',
@@ -117,33 +114,14 @@
       },
 
       startRadicalAnimation() {
-        // Three deliberate departures from Angular (detail-controller.js:198),
-        // all chosen by the maintainer 2026-07-12. Recorded here so a future
-        // parity sweep does not "correct" them back to production's values.
+        // Timings and the re-entrancy guard are deliberate departures from production;
+        // a parity sweep will want to restore its 1250/1250 and drop the guard. Don't.
+        // The pause/gap live on the component (not as consts) so they can be tuned live
+        // in the console — but the fade is CSS, so change BOTH or the still period
+        // drifts. Frames land at 500 / 2125 / 3750ms.
         //
-        //  1. radicalFirstPause is 500ms, not Angular's 1250ms — the animation
-        //     used to sit motionless for over a second after the click.
-        //  2. radicalFrameGap is 1625ms, not 1250ms. The CSS opacity fade on
-        //     .ka-rad-anim img (1.375s, vs production's 1s) is subtracted from
-        //     this gap, so an image is FULLY STILL for (gap - fade) = 250ms.
-        //     The fade IS the animation — one radical dissolving into the next —
-        //     so it takes most of the frame, and the still period is a breath
-        //     between transitions rather than a slideshow.
-        //  3. Re-entrancy is guarded. Angular has none: clicking mid-animation
-        //     schedules an overlapping pass and the frames fight each other.
-        //
-        // Frames land at 500 / 2125 / 3750ms.
-        //
-        // The JS timings live on the component (not as consts) so they can be
-        // tuned live in the browser console without a rebuild — but the fade is
-        // CSS, so change BOTH or the still period drifts:
-        //   var d = document.querySelector('.container2')._x_dataStack[0];
-        //   d.radicalFrameGap = 1625;
-        //   document.querySelectorAll('.ka-rad-anim img')
-        //     .forEach(i => i.style.transitionDuration = '1.375s');
-        //   document.querySelector('.ka-rad-anim').click();
-        // 15 radicals have no animation and the template renders no frames —
-        // Shift+R must stand down too, not cycle state behind an empty slot.
+        // 15 radicals render no frames, so Shift+R must stand down rather than cycle
+        // state behind an empty slot.
         if (!this.hasRadAnim) return;
         if (this.radicalAnimating) return;
         this.radicalAnimating = true;
@@ -176,13 +154,9 @@
         this.stroketimes = JSON.parse(this.$el.dataset.stroketimes || '[]');
         this.hasRadAnim = this.$el.dataset.radHasAnim === 'true';
 
-        // Persist the view mode and chosen typeface across kanji navigation.
-        // Prev/next paging replaces .container2 with a freshly-initialised
-        // component (see navigateKanji), so without this the mode would reset
-        // to 'video' every time you stepped left/right — you'd flip to a new
-        // kanji only to be dropped back into the animation. Production keeps
-        // these on the singleton searchService (detail-controller.js); the
-        // window store is the equivalent that survives a content swap.
+        // Persist view mode and typeface across kanji navigation. Prev/next replaces
+        // .container2 with a freshly-initialised component (see navigateKanji), so
+        // component state cannot carry — it has to live on window.
         const saved = window._detailViewState;
         if (saved) {
           this.detailMode = saved.detailMode;
@@ -235,19 +209,13 @@
             return;
           }
 
-          // Shift+R — replay the radical animation. The only feature with no key of
-          // its own; the radical image was mouse-only in both frontends.
-          //
-          // Matched on e.key, NOT e.code like the cases below. e.code is the
-          // physical key position, so 'KeyR' fires for whatever sits where R is
-          // on QWERTY — on Dvorak that is the key that types 'o'. A mnemonic
-          // shortcut has to follow the character the user actually typed.
-          //
-          // Shift is REQUIRED: a bare printable-character shortcut fails WCAG 2.1.4
-          // (dictation software can fire it mid-word); the modifier takes it out of
-          // scope. Cmd/Ctrl/Alt are excluded so Cmd+R / Ctrl+R (reload) is never
-          // hijacked. No preventDefault: Shift+R has no default action to suppress,
-          // and startRadicalAnimation() already guards against re-entry.
+          // Shift+R — replay the radical animation. (detail-nav.test.ts slices on this
+          // line; keep its wording.) Matched on e.key, NOT e.code like the cases below:
+          // e.code is the physical key position, so 'KeyR' types 'o' on Dvorak, and a
+          // mnemonic shortcut has to follow the character the user actually typed.
+          // Shift is REQUIRED — a bare printable-character shortcut fails WCAG 2.1.4,
+          // because dictation software fires it mid-word. Cmd/Ctrl/Alt are excluded so
+          // Cmd+R / Ctrl+R (reload) is never hijacked.
           if (e.key && e.key.toLowerCase() === 'r' && e.shiftKey && !e.metaKey && !e.ctrlKey && !e.altKey) {
             this.startRadicalAnimation();
             return;
@@ -398,7 +366,7 @@
     : '';
   %>
 
-  <!-- Column 1: Search Form + Video/Typeface -->
+  <%# Column 1: Search Form + Video/Typeface %>
   <div class="col1">
     <div class="row1">
       <form class="search-form" role="search" action="/search" method="get">
@@ -418,7 +386,7 @@
       <h3 id="kanji" aria-level="2">Kanji</h3>
 
       <div class="container-typeface-video">
-        <!-- Video Mode -->
+        <%# Video Mode %>
         <div class="video-container" x-show="detailMode === 'video'">
           <%# Sibling, not a child of <video>: content inside <video> is fallback for
               unsupported browsers and is not reliably exposed to the a11y tree.
@@ -457,7 +425,7 @@
           </div>
         </div>
 
-        <!-- Typeface Mode -->
+        <%# Typeface Mode %>
         <div id="ka-typeface-container" x-show="detailMode === 'typeface'" x-cloak>
           <%# Same shape as the video surface above. %>
           <div class="ka-typefaces" x-ref="typefaceSurface" role="button" tabindex="0" aria-label="Show stroke order animation"
@@ -488,7 +456,7 @@
     </div>
   </div>
 
-  <!-- Column 2: Navigation + Meaning, Readings, Radical -->
+  <%# Column 2: Navigation + Meaning, Readings, Radical %>
   <div class="col2">
     <div class="row1">
       <div class="recordCounter">
@@ -518,15 +486,13 @@
       <p class="meaning"><%= doc.meaning %></p>
 
       <h3 class="onyomi" aria-level="2">Onyomi</h3>
-      <%# lang="ja" is load-bearing, not decoration. The page is lang="en"; when font
-          fallback reaches the generic, the browser picks the CJK face by DOCUMENT
-          language — and macOS then hands back PingFang SC, i.e. CHINESE glyph forms
-          (verified: a 0.00% pixel match against PingFang SC). 骨 直 画 角 are drawn
-          differently in Chinese, and this app teaches the Japanese strokes. Marking the
-          text as Japanese makes even the generic resolve to Hiragino Sans. %>
+      <%# lang="ja" is load-bearing. The page is lang="en", so when font fallback reaches
+          the generic the browser picks the CJK face by DOCUMENT language and macOS hands
+          back PingFang SC — Chinese glyph forms, and 骨 直 画 角 are drawn differently
+          there. Marking the run as Japanese makes even the generic resolve to Hiragino. %>
       <%_ /* No onyomi is recorded as `onyomi: "n/a"` with `onyomi_ja` empty (13 kanji).
-              Test the romaji sentinel, not an empty `onyomi_ja` — the record's own
-              statement of absence, so a mistakenly blank field can't print "n/a". */ _%>
+              Test the romaji sentinel — the record's own statement of absence — so a
+              mistakenly blank field cannot print "n/a". */ _%>
       <p class="onyomi" lang="ja"><%= doc.onyomi === "n/a" ? "n/a" : doc.onyomi_ja %></p>
 
       <h3 class="kunyomi" aria-level="2">Kunyomi</h3>
@@ -535,17 +501,15 @@
       <div class="border3"><div class="border-inner"></div></div>
 
       <h3 class="radical" aria-level="2">Radical</h3>
-      <%# VoiceOver walks this panel in DOM order; the maintainer specified the
-          visual reading order (2026-07-30): glyph, reading, meaning, strokes,
-          position, animation. Every element is absolutely positioned, so the DOM
-          follows speech order without moving a pixel. role="img": Safari otherwise
-          exposes the SVG file's internal tree as extra VoiceOver stops — its
-          Sketch-export <title>, empty layer groups, "Created with Sketch." %>
+      <%# VoiceOver walks this panel in DOM order, so the DOM follows the visual reading
+          order: glyph, reading, meaning, strokes, position, animation. Everything here is
+          absolutely positioned, so that costs no pixels. role="img" stops Safari exposing
+          the SVG's internal tree (Sketch <title>, empty groups) as extra stops. %>
       <% if (doc.rad_name_ja && doc.rad_name && doc.rad_name !== "n/a") { %>
-        <%# Split-language name: "Radical" needs the English voice, the name the
-            Japanese one — a flat alt inherits a single language. aria-hidden: this
-            span is a label source, not content — without it VoiceOver stops on it
-            as a phantom item. aria-labelledby resolves into hidden elements. %>
+        <%# Split-language name: "Radical" needs the English voice and the name the
+            Japanese one, which a flat alt cannot do. aria-hidden because this span is a
+            label source, not content — without it VoiceOver stops on it as a phantom
+            item. aria-labelledby resolves into hidden elements. %>
         <span id="radical-label" class="visually-hidden" aria-hidden="true">Radical image: <span lang="ja"><%= doc.rad_name_ja %></span></span>
         <img class="radical-character" role="img" aria-labelledby="radical-label" src="<%= doc.rad_char_source %>" alt="<%= doc.rad_name_ja %>">
       <% } else { %>
@@ -553,15 +517,15 @@
             re-expose it as a nameless stop. %>
         <img class="radical-character" src="<%= doc.rad_char_source %>" alt="">
       <% } %>
-      <%# Hidden English prefixes name each value, matching "Radical position: hen"
-          (his spec, 2026-08-01); the colon paces the speech. Prefixes are REAL text
-          in the page language, the name a lang="ja" run — never aria-labels. %>
+      <%# Hidden English prefixes name each value ("Radical position: hen"); the colon
+          paces the speech. Prefixes are REAL text in the page language and the name a
+          lang="ja" run — never aria-labels, which inherit a single language. %>
       <div class="radical-name"><span class="visually-hidden">Radical name: </span><span lang="ja"><%= doc.rad_name_ja %></span></div>
       <%# &nbsp;, not a space: VoiceOver trims a text run's trailing whitespace, so
           a plain space vanished and the caption read "Radical meaning:words". %>
       <div class="radical-meaning"><span class="visually-hidden">Radical meaning:&nbsp;</span><%= doc.rad_meaning %></div>
-      <%_ /* Only 々 reaches this as NaN (it has no radical strokes). Same sentinel, same
-              production behaviour: blank — and no sr-only prefix announcing a blank. */ _%>
+      <%_ /* Only 々 reaches this as the NaN sentinel. Renders blank, like production —
+              and no sr-only prefix announcing a blank. */ _%>
       <% const radStroke = numberOrBlank(doc.rad_stroke); %>
       <div class="radical-stroke"><% if (radStroke !== "") { %><span class="visually-hidden">Radical strokes:&nbsp;</span><% } %><%= radStroke %></div>
       <% if (doc.rad_position && doc.rad_position_file) { %>
@@ -569,10 +533,9 @@
         <img class="radical-position" role="img" src="<%= doc.rad_position_file %>" alt="Radical position: <%= doc.rad_position.split(",").pop().trim() %>">
       <% } %>
 
-      <%# 15 radicals have no animation — their CDN frames are an "n/a" placeholder
-          (or 々's blanks). The slot stays EMPTY for them: no image, no button, no
-          screen-reader stop (maintainer's ruling, 2026-08-01). Everything here is
-          absolutely positioned, so omitting the block moves nothing. %>
+      <%# 15 radicals have no animation — their CDN frames draw an "n/a" placeholder. The
+          slot stays EMPTY for them: no image, no button, no screen-reader stop. Everything
+          here is absolutely positioned, so omitting the block moves nothing. %>
       <% if (doc.rad_has_anim) { %>
       <%# role="button" on the div, not a real <button>: a <button> picks up UA styling
           (WebKit's asymmetric padding among it) and would move ink on a frozen UI. %>
@@ -589,7 +552,7 @@
     </div>
   </div>
 
-  <!-- Column 3: Info + Strokes, Grade, References, Hint -->
+  <%# Column 3: Info + Strokes, Grade, References, Hint %>
   <div class="col3">
     <div class="row1">
       <button class="info-button" @click="$refs.helpDialog.showModal()">
@@ -601,10 +564,9 @@
       <p class="strokes"><%= doc.kstroke %></p>
 
       <h3 class="grade" aria-level="2">Grade</h3>
-      <%_ /* 229 kanji have no grade, stored as the NaN sentinel that `?grade=` searches
-              on. Production renders it blank (its NaN becomes null crossing JSON); print
-              the raw value here and the student reads "NaN". 々 alone says "n/a" — it is
-              not a kanji, so no grade can apply (maintainer's ruling, 2026-07-28). */ _%>
+      <%_ /* 229 kanji have no grade, stored as the NaN sentinel that `?grade=` searches on.
+              numberOrBlank is required: print the raw value and the student reads "NaN".
+              々 alone says "n/a" — it is not a kanji, so no grade can apply. */ _%>
       <p class="grade"><%= doc.ka_utf === "々" ? "n/a" : numberOrBlank(doc.grade) %></p>
 
       <div class="border4"><div class="border-inner"></div></div>
@@ -624,7 +586,7 @@
     </div>
   </div>
 
-  <!-- Column 4: Branding + Examples -->
+  <%# Column 4: Branding + Examples %>
   <div class="col4">
     <div class="row1 desktop-branding">
       <a href="https://kanjialive.com" target="_blank" rel="noopener" aria-label="Kanji alive website (opens in new tab)">
@@ -641,10 +603,9 @@
               <div class="example-ja example-english"><%= example.english %></div>
             </div>
             <div class="example-audio">
-              <%# "Play pronunciation", nothing more — "of <word>" was cut as too
-                  verbose (his ruling, 2026-08-01): the word is the row just read.
-                  aria-label, not name-from-content: the label keeps the CSS play
-                  glyph (a private-use character) out of the announcement. %>
+              <%# "Play pronunciation", nothing more — the word is the row just read.
+                  aria-label, not name-from-content: it keeps the CSS play glyph (a
+                  private-use character) out of the announcement. %>
               <button class="icon-play audio-play ka-icon-gray pointer"
                       data-audio="<%= example.mp3 %>"
                       aria-label="Play pronunciation"
@@ -656,12 +617,12 @@
     </div>
   </div>
 
-  <!-- Decorative Borders -->
+  <%# Decorative Borders %>
   <div class="border1"><div class="border-inner"></div></div>
   <div class="border2"><div class="border-inner"></div></div>
   <div class="border7"><div class="border-inner"></div></div>
 
-  <!-- Stroke Breakdown -->
+  <%# Stroke Breakdown %>
   <div class="stroke-breakdown">
     <% doc.strokes.forEach((stroke, index) => { %>
       <img class="ka-breakdown"
@@ -671,25 +632,25 @@
     <% }); %>
   </div>
 
-  <!-- Help Modal -->
+  <%# Help Modal %>
   <dialog x-ref="helpDialog" class="help-modal" aria-labelledby="help-modal-title" @click.self="$refs.helpDialog.close()">
     <%- include('../partials/detail-help-modal') %>
   </dialog>
 
-  <!-- Version -->
+  <%# Version %>
   <div class="version"><p>v2.1</p></div>
 </main>
 
-<!-- Announces prev/next swaps. OUTSIDE .container2: navigateKanji() replaces
-     that node wholesale, and a live region must pre-exist the mutation. -->
+<%# Announces prev/next swaps. OUTSIDE .container2: navigateKanji() replaces that
+    node wholesale, and a live region must pre-exist the mutation. %>
 <div id="a11y-status" class="visually-hidden" role="status"></div>
 
-<!-- Logo -->
+<%# Logo %>
 <div class="logo">
   <img src="https://media.kanjialive.com/img/fan_logo_104.jpg" alt="Kanji alive logo" loading="lazy"/>
 </div>
 
-<!-- Audio element for examples -->
+<%# Audio element for examples %>
 <audio id="example-audio" preload="none" style="display: none;"></audio>
 </div>
 

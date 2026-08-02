@@ -9,18 +9,15 @@
       descriptive name. loadResults() keeps it current via the X-Title header. %>
   <title><%= typeof query !== 'undefined' && query ? query + ' - Kanji alive' : 'Kanji alive Web Application' %></title>
 
-  <!-- CSS -->
+  <%# CSS %>
   <link href="/static/css/kanji-alive-modern.css" rel="stylesheet">
 
-  <!-- Alpine.js — served from this app, NOT a CDN. A vendored, pinned copy cannot
-       become un-fetchable if a package registry disappears, and browsers do not
-       break backwards compatibility, so it keeps working regardless of upstream. -->
+  <%# Vendored, NOT a CDN: a pinned local copy cannot become un-fetchable. %>
   <script src="/static/js/libs/alpinejs-3.15.12.min.js" defer></script>
 
   <%- include('../partials/focus-ring') %>
 
-  <!-- Results loading. Replaces HTMX, which was only ever doing this one job.
-       Kept in <head> so it survives content swaps. -->
+  <%# Results loading. In <head> so it survives content swaps. %>
   <script>
   // LOAD-RESULTS-START — results-race.test.ts lifts this region and runs it. Keep the markers.
   var _latestResultsRequest = 0;
@@ -52,7 +49,7 @@
       var res = await fetch(url, { signal: controller.signal });
       if (requestId !== _latestResultsRequest) return;
 
-      // Server asks the browser to navigate instead (colon-syntax queries)
+      // Server asks the browser to navigate instead (colon-syntax queries).
       var redirect = res.headers.get('X-Redirect');
       if (redirect) { window.location.href = redirect; return; }
 
@@ -63,17 +60,17 @@
 
       _swapResults(target, html);
 
-      // Show the full-page URL, not the partial endpoint
+      // Show the full-page URL, not the partial endpoint.
       var pushUrl = res.headers.get('X-Push-Url');
       if (pushUrl) history.pushState(null, '', pushUrl);
 
-      // Keep the tab/bookmark name in step with that URL. Percent-encoded on
-      // the wire — headers cannot carry raw Japanese.
+      // Keep the tab name in step with that URL. Percent-encoded on the wire —
+      // headers cannot carry raw Japanese.
       var title = res.headers.get('X-Title');
       if (title) document.title = decodeURIComponent(title);
 
-      // Alpine's MutationObserver initialises the new subtree on its own; this
-      // just tells the page component to re-measure the custom scrollbar.
+      // Alpine's MutationObserver initialises the new subtree itself; this only tells
+      // the page component to re-measure the custom scrollbar.
       document.dispatchEvent(new CustomEvent('results:loaded'));
     } catch (err) {
       // A superseded request is not a failure: without this, every aborted request
@@ -95,20 +92,17 @@
   };
   // LOAD-RESULTS-END
 
-  // Alpine component registration (in head so it survives content swaps)
   document.addEventListener('alpine:init', () => {
     Alpine.data('searchPage', () => {
       var _animFrame = null;
       return {
-      // Read page-specific data from data-* attributes on the container
       mode: 'kanji',
       modes: ['kanji', 'rsort', 'ksort'],
       queryString: '',
 
-      // Auto-repeat must not cycle: a held key fires ~33/sec. Scoped to the MODE keys
-      // only — ArrowLeft/Right scroll, where repeating is the point.
-      // BOTH call sites route through here: the global handler skips INPUTs, so the
-      // search box has its own bindings, and that is the common case after a search.
+      // Auto-repeat must not cycle: a held key fires ~33/sec. Scoped to the MODE keys —
+      // ArrowLeft/Right scroll, where repeating is the point. Both call sites route
+      // through here: the global handler skips INPUTs, so the search box binds its own.
       cycleModeKey(event, direction) {
         if (event.repeat) return;
         this.cycleMode(direction);
@@ -120,28 +114,25 @@
         this.mode = this.modes[newIndex];
         this.currentGroup = 0;
 
-        // Build URL for the results request
         let url = '/htmx/partials/results';
         const input = document.getElementById('search-input');
 
         if (this.queryString) {
-          // Advanced search - use stored query string, update mode
           const params = new URLSearchParams(this.queryString);
           params.set('mode', this.mode);
           url += '?' + params.toString();
         } else if (input.value) {
-          // Basic search - use input value
           url += '?q=' + encodeURIComponent(input.value) + '&mode=' + this.mode;
         } else {
-          return; // No search to cycle
+          return;   // nothing to cycle
         }
 
         loadResults(url);
       },
 
       submitSearch() {
-        // New basic search from the form. Clear stored advanced state first so
-        // cycleMode() uses the input value, not stale advanced params.
+        // Clear stored advanced state first, or cycleMode() reuses stale params
+        // instead of the input value.
         this.queryString = '';
         this.mode = 'kanji';
         this.currentGroup = 0;
@@ -176,9 +167,8 @@
         thumb.style.left = (sRatio * (ow - thumbW)) + 'px';
       },
 
-      // Compose a polite announcement from the freshly swapped DOM. Reads the
-      // DOM rather than component state so error and no-results swaps are
-      // announced with their own text.
+      // Reads the swapped-in DOM rather than component state, so error and
+      // no-results swaps announce with their own text.
       _announceResults() {
         var status = document.getElementById('a11y-status');
         var c = this.$refs.resultsContainer;
@@ -231,15 +221,11 @@
 
       // The last group that can actually be parked at the left inset.
       //
-      // NOT groups.length - 1. That is the last group that EXISTS; the trailing groups
-      // start beyond maxScroll, so the browser clamps the scroll and they never reach the
-      // left edge — they are already fully on screen in the final viewport, with nothing
-      // left to scroll to. Advancing currentGroup into them desynchronises the index from
-      // the view: the view sits at the end while the index climbs, and every ArrowLeft
-      // afterwards steps back through groups that all clamp to the same scrollLeft, moving
-      // NOTHING, until the index drops below this bound. It reads as though the extra
-      // ArrowRight presses were cached and have to be paid back one for one.
-      // (grade:1 rsort had three such groups = three dead presses. Reported 2026-07-17.)
+      // NOT groups.length - 1, which is the last group that EXISTS. Trailing groups start
+      // beyond maxScroll, so the browser clamps and they never reach the left edge.
+      // Advancing currentGroup into them desynchronises the index from the view: every
+      // ArrowLeft afterwards clamps to the same scrollLeft and moves NOTHING, reading as
+      // though the extra ArrowRight presses were banked and must be paid back one for one.
       //
       // Derive the bound from the scroller, never from the element count.
       _lastAlignableGroup(scroller, groups) {
@@ -300,8 +286,8 @@
         var maxThumbTravel = scroller.offsetWidth - thumb.offsetWidth;
         var maxScroll = scroller.scrollWidth - scroller.offsetWidth;
         if (maxThumbTravel <= 0 || maxScroll <= 0) return;
-        // Imperative class toggle keeps the bar visible while the cursor is
-        // outside the wrapper mid-drag (CSS :hover alone would fade it)
+        // Keeps the bar visible while the cursor leaves the wrapper mid-drag;
+        // CSS :hover alone would fade it.
         if (track) track.classList.add('sb-dragging');
         var onMove = function (ev) {
           scroller.scrollLeft = startScrollLeft + (ev.clientX - startX) * (maxScroll / maxThumbTravel);
@@ -316,27 +302,23 @@
       },
 
       init() {
-        // Read page-specific state from data-* attributes
         this.mode = this.$el.dataset.mode || 'kanji';
         this.queryString = this.$el.dataset.querystring || '';
 
         var self = this;
 
-        // Update custom scrollbar on scroll (capture phase catches child .scroller)
+        // Capture phase, to catch the child .scroller's scroll events.
         this._scrollHandler = function() { self._updateScrollThumb(); };
         this.$refs.resultsContainer.addEventListener('scroll', this._scrollHandler, true);
 
-        // Re-measure the custom scrollbar after new results are swapped in
         this._settleHandler = function() {
           self._updateScrollThumb();
           self._announceResults();
         };
         document.addEventListener('results:loaded', this._settleHandler);
 
-        // Initial update
         this._updateScrollThumb();
 
-        // Keyboard shortcuts for arrow keys
         this._keyHandler = (e) => {
           if (e.target.tagName === 'INPUT') return;
 
@@ -389,9 +371,9 @@
 
   <h1 class="visually-hidden">Kanji alive — search for kanji</h1>
 
-  <!-- Header Row -->
+  <%# Header Row %>
   <header class="header-row">
-    <!-- Search Form -->
+    <%# Search Form %>
     <div class="col1">
       <div class="row1">
         <form class="search-form" role="search" @submit.prevent="submitSearch()">
@@ -411,7 +393,7 @@
       </div>
     </div>
 
-    <!-- Sort Controls -->
+    <%# Sort Controls %>
     <div class="col2">
       <div class="row1">
         <div class="recordCounter">
@@ -435,7 +417,7 @@
       </div>
     </div>
 
-    <!-- Info Button -->
+    <%# Info Button %>
     <div class="col3">
       <div class="row1">
         <button class="info-button" @click="$refs.helpDialog.showModal()">
@@ -444,7 +426,7 @@
       </div>
     </div>
 
-    <!-- Branding -->
+    <%# Branding %>
     <div class="col4">
       <div class="row1 desktop-branding">
         <a href="https://kanjialive.com" target="_blank" rel="noopener" aria-label="Kanji alive website (opens in new tab)">
@@ -454,11 +436,11 @@
     </div>
   </header>
 
-  <!-- Decorative Borders -->
+  <%# Decorative Borders %>
   <div class="border1"><div class="border-inner"></div></div>
   <div class="border2"><div class="border-inner"></div></div>
 
-  <!-- Results Container -->
+  <%# Results Container %>
   <main id="search-results"
         class="row3 scrollbar-wrapper"
         x-ref="resultsContainer"
@@ -477,21 +459,20 @@
     </div>
   </main>
 
-  <!-- Announces result swaps to screen readers. OUTSIDE the swap target:
-       loadResults() replaces #search-results' children, and a live region
-       must pre-exist a mutation to be announced. -->
+  <%# Announces result swaps. OUTSIDE the swap target: loadResults() replaces
+      #search-results' children, and a live region must pre-exist a mutation. %>
   <div id="a11y-status" class="visually-hidden" role="status"></div>
 
-  <!-- Help Modal -->
+  <%# Help Modal %>
   <dialog x-ref="helpDialog" class="help-modal" aria-labelledby="help-modal-title" @click.self="$refs.helpDialog.close()">
     <%- include('../partials/search-help-modal') %>
   </dialog>
 
-  <!-- Version -->
+  <%# Version %>
   <div class="version"><p>v2.1</p></div>
 </div>
 
-<!-- Logo -->
+<%# Logo %>
 <div class="logo">
   <img src="https://media.kanjialive.com/img/fan_logo_104.jpg" alt="Kanji alive logo" loading="lazy"/>
 </div>

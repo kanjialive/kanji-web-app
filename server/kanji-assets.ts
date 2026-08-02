@@ -1,11 +1,11 @@
 /**
- * Shared CDN URL constants and asset enrichment for kanji documents.
- * Used by html-routes.ts (HTMX frontend) and private-api.ts (JSON API).
+ * CDN URL constants and asset enrichment, used by html-routes.ts and private-api.ts.
+ * public-api.ts has its OWN same-named enricher with a different (nested) output shape —
+ * that duplication is deliberate; the two response contracts are not shared.
  */
 
 import { KanjiDocument, ExtendedKanjiDocument } from "./types";
 
-// CDN base URLs for assets
 const baseURL = "https://media.kanjialive.com";
 export const examplesAudioBase = `${baseURL}/examples_audio`;
 export const animationPath = `${baseURL}/kanji_animations`;
@@ -33,23 +33,17 @@ function escapeHtmlText(text: string): string {
 }
 
 /**
- * The COMPLETE set of markup permitted inside a mnemonic hint.
- *
- * Derived by scanning the hints, not guessed: the only markup that occurs is a
- * `<span class='note'>` wrapper around etymology asides and its closing tag. No other
- * tags, no HTML entities. RE-DERIVE it rather than trusting a count written here — the
- * figures this block used to carry ("115 of 1,006") were both wrong:
+ * The COMPLETE set of markup permitted inside a mnemonic hint: a `<span class='note'>`
+ * wrapper around etymology asides, and its closing tag. Derived by scanning the hints,
+ * not guessed — RE-DERIVE it rather than trusting this comment:
  *
  *   new Set(docs.flatMap(d => [...String(d.mn_hint).matchAll(/<[^>]*>/g)].map(m => m[0])))
  *
- * Hints must render as markup (`<%- doc.hint %>` in detail.ejs) because they
- * legitimately contain this span and the `[N]` image tokens. So renderHint()
- * escapes the whole string, then restores ONLY these exact sequences. Anything
- * else a hint could contain — a <script>, an onerror handler, a stray tag from a
- * bad or compromised import — stays escaped and renders as inert, visible text.
- *
- * An allowlist by construction, needing no sanitizer dependency: over this app's
- * remaining lifetime every dependency is a liability.
+ * Hints must render as markup (`<%- doc.hint %>`) because they legitimately contain that
+ * span and the `[N]` image tokens, so renderHint() escapes the whole string and restores
+ * ONLY these exact sequences. Anything else — a <script>, an onerror handler, a stray tag
+ * from a bad import — stays escaped and renders as inert, visible text. An allowlist by
+ * construction, so no sanitizer dependency.
  */
 const HINT_ALLOWED_MARKUP: ReadonlyArray<readonly [RegExp, string]> = [
   [/&lt;span class='note'&gt;/g, "<span class='note'>"],
@@ -67,9 +61,8 @@ export function renderHint(mnHint: string): string {
   for (const [pattern, replacement] of HINT_ALLOWED_MARKUP) {
     hint = hint.replace(pattern, replacement);
   }
-  // The alt is the maintainer's wording: no name for the fragment exists in the
-  // data (the token is only a file number), and without an alt VoiceOver reads
-  // the SVG filename aloud mid-sentence.
+  // An alt is required: no name for the fragment exists in the data (the token is only a
+  // file number), and without one VoiceOver reads the SVG filename aloud mid-sentence.
   return hint.replace(
     /\[([0-9]+)\]/g,
     `<img src="${mnemonicHintsPath}/$1.svg" alt="Image of kanji fragment" />`
@@ -77,11 +70,10 @@ export function renderHint(mnHint: string): string {
 }
 
 /**
- * Radicals whose rad_frames files on the CDN are NOT animations: fourteen serve
- * a shared "n/a" placeholder SVG, and "none" (々) three deliberately blank
- * frames. The detail page renders no animation block for these — a blank slot,
- * no control (maintainer's ruling, 2026-08-01). The fact lives only in the CDN
- * assets; re-derive this set with offline/scripts/scope-no-rad-anim.mjs.
+ * Radicals whose rad_frames files on the CDN are NOT animations: fourteen serve a shared
+ * "n/a" placeholder SVG, and "none" (々) three blank frames. The detail page renders no
+ * animation block for these — blank slot, no control, no screen-reader stop. The fact
+ * lives only in the CDN assets, so a 200 is not proof of an animation.
  */
 export const RADICALS_WITHOUT_ANIMATION: ReadonlySet<string> = new Set([
   "hanebou",
@@ -101,9 +93,7 @@ export const RADICALS_WITHOUT_ANIMATION: ReadonlySet<string> = new Set([
   "none",
 ]);
 
-/**
- * Extends a kanji document with all asset URLs for the HTMX detail page.
- */
+/** Adds the CDN asset URLs the detail page binds against. FLAT output shape. */
 export function extendKanjiWithAssets(doc: KanjiDocument): ExtendedKanjiDocument {
   const alpha = "abcdefghijklmnopqrstuvwxyz".split("");
   const examples = doc.examples.map(([japanese, english], i) => {

@@ -2,18 +2,17 @@
 const currentMode = typeof mode !== 'undefined' ? mode : 'kanji';
 const origQueryString = typeof queryString !== 'undefined' ? queryString : '';
 
-// Detail URL: just kanji + search params (server computes neighbors from search results)
+// Kanji + search params; the server computes neighbours from the search results.
 function buildDetailUrl(kanjiChar) {
   return `/${encodeURIComponent(kanjiChar)}${origQueryString}`;
 }
 %>
 
 <% if (currentMode === 'kanji') { %>
-  <!-- Simple Kanji Grid -->
+  <%# Simple kanji grid %>
   <%
-  // Legacy fill order: constrain the paragraph width so kanji wrap into at
-  // most 12 rows — results fill top-to-bottom, then extend rightward into
-  // the horizontal scroll (search-controller.js kanjiResultsStyle)
+  // Constrains the paragraph width so kanji wrap into at most 12 rows: results fill
+  // top-to-bottom, then extend rightward into the horizontal scroll.
   const kanjiGridWidth = Math.max(Math.ceil(results.length / 12), 7) * 38;
   %>
   <div class="scroller scroller-kanji">
@@ -24,19 +23,16 @@ function buildDetailUrl(kanjiChar) {
       <div class="ka-border-bottom">
         <div class="border-inner"></div>
       </div>
-      <%# lang="ja" — see detail.ejs. Bare kanji are the MOST exposed text in the app: with
-          the page marked lang="en", any browser that reaches the generic font renders them
-          in a Chinese face (macOS hands back PingFang SC — a 0.00% pixel match), so 直/骨/
-          画/角 would show the wrong strokes in the very grid students click to learn them. %>
-      <%# ⚠️ NO trailing space after the kanji, and none between the anchors either —
-          the gap is CSS now (p.kanji > a.ka { padding-right }). It used to be this
-          literal space character, which made the grid's column pitch a FONT METRIC:
-          the retired mplus-1m-light was monospaced (space = 0.5em = 12.5px), so the
-          pitch was 37.5px and the 38px-per-column width above was sized to it. Any
-          substitute face has a narrower space (Hiragino: 0.333em = 8.32px) and the
-          grid silently reflows — 8 kanji per row instead of 7. p.kanji's font-size:0
-          collapses the whitespace between these tags, so re-indenting this loop is
-          safe; adding a space back inside the anchor is not. %>
+      <%# lang="ja" — see detail.ejs. Bare kanji are the most exposed text in the app: on
+          a lang="en" page any browser reaching the generic font draws them in a Chinese
+          face, so 直/骨/画/角 would show the wrong strokes in the very grid students
+          click to learn them. %>
+      <%# NO space after the kanji, and none between the anchors: the gap is CSS now
+          (p.kanji > a.ka { padding-right }). As a literal space it was a FONT METRIC —
+          a face with a narrower space silently reflowed the grid to 8 kanji per row
+          where 7 belong, breaking the 38px-per-column width above. font-size:0 collapses
+          the whitespace between these tags, so re-indenting the loop is safe; putting a
+          space back inside the anchor is not. %>
       <p class="kanji" lang="ja" style="width: <%= kanjiGridWidth %>px">
         <% results.forEach((kanji, index) => { %>
           <a href="<%= buildDetailUrl(kanji.ka_utf) %>"
@@ -48,15 +44,15 @@ function buildDetailUrl(kanjiChar) {
   </div>
 
 <% } else if (currentMode === 'ksort' && typeof kanjiStrokeGroups !== 'undefined') { %>
-  <!-- Kanji Stroke Groups -->
+  <%# Kanji stroke groups %>
   <div class="scroller row search-results-container">
     <div class="search-results">
       <ul class="list-inline">
         <% kanjiStrokeGroups.forEach(group => { %>
           <li class="results-group">
-            <%# numberOrBlank — a stroke count is a raw Mongo number and NaN is a real
-                sentinel in this data. No kanji holds kstroke: NaN today; the radical
-                branch below does, and these two headings must not drift apart. %>
+            <%# numberOrBlank: a stroke count is a raw Mongo number and NaN is a real
+                sentinel here. No kanji holds kstroke: NaN today, but the radical branch
+                below does and these two headings must not drift apart. %>
             <div class="ka-results-h1" aria-hidden="true"><%= numberOrBlank(group.stroke) %></div>
             <div class="ka-results-h3" role="heading" aria-level="2"
                  aria-label="<%= (numberOrBlank(group.stroke) + ' kanji stroke' + (group.stroke !== 1 ? 's' : '')).trim() %>">Kanji Stroke<%= group.stroke !== 1 ? 's' : '' %></div>
@@ -68,12 +64,12 @@ function buildDetailUrl(kanjiChar) {
                 <div class="grouped-column inline">
                   <% column.forEach(radical => { %>
                     <div>
-                      <%# Japanese name ONLY, never the meaning (the app withholds easy
-                          answers); no romaji: VoiceOver re-read it in English. The name
-                          is REAL hidden text, not an aria-label — NVDA speaks attributes
-                          in the page language, so a label never reached the Japanese
-                          voice; text inside the lang="ja" element does. The glyph stays
-                          aria-hidden: VoiceOver appends its own English description. %>
+                      <%# Japanese name ONLY — never the meaning (the app withholds easy
+                          answers) and no romaji (VoiceOver re-read it in English). REAL
+                          hidden text, not an aria-label: NVDA speaks attributes in the
+                          page language, so a label never reaches the Japanese voice.
+                          The glyph stays aria-hidden — VoiceOver appends its own
+                          English description. %>
                       <% if (radical.rad_name_ja && radical.rad_name && radical.rad_name !== "n/a") { %>
                       <div class="ka-radical inline" lang="ja"><span class="visually-hidden"><%= radical.rad_name_ja %></span><span aria-hidden="true"><%= radical.radical %></span></div>
                       <% } else { %>
@@ -102,18 +98,16 @@ function buildDetailUrl(kanjiChar) {
   </div>
 
 <% } else if (currentMode === 'rsort' && typeof radicalStrokeGroups !== 'undefined') { %>
-  <!-- Radical Stroke Groups -->
+  <%# Radical stroke groups %>
   <div class="scroller row search-results-container">
     <div class="search-results">
       <ul class="list-inline">
         <% radicalStrokeGroups.forEach(group => { %>
           <li class="results-group">
-            <%# 🔴 numberOrBlank is load-bearing HERE. 々 holds rad_stroke: NaN meaning
-                "no radical strokes", so this printed a results heading reading literally
-                "NaN" — reachable at /search?rs=&mode=rsort. Production renders it
-                blank (its NaN becomes null crossing JSON to Angular); so must this.
-                The label below deliberately still says "Strokes": NaN !== 1, exactly as
-                production's null !== 1. %>
+            <%# numberOrBlank is load-bearing HERE: 々 holds rad_stroke: NaN, so without
+                it this heading prints the literal string "NaN" (reachable at
+                /search?rs=&mode=rsort). Renders blank, like production. The label below
+                deliberately still says "Strokes" — NaN !== 1. %>
             <div class="ka-results-h1" aria-hidden="true"><%= numberOrBlank(group.stroke) %></div>
             <div class="ka-results-h3" role="heading" aria-level="2"
                  aria-label="<%= (numberOrBlank(group.stroke) + ' radical stroke' + (group.stroke !== 1 ? 's' : '')).trim() %>">Radical Stroke<%= group.stroke !== 1 ? 's' : '' %></div>
