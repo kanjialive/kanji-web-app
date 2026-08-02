@@ -43,7 +43,7 @@ export interface StrokeGroup {
  * the Mongo document directly loses that accident, exactly as it does for display.
  *
  * ⚠️ Do NOT "fix" this by cleaning NaN out of the data. The sentinel is load-bearing:
- * search.ts turns `?rs=n/a` into `{ rad_stroke: NaN }` because Mongo matches NaN to
+ * search.ts turns `?rs=` into `{ rad_stroke: NaN }` because Mongo matches NaN to
  * NaN, and that is a real search.
  *
  * NaN sorts LAST — "no radical strokes" belongs after every known count, not before

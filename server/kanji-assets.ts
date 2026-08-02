@@ -35,10 +35,12 @@ function escapeHtmlText(text: string): string {
 /**
  * The COMPLETE set of markup permitted inside a mnemonic hint.
  *
- * Derived by scanning all 1,006 hints in the production database on 2026-07-12,
- * not guessed: the only markup that occurs is a `<span class='note'>` wrapper
- * around etymology asides (115 uses) and its closing tag. No other tags, no HTML
- * entities.
+ * Derived by scanning the hints, not guessed: the only markup that occurs is a
+ * `<span class='note'>` wrapper around etymology asides and its closing tag. No other
+ * tags, no HTML entities. RE-DERIVE it rather than trusting a count written here — the
+ * figures this block used to carry ("115 of 1,006") were both wrong:
+ *
+ *   new Set(docs.flatMap(d => [...String(d.mn_hint).matchAll(/<[^>]*>/g)].map(m => m[0])))
  *
  * Hints must render as markup (`<%- doc.hint %>` in detail.ejs) because they
  * legitimately contain this span and the `[N]` image tokens. So renderHint()

@@ -110,7 +110,7 @@ function buildDetailUrl(kanjiChar) {
           <li class="results-group">
             <%# 🔴 numberOrBlank is load-bearing HERE. 々 holds rad_stroke: NaN meaning
                 "no radical strokes", so this printed a results heading reading literally
-                "NaN" — reachable at /search?rs=n/a&mode=rsort. Production renders it
+                "NaN" — reachable at /search?rs=&mode=rsort. Production renders it
                 blank (its NaN becomes null crossing JSON to Angular); so must this.
                 The label below deliberately still says "Strokes": NaN !== 1, exactly as
                 production's null !== 1. %>

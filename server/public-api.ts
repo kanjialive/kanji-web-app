@@ -53,8 +53,8 @@ const withoutLicensedFields = (
  * parseAdvancedQuery() silently drops every parameter it does not recognise or cannot
  * coerce, so `?foo=bar`, `?grade=abc` and a bare `/api/public/search/advanced` all
  * arrive here as `{}`. Passing that to find() returned the ENTIRE collection — 1,235
- * documents — as though every kanji had matched a search that specified nothing. On a
- * metered API that bills a typo'd parameter as a successful full-collection fetch.
+ * documents — as though every kanji had matched a search that specified nothing. (The
+ * public API is FREE — an API key gates access, it does not bill for it.)
  *
  * private-api.ts has had this guard all along; the public copy never got it. Same
  * response shape as the private one, and as this file's own not-found paths.

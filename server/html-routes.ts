@@ -14,7 +14,7 @@ import { extendKanjiWithAssets } from "./kanji-assets";
  * Render a number the way production renders it, i.e. blank when it is the NaN sentinel.
  *
  * 229 kanji hold `grade: NaN` and 々 holds `rad_stroke: NaN`. That is a DELIBERATE sentinel
- * meaning "this kanji has no grade", and it is LOAD-BEARING: search.ts turns `?grade=n/a`
+ * meaning "this kanji has no grade", and it is LOAD-BEARING: search.ts turns `?grade=`
  * into `{ grade: NaN }` because Mongo matches NaN to NaN, and that is a real search which
  * returns those 229 kanji. **Never clean the sentinel out of the data** — only keep it off
  * the page.
