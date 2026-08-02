@@ -11,7 +11,7 @@ import type { KanjiDocument } from "./types";
 const img = (n: string) =>
   `<img src="${mnemonicHintsPath}/${n}.svg" alt="Image of kanji fragment" />`;
 
-// --- Behaviour that must NOT change (real data, ~1,000 hints in production) ---
+// --- Behaviour that must NOT change (every one of the 1,235 documents has a hint) ---
 
 test("renderHint expands [N] tokens into CDN <img> tags", () => {
   assert.equal(
@@ -21,7 +21,7 @@ test("renderHint expands [N] tokens into CDN <img> tags", () => {
 });
 
 test("renderHint preserves the allowlisted <span class='note'> markup", () => {
-  // 115 hints in the database wrap etymology asides in exactly this span.
+  // 142 hints wrap etymology asides in exactly this span â the only markup in the data.
   assert.equal(
     renderHint("Trees 木 <span class='note'>(orig. \"inch\")</span> here."),
     "Trees 木 <span class='note'>(orig. \"inch\")</span> here."
@@ -29,7 +29,7 @@ test("renderHint preserves the allowlisted <span class='note'> markup", () => {
 });
 
 test("renderHint leaves quotes and apostrophes as literal characters", () => {
-  // Escaping these would emit &quot;/&#39; and churn ~200 hints for no gain.
+  // Escaping these would emit &quot;/&#39; and churn 240 hints for no gain.
   assert.equal(
     renderHint(`The fields can use a man's "strength".`),
     `The fields can use a man's "strength".`

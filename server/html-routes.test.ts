@@ -390,18 +390,18 @@ test("々 renders n/a for grade and onyomi, blank for radical strokes", async ()
 });
 
 test("a gradeless kanji that is not 々 still renders grade blank", async () => {
-  // 畑 is both gradeless in shape here AND one of the 13 with no onyomi — the two
-  // rules must not leak into each other: onyomi n/a, grade blank.
+  // 芝 as the collection holds it: gradeless AND one of the 13 with no onyomi. The
+  // two rules must not leak into each other — onyomi n/a, grade blank.
   const doc = detailDoc({
-    ka_utf: "畑",
-    kname: "hatake",
+    ka_utf: "芝",
+    kname: "shiba(fu)",
     grade: NaN,
     onyomi: "n/a",
     onyomi_ja: "",
-    meaning: "field",
+    meaning: "lawn",
   });
   await withServer(resultsDb([doc]), async (base) => {
-    const res = await fetch(`${base}/${encodeURIComponent("畑")}`, hostileFetch());
+    const res = await fetch(`${base}/${encodeURIComponent("芝")}`, hostileFetch());
     assert.equal(res.status, 200);
     const body = await res.text();
     assert.equal(valueOf(body, '<p class="grade">'), "");

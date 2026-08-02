@@ -89,8 +89,8 @@ test("public extendKanjiWithAssets output is stable (golden)", () => {
  *
  * parseAdvancedQuery() silently drops every parameter it does not recognise, so
  * `?foo=bar` and a bare /api/public/search/advanced reached this file as `{}` — and
- * `find({})` matches EVERYTHING. A typo'd parameter came back as 1,235 documents billed
- * as a successful search. private-api.ts has always guarded this; the public copy never
+ * `find({})` matches EVERYTHING. A typo'd parameter came back as 1,235 documents dressed
+ * up as a successful search. private-api.ts has always guarded this; the public copy never
  * did. (A RECOGNISED key with an unusable operand is different: it becomes a
  * match-nothing clause, tested separately below.)
  *

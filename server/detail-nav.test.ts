@@ -27,7 +27,7 @@ import path from "path";
 //
 // Same approach as results-race.test.ts: lift the shipped code, run it against stubs. No
 // jsdom — the surface is querySelector/replaceWith/dataset and the bug is ordering, so a
-// spy answers it and a DOM would not add anything. See CLAUDE.md, "the five gates".
+// spy answers it and a DOM would not add anything. See CLAUDE.md on the gates.
 //
 
 const EJS_PATH = path.join(__dirname, "views", "pages", "detail.ejs");
