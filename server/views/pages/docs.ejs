@@ -140,6 +140,7 @@
         <pre>https://kanjialive-api.p.rapidapi.com/api/public/kanji/訪</pre>
         <h2>Response</h2>
         <p>The JSON response will be a single JSON Object for the kanji that you have appended to the detail endpoint. All asset URLs will always be fully qualified.</p>
+        <p><strong>Note:</strong> <code>kunyomi.romaji</code> lists a kanji's readings in full, while <code>kunyomi.hiragana</code> gives only the part written with the kanji itself — 訪れる is written 訪 + れる, so the reading shown is おとず. The two are not a one-to-one pair, and the same applies to the Kunyomi shown in the web app.</p>
         <pre>
  {
   "kanji": {
@@ -183,7 +184,7 @@
     },
     "kunyomi": {
       "romaji": "otozureru, tazuneru, otozu, tazu",
-      "hiragana": "おとずれる、たずねる、おとず、たず"
+      "hiragana": "おとず、たず"
     },
     "video": {
       "poster": "https://media.kanjialive.com/kanji_strokes/otozu(reru)_11.svg",
