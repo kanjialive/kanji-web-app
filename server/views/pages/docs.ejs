@@ -20,16 +20,16 @@
     <main class="docs-columns">
       <section class="docs-col docs-col-left">
         <h2>Introduction</h2>
-        <p>Almost all of the functionality of the <em>Kanji Alive</em> <a href="http://app.kanjialive.com">web application</a> can be accessed using the <a href="https://rapidapi.com/KanjiAlive/api/learn-to-read-and-write-japanese-kanji" target="_blank">public developer API</a> hosted and documented on <a href="https://rapidapi.com" target="_blank">Rapid API</a> under a <a href="http://creativecommons.org/licenses/by/4.0/" target="_blank">Creative Commons Attribution (CC-BY)</a> license. If you prefer, you can also download our language data and media files from our <a href="https://github.com/kanjialive/media">GitHub repository</a> for offline use under the same license.</p>
+        <p>Almost all of the functionality of the <em>Kanji Alive</em> <a href="http://app.kanjialive.com">web application</a> can be accessed using the <a href="https://rapidapi.com/KanjiAlive/api/learn-to-read-and-write-japanese-kanji" target="_blank">public developer API</a> hosted on <a href="https://rapidapi.com" target="_blank">Rapid API</a> under a <a href="http://creativecommons.org/licenses/by/4.0/" target="_blank">Creative Commons Attribution (CC-BY)</a> license. If you prefer, you can also download our language data and media files from our <a href="https://github.com/kanjialive/media">GitHub repository</a> for offline use under the same license.</p>
         <p>The only exceptions are searching for kanji by textbook and viewing the mnemonic hints for individual kanji. Due to licensing restrictions these features and data are not available in the public API or offline on GitHub. Note: You will need to sign-up for a free account at <a href="https://rapidapi.com" target="_blank">Rapid API</a> to get your <em>Kanji Alive</em> API key.</p>
-        <p>The documentation on this page supplements the <a href="https://rapidapi.com/KanjiAlive/api/learn-to-read-and-write-japanese-kanji" target="_blank">API documented on Rapid API</a>. If needed, please review the <em>Kanji alive</em> <a href="https://kanjialive.com/user-guide/" target="_blank">User Guide</a> for further details on individual fields and components.</p>
+        <p>This page is the reference documentation for the public API; use the <a href="https://rapidapi.com/KanjiAlive/api/learn-to-read-and-write-japanese-kanji" target="_blank">Rapid API listing</a> to subscribe and obtain your key. If needed, please review the <em>Kanji alive</em> <a href="https://kanjialive.com/user-guide/" target="_blank">User Guide</a> for further details on individual fields and components.</p>
         <h2>Basic Search</h2>
         <p>Valid search strings for the basic search endpoint <code>:search</code> are a single kanji character, an Onyomi reading in katakana, a Kunyomi reading in hiragana, or a kanji's simplified English meaning.</p>
-        <pre>https://kanjialive-api.p.rapidapi.com/api/public/search/</pre>
+        <pre>https://kanjialive-api.p.rapidapi.com/api/public/search/:search</pre>
         <h2>Advanced Search</h2>
         <p>Advanced search mirrors the advanced search options in the <em>Kanji Alive</em> app with one exception. Due to licensing restrictions you cannot search for kanji by textbook (chapter).</p>
         <p>You can construct an advanced search with any combination of the following key/value pairs as URL parameters. The base endpoint will always be:</p>
-        <pre>https://app.kanjialive.com/api/public/search/advanced</pre>
+        <pre>https://kanjialive-api.p.rapidapi.com/api/public/search/advanced</pre>
         <table>
             <tbody><tr>
                 <td><code>on</code></td>
@@ -135,7 +135,7 @@
         <li> The API does not offer data on an individual kanji's mnemonic hints</li>
         </ol>
         <p>The detail endpoint has one parameter, and that is the <code>:character</code> itself.</p>
-        <pre>https://app.kanjialive.com/api/public/kanji/:character</pre>
+        <pre>https://kanjialive-api.p.rapidapi.com/api/public/kanji/:character</pre>
         <p>Here is an example of how to use the detail endpoint</p>
         <pre>https://kanjialive-api.p.rapidapi.com/api/public/kanji/訪</pre>
         <h2>Response</h2>
