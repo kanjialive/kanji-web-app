@@ -208,7 +208,7 @@ function harness(fetchStub: FetchStub): Harness {
   return { load, target, pushed, events, titles, location: windowStub.location };
 }
 
-// ── the race (#4) ────────────────────────────────────────────────────────────────────
+// ── the race ─────────────────────────────────────────────────────────────────────────
 
 test("a stale response cannot overwrite a newer one", async () => {
   const release: Array<() => void> = [];
@@ -319,7 +319,7 @@ test("an aborted request does not paint the error state over good results", asyn
   );
 });
 
-// ── the scrollbar track (#5) ─────────────────────────────────────────────────────────
+// ── the scrollbar track ──────────────────────────────────────────────────────────────
 
 test("a failed search leaves the scrollbar track intact for the next one", async () => {
   let call = 0;

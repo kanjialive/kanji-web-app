@@ -21,7 +21,7 @@ test("renderHint expands [N] tokens into CDN <img> tags", () => {
 });
 
 test("renderHint preserves the allowlisted <span class='note'> markup", () => {
-  // 142 hints wrap etymology asides in exactly this span â the only markup in the data.
+  // 142 hints wrap etymology asides in exactly this span — the only markup in the data.
   assert.equal(
     renderHint("Trees 木 <span class='note'>(orig. \"inch\")</span> here."),
     "Trees 木 <span class='note'>(orig. \"inch\")</span> here."
@@ -92,7 +92,8 @@ const minimalDoc = (rad_name_file: string) =>
 
 test("RADICALS_WITHOUT_ANIMATION is exactly the CDN-derived set", () => {
   // 14 radicals serve the "n/a" placeholder plus "none" (々's blank frames).
-  // Re-derive with offline/scripts/scope-no-rad-anim.mjs before changing.
+  // Re-derive before changing: a placeholder frame carries `no-rad-anim` in its SVG,
+  // so a 200 from the CDN is not evidence of an animation.
   assert.deepEqual(
     [...RADICALS_WITHOUT_ANIMATION].sort(),
     ["hanebou", "ichi", "iro", "kan", "keigamae", "nabebuta", "ni", "no",

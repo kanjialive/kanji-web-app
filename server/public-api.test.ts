@@ -7,8 +7,8 @@ import * as publicApi from "./public-api";
 import { extendKanjiWithAssets } from "./public-api";
 
 // Golden test for the PUBLIC (nested) enrichment contract. External RapidAPI
-// consumers depend on these exact URL strings and object shape, so this locks
-// them down: it must stay green, unchanged, across the CDN-constant refactor.
+// consumers depend on these exact URL strings and object shape, so any refactor
+// of the CDN URL building must leave this file green and unchanged.
 const doc = {
   ka_id: "kanji_42",
   ka_utf: "水",
@@ -94,7 +94,7 @@ test("public extendKanjiWithAssets output is stable (golden)", () => {
  * did. (A RECOGNISED key with an unusable operand is different: it becomes a
  * match-nothing clause, tested separately below.)
  *
- * ⚠️ Asserts the Mongo call is never MADE, not just that the body looks right. A guard
+ * Asserts the Mongo call is never MADE, not just that the body looks right. A guard
  * that queried first and discarded the result afterwards would still be wrong.
  *
  * Seen red: removing the Object.keys() guard from getSearchResultsWithQuery() fails all

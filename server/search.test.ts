@@ -105,7 +105,7 @@ test("parseAdvancedQuery lower-cases the operand (case-insensitive search)", () 
 // Lower-casing is a no-op for kana and kanji — "みず".toLowerCase() === "みず" — which
 // is precisely WHY it is safe here. It must not disturb Japanese matching.
 //
-// ⚠️ Do not "improve" this into a Mongo case-insensitive collation. Tested and
+// Never "improve" this into a Mongo case-insensitive collation. Tested and
 // rejected: {locale:"en", strength:2} treats hiragana and katakana as EQUAL (they
 // differ only at the tertiary level, the same level as letter case), so a search for
 // すい matched the katakana onyomi スイ — 6 hits where there should be 0. That would
@@ -227,7 +227,7 @@ test("parseAdvancedQuery returns an empty object for empty input", () => {
   assert.deepEqual(parseAdvancedQuery({}), {});
 });
 
-// Injection guards (plans/002): Express's qs parser can deliver operator objects
+// Injection guards: Express's qs parser can deliver operator objects
 // (e.g. ?kanji[$ne]=x). Non-string operands must be dropped, never embedded in the
 // Mongo filter. The `as unknown as StringDict` casts deliberately push a non-string
 // operand past the parameter type to simulate that runtime shape.

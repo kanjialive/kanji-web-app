@@ -8,7 +8,7 @@ import {
 
 // Characterization test: locks in the CURRENT output of the grid-packing
 // algorithm, not a hand-derived ideal. If the algorithm is intentionally
-// changed, rewrite these expectations wholesale (see plans/001).
+// changed, rewrite these expectations wholesale.
 const sample = [
   { ka_id: "kanji_1", ka_utf: "a", kstroke: 1, rad_utf: "R1", rad_stroke: 1, rad_order: 1 },
   { ka_id: "kanji_2", ka_utf: "b", kstroke: 1, rad_utf: "R1", rad_stroke: 1, rad_order: 1 },
@@ -46,7 +46,7 @@ test("groupByKanjiStrokes starts a new stroke group for a different radical", ()
  * unmerged and hands back an array sorted in pieces. The rsort view then printed its
  * stroke headings 1…17, NaN, and then 1…17 all over again.
  *
- * ⚠️ Reproduce at REAL SIZE. TimSort runs a plain insertion sort below 22 elements, so
+ * Reproduce at REAL SIZE. TimSort runs a plain insertion sort below 22 elements, so
  * a three-item fixture sorts correctly no matter how broken the comparator is and the
  * test passes while the app is visibly wrong. The corpus below is the size of the real
  * collection.

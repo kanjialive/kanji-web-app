@@ -75,7 +75,7 @@ async function withServer(
     const port = typeof addr === "object" && addr ? addr.port : 0;
     await fn(`http://127.0.0.1:${port}`);
   } finally {
-    // ⚠️ closeAllConnections() before close(), or a FAILING run HANGS instead of
+    // closeAllConnections() before close(), or a FAILING run HANGS instead of
     // ending. A route handler that throws out of an async function never sends a
     // response, so its socket stays open and server.close() waits for it forever —
     // which is exactly the state the hostile-query tests below provoke when the bug
@@ -171,7 +171,7 @@ test("/api/docs renders the licensing restriction, without touching the database
  * and Node terminated the process: two unauthenticated GETs crashed the staging dyno on
  * 2026-07-24 and Heroku's backoff kept it down.
  *
- * ⚠️ These pass with a WORKING database on purpose. The crash had nothing to do with
+ * These pass with a WORKING database on purpose. The crash had nothing to do with
  * Mongo — it happened before any query — so a brokenDb() would hide it behind a 500.
  *
  * Seen red: reverting queryParam() in renderSearchPage() fails exactly the three
@@ -179,7 +179,7 @@ test("/api/docs renders the licensing restriction, without touching the database
  */
 
 // A Db that answers every query with an empty result set.
-// ⚠️ Annotate the return types. `npm test` compiles this file with noImplicitAny
+// Annotate the return types. `npm test` compiles this file with noImplicitAny
 // (tsconfig excludes *.test.ts, so the typecheck gate never sees it), and a stub
 // cursor whose sort() returns itself is an implicit any — TS7011 at test time only.
 interface StubCursor {
@@ -303,7 +303,7 @@ for (const mode of MODE_INPUTS) {
 }
 
 /**
- * 🔴 The NaN sentinel must not reach a results heading.
+ * The NaN sentinel must not reach a results heading.
  *
  * 々 holds `rad_stroke: NaN` meaning "no radical strokes", and the rsort view printed it
  * straight into the group heading as the literal text "NaN". Production renders it blank
@@ -311,7 +311,7 @@ for (const mode of MODE_INPUTS) {
  * from the Mongo document directly loses that accident, which is what numberOrBlank()
  * exists to restore. It was fully unit-tested and simply not in scope in this template.
  *
- * ⚠️ This drives the REAL route and renders the REAL template, so it also proves the
+ * This drives the REAL route and renders the REAL template, so it also proves the
  * helper is actually reachable from the view — a numberOrBlank() unit test cannot.
  *
  * Seen red: dropping numberOrBlank() from the rsort heading in partials/results.ejs, and
@@ -431,7 +431,7 @@ test("a real onyomi renders as itself, not n/a", async () => {
 // Bound the wait. A reintroduced crash leaves the request unanswered forever; without
 // a deadline the assertion below never runs and the runner sits there looking busy.
 //
-// ⚠️ A FUNCTION, not a shared constant. AbortSignal.timeout() starts counting the moment
+// A FUNCTION, not a shared constant. AbortSignal.timeout() starts counting the moment
 // it is CREATED, not when a fetch picks it up, and once fired it stays fired forever. One
 // module-scope signal would therefore be a single 5s budget for the whole FILE: on a slow
 // CI runner every test after the 5s mark fails instantly with TimeoutError — a red that
@@ -517,7 +517,7 @@ test("canonicalHtmxUrl never returns a protocol-relative or off-origin location"
 });
 
 /**
- * ⚠️ The two tests above guard the helper. This one guards that index.ts still USES it —
+ * The two tests above guard the helper. This one guards that index.ts still USES it —
  * without this, someone re-inlining the old one-liner passes every test above while
  * reopening the hole. It reads the source that ships, like the other gates here do.
  */

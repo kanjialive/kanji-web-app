@@ -369,7 +369,7 @@ test("the arrow cases suppress Safari's text-selection default", () => {
   }
 });
 
-// ── play/pause state (2026-07-26) ────────────────────────────────────────────────────
+// ── play/pause state ─────────────────────────────────────────────────────────────────
 
 // String-matched, like the auto-repeat tests above and for the same reason: these live
 // inside the Alpine component and close over `this`, so they cannot be lifted and run.
