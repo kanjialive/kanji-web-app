@@ -196,10 +196,13 @@ body {
   margin: 0;
   line-height: 1.42857143; /* Bootstrap's default — row pitch and text metrics depend on it */
 
-  /* Centres the sheet vertically as well as horizontally (see .container).
-     The 55px is the old top/bottom margin, kept as a minimum gap. */
+  /* Centres the sheet vertically as well as horizontally (see .container). The 40px is
+     a MINIMUM gap, not the usual one: once the window is tall enough to centre the
+     sheet it cancels out of the arithmetic and moves nothing. Production's 55px
+     (kanji-alive.css .container margin-top) was too tall a floor under a Mac dock plus
+     a bookmarks bar — his ruling, 2026-08-02. */
   min-height: 100vh;
-  padding: 55px 0;
+  padding: 40px 0;
   display: flex;
   flex-direction: column;
 }
