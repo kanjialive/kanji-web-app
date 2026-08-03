@@ -22,9 +22,12 @@ cp .env.example .env
 `MONGODB_URI` and `MASHAPE_SECRET` are required — the server exits on startup if
 either is missing. `PORT` (default 5000) and `USE_HTMX` are optional.
 
-The project does not use `dotenv`: `.env` is read by `docker-compose` (via
-`env_file`). To run the server directly with `npm run dev` or `npm start`, export
-the variables into your shell first (e.g. `export $(grep -v '^#' .env | xargs)`).
+The project does not use `dotenv`, and nothing reads `.env` on its own. Export the
+variables into your shell before `npm run dev` or `npm start`:
+
+```bash
+set -a; source .env; set +a
+```
 
 `npm run dev` compiles TypeScript and copies the static files into `dist/`, then
 runs the compiled server — the same tree that deploys. It is deliberately not a
