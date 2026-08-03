@@ -77,6 +77,85 @@ test("getKanjiWithCharacter returns 200 with an enriched body when found", async
   assert.equal(body.strokes.length, 1);
 });
 
+/**
+ * LICENCE-RESTRICTED fields (CLAUDE.md "Key Patterns"). This route is UNAUTHENTICATED, so
+ * the whole list must go — plus `hint`, which is mn_hint rendered by the shared enricher
+ * AFTER the read and therefore out of reach of any Mongo projection.
+ *
+ * Both layers read ONE list, so a wrong list fails both tests. What each proves separately
+ * is that its layer still RUNS: seen red by dropping withoutLicensedFields() (first test —
+ * hint survives even with the projection in place) and by removing the projection argument
+ * from findOne (second).
+ */
+const LICENSED_FIELDS = [
+  "mn_hint",
+  "hint",
+  "hint_group",
+  "txt_books",
+  "textbook_search",
+];
+
+test("no licensed field leaves the private kanji route", async () => {
+  // Deliberately leaky: findOne ignores the projection, so this proves the SPREAD layer
+  // on its own. A doc arriving intact is exactly what a mistyped projection would give us.
+  initDb(async () => ({
+    ka_id: "kanji_1",
+    ka_utf: "水",
+    kname: "water",
+    kstroke: 1,
+    grade: 1,
+    examples: [] as string[][],
+    rad_position: "",
+    rad_name: "mizu",
+    rad_name_file: "mizu",
+    mn_hint: "Between the rivers…",
+    hint_group: 2,
+    txt_books: [{ chapter: "19", txt_bk: "txtGenki" }],
+    textbook_search: ["gen", "gen:c19"],
+  }));
+  const res = fakeRes();
+  await privateApi.getKanjiWithCharacter(charReq("水"), res as unknown as Response);
+  const body = res.body as Record<string, unknown>;
+  for (const field of LICENSED_FIELDS) {
+    assert.ok(!(field in body), `${field} must not leave the private API`);
+  }
+  // Deletion, not a DTO: everything else keeps its shape.
+  assert.equal(body.ka_utf, "水");
+  assert.equal(body.grade, 1);
+  assert.equal((body.strokes as string[]).length, 1);
+});
+
+test("the private kanji route projects the licensed fields out at Mongo", async () => {
+  const projections: unknown[] = [];
+  privateApi.init({
+    collection: () => ({
+      findOne: async (
+        _filter: object,
+        options?: { projection?: object }
+      ): Promise<unknown> => {
+        projections.push(options?.projection);
+        return null;
+      },
+    }),
+  } as unknown as Db);
+
+  await privateApi.getKanjiWithCharacter(charReq("水"), fakeRes() as unknown as Response);
+  await privateApi.getKanjiWithId(
+    { params: { id: "kanji_1" } } as unknown as Request,
+    fakeRes() as unknown as Response
+  );
+
+  assert.equal(projections.length, 2, "both read paths must hit the stub");
+  for (const projection of projections) {
+    assert.deepEqual(projection, {
+      mn_hint: 0,
+      hint_group: 0,
+      txt_books: 0,
+      textbook_search: 0,
+    });
+  }
+});
+
 // Captures the filter the handler actually hands to Mongo.
 function initDbCapturingFind(): { filter: () => object } {
   let seen: object = {};

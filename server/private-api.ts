@@ -1,7 +1,7 @@
 import { Db, Collection } from "mongodb";
 import { Request, Response } from "express";
 import * as search from "./search";
-import { KanjiDocument } from "./types";
+import { KanjiDocument, LicensedField } from "./types";
 import { extendKanjiWithAssets } from "./kanji-assets";
 
 let db: Db;
@@ -13,19 +13,34 @@ export const init = (database: Db) => {
 };
 
 /**
- * Fields excluded from every private-API response.
+ * LICENCE-RESTRICTED fields (CLAUDE.md "Key Patterns"), excluded from every private-API
+ * response. This route is UNAUTHENTICATED, so the same list the public API withholds
+ * applies here — keyed off the same `LicensedField` type so the two cannot drift.
  *
- * `textbook_search` and `mn_hint` are both LICENCE-RESTRICTED and this endpoint is
- * unauthenticated, so this projection alone closes very little:
- *
- *   - The FILTER is the leak. search.ts maps `text` onto textbook_search, so an
- *     unauthenticated ?text=gen:19 here returns exactly that chapter whether or not the
- *     field is in the body. (The public route rejects it, and ?list= accepts only the two
- *     public study lists on every route.)
- *   - mn_hint cannot be dropped here at all: AngularJS renders the hint from JSON.
- *     Phase 7 closes that leak and no other.
+ * Two layers, as on the public API: the Mongo read below and the response spread. A leak
+ * needs both to be wrong. The FILTER is a third surface and is closed separately — see the
+ * "api" argument in advancedSearch().
  */
-const LICENSED_FIELDS_PROJECTION = { textbook_search: 0 } as const;
+const LICENSED_FIELDS_PROJECTION: Record<LicensedField, 0> = {
+  mn_hint: 0,
+  hint_group: 0,
+  txt_books: 0,
+  textbook_search: 0,
+};
+
+/**
+ * `hint` is mn_hint RENDERED — derived by extendKanjiWithAssets() after the read, so no
+ * Mongo projection can reach it. Delete it HERE, never in kanji-assets.ts: html-routes.ts
+ * shares that enricher and the EJS detail page genuinely needs the hint.
+ */
+const DERIVED_LICENSED_FIELDS = ["hint"] as const;
+
+const withoutLicensedFields = (doc: object): Record<string, unknown> => {
+  const copy: Record<string, unknown> = { ...doc };
+  for (const field of Object.keys(LICENSED_FIELDS_PROJECTION)) delete copy[field];
+  for (const field of DERIVED_LICENSED_FIELDS) delete copy[field];
+  return copy;
+};
 
 const getKanjiWithObject = async (obj: object, req: Request, res: Response) => {
   try {
@@ -34,7 +49,10 @@ const getKanjiWithObject = async (obj: object, req: Request, res: Response) => {
       projection: LICENSED_FIELDS_PROJECTION,
     });
     if (result) {
-      res.send(extendKanjiWithAssets(result));
+      // The projection leaves mn_hint undefined, which renderHint() would throw on. Feed
+      // it an empty string so nothing licensed is derived; the empty `hint` is deleted
+      // with the rest.
+      res.send(withoutLicensedFields(extendKanjiWithAssets({ ...result, mn_hint: "" })));
     } else {
       res.status(404).send({ error: "No kanji found." });
     }
