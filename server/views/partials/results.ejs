@@ -20,7 +20,11 @@ function buildDetailUrl(kanjiChar) {
       <div id="kanji-count" class="ka-results-h1" aria-hidden="true"><%= results.length %></div>
       <div class="ka-results-h3" role="heading" aria-level="2"
            aria-label="<%= results.length %> kanji">Kanji</div>
-      <div class="ka-border-bottom">
+      <%# The rule's only positioned ancestor is .scroller, so the sheet's width: 100%
+          measures the 1104px VIEWPORT and the rule stops short once the grid overflows.
+          +3 matches p.kanji's margin-left, which pushes the scrollable width past the
+          grid box. min-width keeps the full-width rule narrow results (266px) draw. %>
+      <div class="ka-border-bottom" style="width: <%= kanjiGridWidth + 3 %>px; min-width: 100%">
         <div class="border-inner"></div>
       </div>
       <%# lang="ja" — see detail.ejs. Bare kanji are the most exposed text in the app: on
