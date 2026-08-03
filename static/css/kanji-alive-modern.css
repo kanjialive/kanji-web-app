@@ -657,9 +657,11 @@ span.search {
   margin-left: 0;
 }
 
+/* No overflow here: the shorthand would override .scroller's overflow-x: auto and
+   leave the grid scrollable only programmatically — the thumb and the vertical wheel
+   would still work, so a trackpad swipe failing is the only symptom. */
 .scroller-kanji {
   width: var(--content-width);
-  overflow: hidden;
 }
 
 /* Results header */
