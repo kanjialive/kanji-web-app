@@ -517,6 +517,32 @@ test("canonicalHtmxUrl never returns a protocol-relative or off-origin location"
 });
 
 /**
+ * Ordering is the whole property: below app.all("/*") the route still compiles, still
+ * looks right in review, and silently 302s /robots.txt to /search — which is what
+ * production did for years. tsc cannot see route order, so this reads the shipped source.
+ */
+test("index.ts serves /robots.txt, and does so ABOVE the catch-all", () => {
+  const source = fs.readFileSync(path.join(__dirname, "index.ts"), "utf8");
+
+  const robots = source.indexOf('app.get("/robots.txt"');
+  assert.notEqual(robots, -1, "no /robots.txt route in index.ts");
+
+  // The call signature, not the bare string: prose above mentions app.all("/*") too,
+  // and matching a comment would compare the route against the wrong position.
+  const catchAll = source.indexOf('app.all("/*", function');
+  assert.notEqual(catchAll, -1, "no catch-all found — has it moved? regex has rotted");
+  assert.ok(
+    robots < catchAll,
+    "/robots.txt must be registered before the catch-all, or it redirects to /search"
+  );
+
+  // The body is the point: /api/ closed, the docs page carved back in.
+  const body = source.slice(robots, catchAll);
+  assert.match(body, /Disallow: \/api\//, "robots.txt must disallow /api/");
+  assert.match(body, /Allow: \/api\/docs/, "the public API docs page must stay crawlable");
+});
+
+/**
  * The two tests above guard the helper. This one guards that index.ts still USES it —
  * without this, someone re-inlining the old one-liner passes every test above while
  * reopening the hole. It reads the source that ships, like the other gates here do.

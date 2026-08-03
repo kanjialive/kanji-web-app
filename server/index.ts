@@ -116,6 +116,18 @@ app.use(
 );
 app.use("/static", express.static(path.join(__dirname, "static")));
 app.use("/partials", express.static(path.join(__dirname, "partials")));
+
+// Must stay ABOVE app.all("/*") — without it the catch-all 302s /robots.txt to /search,
+// so crawlers read an HTML page as the rules and conclude nothing is disallowed.
+// `/api/` because the unauthenticated JSON routes serve licence-restricted mn_hint;
+// `/api/docs` is carved back in — it is public reference documentation and the place
+// the licensing restriction is stated. A crawler that ignores Allow just skips the
+// docs page; it cannot reach anything restricted. Kanji pages stay crawlable: they
+// are the app's public face. This is a request to well-behaved crawlers, NOT access
+// control — it does not stop a scraper, and nothing here should assume it does.
+app.get("/robots.txt", (req: Request, res: Response) => {
+  res.type("text/plain").send("User-agent: *\nDisallow: /api/\nAllow: /api/docs\n");
+});
 if (!USE_HTMX) {
   // AngularJS mode serves index.html at the root.
   app.get("/", (req: Request, res: Response) => {
