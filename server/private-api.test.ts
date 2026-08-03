@@ -76,3 +76,47 @@ test("getKanjiWithCharacter returns 200 with an enriched body when found", async
   // enrichment adds a per-stroke image array
   assert.equal(body.strokes.length, 1);
 });
+
+// Captures the filter the handler actually hands to Mongo.
+function initDbCapturingFind(): { filter: () => object } {
+  let seen: object = {};
+  privateApi.init({
+    collection: () => ({
+      find: (filter: object) => {
+        seen = filter;
+        return { toArray: async (): Promise<unknown[]> => [] };
+      },
+    }),
+  } as unknown as Db);
+  return { filter: () => seen };
+}
+
+function queryReq(query: Record<string, string>): Request {
+  return { query } as unknown as Request;
+}
+
+// search.test.ts proves parseAdvancedQuery is CLOSED on the "api" surface; only this
+// proves advancedSearch asks for that surface. It took the "app" default for years,
+// so ?text= on this unauthenticated route returned exactly one textbook chapter.
+test("advancedSearch closes ?text= — the route passes the api surface", async () => {
+  const cap = initDbCapturingFind();
+  await privateApi.advancedSearch(
+    queryReq({ text: "cij:15" }) as never,
+    fakeRes() as unknown as Response
+  );
+  assert.deepEqual(
+    cap.filter(),
+    { textbook_search: { $in: [] } },
+    "?text= must match nothing on the unauthenticated JSON API"
+  );
+});
+
+// Study lists are NOT textbooks (maintainer's ruling): ?list= stays open here.
+test("advancedSearch keeps ?list= working on the api surface", async () => {
+  const cap = initDbCapturingFind();
+  await privateApi.advancedSearch(
+    queryReq({ list: "ap:c3" }) as never,
+    fakeRes() as unknown as Response
+  );
+  assert.deepEqual(cap.filter(), { textbook_search: { $in: ["ap:c3"] } });
+});

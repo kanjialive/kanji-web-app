@@ -90,7 +90,10 @@ export const advancedSearch = async (
   const query =
     typeof basic === "string"
       ? search.generateBasicQuery(basic)
-      : search.parseAdvancedQuery(req.query);
+      // "api", not the "app" default: this route is unauthenticated, so ?text= here
+      // discloses the licensed textbook mapping to anyone. The EJS frontend never
+      // calls it — it renders through html-routes, which keeps the feature.
+      : search.parseAdvancedQuery(req.query, "api");
   await getSearchResultsWithQuery(query, req, res);
 };
 

@@ -42,22 +42,28 @@ const searchOperand = (value: string): string => value.toLowerCase();
  * `text` (textbook) and `list` (study list) write to the SAME field, so the OPERAND is
  * what decides which one a query really is — otherwise `?list=gen:c3` reaches a licensed
  * textbook through the unrestricted key. Study lists (`ap`, `mac`) are public; the other
- * textbook codes are licence-restricted, and the public API's published docs promise
- * textbook search is unavailable there.
+ * textbook codes are licence-restricted, and reachable from the EJS frontend only —
+ * both JSON APIs are unauthenticated or externally published, so neither may query one.
  *
  * A disallowed operand matches NOTHING and is never dropped — dropping would silently
  * broaden `?text=gen&grade=1` to `?grade=1`.
  */
 const STUDY_LIST_OPERAND = /^(ap|mac)(:|$)/;
 
-export type SearchSurface = "app" | "public";
+/**
+ * "app" is the server-rendered EJS frontend ALONE — the only surface where textbook
+ * search is a feature (the Quick Reference panel documents all 15 codes). "api" is the
+ * unauthenticated JSON API, "public" the RapidAPI one; neither may reach a textbook.
+ */
+export type SearchSurface = "app" | "api" | "public";
 
 const textbookOperandAllowed = (
   key: string,
   operand: string,
   surface: SearchSurface
 ): boolean => {
-  if (key === "text" && surface === "public") return false;
+  // Allowlist, not a denylist: a surface added later is closed until it says otherwise.
+  if (key === "text" && surface !== "app") return false;
   // "" is the absence search every advanced key supports.
   if (operand === "") return true;
   if (key === "list") return STUDY_LIST_OPERAND.test(operand);

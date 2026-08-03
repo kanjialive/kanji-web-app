@@ -206,9 +206,32 @@ test("text matches nothing on the public surface, still works in the app", () =>
   assert.deepEqual(parseAdvancedQuery({ text: "" }, "public"), {
     textbook_search: { $in: [] },
   });
-  // the app surface (private API, EJS, Angular) keeps its textbook search
+  // the app surface — the server-rendered EJS frontend — keeps its textbook search
   assert.deepEqual(parseAdvancedQuery({ text: "gen:c3" }), {
     textbook_search: { $in: ["gen:c3"] },
+  });
+});
+
+// The unauthenticated JSON API is a THIRD surface. Projecting textbook_search out
+// of the response hid nothing while ?text= still filtered on it: the licensed
+// mapping is fully enumerable from the result set alone, no key required.
+test("text matches nothing on the api surface", () => {
+  for (const operand of ["gen:c3", "ap:c3", "cij:15", ""]) {
+    assert.deepEqual(
+      parseAdvancedQuery({ text: operand }, "api"),
+      { textbook_search: { $in: [] } },
+      `?text=${operand} must match nothing on the JSON API`
+    );
+  }
+  // ...and the study-list key still works there: study lists are not licensed.
+  assert.deepEqual(parseAdvancedQuery({ list: "ap:c3" }, "api"), {
+    textbook_search: { $in: ["ap:c3"] },
+  });
+  // A disallowed operand is a match-nothing clause, never a dropped term, so a
+  // combined query cannot silently broaden to whatever survives.
+  assert.deepEqual(parseAdvancedQuery({ text: "gen:c3", grade: "1" }, "api"), {
+    grade: 1,
+    textbook_search: { $in: [] },
   });
 });
 
