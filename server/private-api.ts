@@ -35,6 +35,18 @@ const LICENSED_FIELDS_PROJECTION: Record<LicensedField, 0> = {
  */
 const DERIVED_LICENSED_FIELDS = ["hint"] as const;
 
+/**
+ * Kenkyusha retired the Luminous dictionary, so every document's `luminous` URL 404s.
+ * Withheld rather than served as a dead link — no frontend renders it. NOT a licensing
+ * matter: keep it out of LICENSED_FIELDS_PROJECTION, whose docblock states that constraint.
+ */
+const RETIRED_FIELDS_PROJECTION = { luminous: 0 } as const;
+
+const KANJI_PROJECTION = {
+  ...LICENSED_FIELDS_PROJECTION,
+  ...RETIRED_FIELDS_PROJECTION,
+};
+
 const withoutLicensedFields = (doc: object): Record<string, unknown> => {
   const copy: Record<string, unknown> = { ...doc };
   for (const field of Object.keys(LICENSED_FIELDS_PROJECTION)) delete copy[field];
@@ -46,7 +58,7 @@ const getKanjiWithObject = async (obj: object, req: Request, res: Response) => {
   try {
     const collection: Collection<KanjiDocument> = db.collection("kanji");
     const result: KanjiDocument | null = await collection.findOne(obj, {
-      projection: LICENSED_FIELDS_PROJECTION,
+      projection: KANJI_PROJECTION,
     });
     if (result) {
       // The projection leaves mn_hint undefined, which renderHint() would throw on. Feed

@@ -125,7 +125,7 @@ test("no licensed field leaves the private kanji route", async () => {
   assert.equal((body.strokes as string[]).length, 1);
 });
 
-test("the private kanji route projects the licensed fields out at Mongo", async () => {
+test("the private kanji route projects the withheld fields out at Mongo", async () => {
   const projections: unknown[] = [];
   privateApi.init({
     collection: () => ({
@@ -147,11 +147,15 @@ test("the private kanji route projects the licensed fields out at Mongo", async 
 
   assert.equal(projections.length, 2, "both read paths must hit the stub");
   for (const projection of projections) {
+    // Exact, so a mistyped key fails here. The first four are licence-restricted; the
+    // fifth is not — `luminous` is withheld because Kenkyusha retired Luminous and the
+    // stored URL 404s. Don't let the two reasons merge.
     assert.deepEqual(projection, {
       mn_hint: 0,
       hint_group: 0,
       txt_books: 0,
       textbook_search: 0,
+      luminous: 0,
     });
   }
 });

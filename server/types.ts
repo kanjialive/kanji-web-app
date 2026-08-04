@@ -30,7 +30,7 @@ export interface KanjiDocument {
   kunyomi_ja_search: string[];
   kunyomi_ka_display: string;
   kunyomi_search: string[];
-  luminous: string;
+  luminous: string; // Dead link — Kenkyusha retired Luminous; withheld by private-api.ts.
   meaning: string;
   meaning_search: string[];
   mn_hint: string;
