@@ -197,13 +197,14 @@ const LICENSED_FIELDS = [
   "textbook_search",
 ];
 
-test("licensed fields never appear in the public kanji response", () => {
+test("licensed and retired fields never appear in the public kanji response", () => {
   const leakyDoc = {
     ...doc,
     mn_hint: "Between the rivers…",
     hint_group: 2,
     txt_books: [{ chapter: "19", txt_bk: "txtGenki" }],
     textbook_search: ["gen", "gen:c19"],
+    luminous: "https://www.kenkyusha.co.jp/collab/KanjiAlive/index.php?field=水",
   } as unknown as KanjiDocument;
 
   const out = extendKanjiWithAssets(leakyDoc) as unknown as Record<
@@ -213,13 +214,16 @@ test("licensed fields never appear in the public kanji response", () => {
   for (const field of LICENSED_FIELDS) {
     assert.ok(!(field in out), `${field} must not leave the public API`);
   }
+  // The SPREAD layer on its own: this doc never went through a projection, so a dead
+  // Luminous URL surviving here is exactly what a projection-only fix would ship.
+  assert.ok(!("luminous" in out), "the retired luminous link must not leave the API");
   // deletion, not a DTO: the rest of the document keeps its shape
   assert.equal(out.ka_utf, "水");
   assert.equal(out.kname, "water");
   assert.equal(out.grade, 1);
 });
 
-test("both public kanji read paths project the licensed fields out at Mongo", async () => {
+test("both public kanji read paths project the withheld fields out at Mongo", async () => {
   const projections: unknown[] = [];
   const stubCollection = {
     findOne: async (
@@ -250,11 +254,15 @@ test("both public kanji read paths project the licensed fields out at Mongo", as
 
   assert.equal(projections.length, 2, "both read paths must hit the stub");
   for (const projection of projections) {
+    // Exact, so a mistyped key fails here. The first four are licence-restricted; the
+    // fifth is not — `luminous` is withheld because Kenkyusha retired Luminous and the
+    // stored URL 404s. Don't let the two reasons merge.
     assert.deepEqual(projection, {
       mn_hint: 0,
       hint_group: 0,
       txt_books: 0,
       textbook_search: 0,
+      luminous: 0,
     });
   }
 });

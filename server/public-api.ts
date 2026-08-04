@@ -4,6 +4,7 @@ import * as search from "./search";
 import {
   Example,
   LicensedField,
+  RetiredField,
   SimpleExtendedKanjiDocument,
   Kanji,
   KanjiDocument,
@@ -44,6 +45,29 @@ const withoutLicensedFields = (
     delete copy[field as LicensedField];
   }
   return copy as Omit<KanjiDocument, LicensedField>;
+};
+
+/**
+ * Kenkyusha retired the Luminous dictionary, so every document's `luminous` URL 404s.
+ * Withheld rather than served as a dead link. NOT a licensing matter: kept out of
+ * LICENSED_FIELDS_PROJECTION, whose docblock above states that constraint.
+ */
+const RETIRED_FIELDS_PROJECTION: Record<RetiredField, 0> = { luminous: 0 };
+
+const KANJI_PROJECTION = {
+  ...LICENSED_FIELDS_PROJECTION,
+  ...RETIRED_FIELDS_PROJECTION,
+};
+
+/** Both layers, as for the licensed fields: a new read path or a new spread can't leak alone. */
+const withoutWithheldFields = (
+  doc: KanjiDocument
+): Omit<KanjiDocument, LicensedField | RetiredField> => {
+  const copy: Partial<KanjiDocument> = withoutLicensedFields(doc);
+  for (const field of Object.keys(RETIRED_FIELDS_PROJECTION)) {
+    delete copy[field as RetiredField];
+  }
+  return copy as Omit<KanjiDocument, LicensedField | RetiredField>;
 };
 
 /**
@@ -117,7 +141,7 @@ export const getKanjiWithCharacter = async (req: Request, res: Response) => {
     const collection: Collection<KanjiDocument> = db.collection("kanji");
     const result: KanjiDocument | null = await collection.findOne(
       { ka_utf: req.params.character },
-      { projection: LICENSED_FIELDS_PROJECTION }
+      { projection: KANJI_PROJECTION }
     );
     if (result) {
       res.send(extendKanjiWithAssets(result));
@@ -134,7 +158,7 @@ export const getAllKanji = async (req: Request, res: Response) => {
   try {
     const collection: Collection<KanjiDocument> = db.collection("kanji");
     const results: KanjiDocument[] = await collection
-      .find({}, { projection: LICENSED_FIELDS_PROJECTION })
+      .find({}, { projection: KANJI_PROJECTION })
       .toArray();
     const structured_results = results.map((doc) =>
       extendKanjiWithAssets(doc)
@@ -290,7 +314,7 @@ export function extendKanjiWithAssets(
   }
 
   const extendedKanji: SimpleExtendedKanjiDocument = {
-    ...withoutLicensedFields(doc),
+    ...withoutWithheldFields(doc),
     kanji: kanji,
     radical: radical,
     references: references,

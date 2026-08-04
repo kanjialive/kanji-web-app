@@ -65,8 +65,12 @@ export type LicensedField =
   | "txt_books"
   | "textbook_search";
 
+/** RETIRED, not licensed: Kenkyusha withdrew Luminous, so the stored URL 404s. Withheld
+ * from API responses rather than served as a dead link. */
+export type RetiredField = "luminous";
+
 export interface SimpleExtendedKanjiDocument
-  extends Omit<KanjiDocument, "examples" | LicensedField> {
+  extends Omit<KanjiDocument, "examples" | LicensedField | RetiredField> {
   kanji: Kanji;
   radical: Radical;
   examples: Example[];

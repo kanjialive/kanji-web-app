@@ -1,7 +1,7 @@
 import { Db, Collection } from "mongodb";
 import { Request, Response } from "express";
 import * as search from "./search";
-import { KanjiDocument, LicensedField } from "./types";
+import { KanjiDocument, LicensedField, RetiredField } from "./types";
 import { extendKanjiWithAssets } from "./kanji-assets";
 
 let db: Db;
@@ -40,7 +40,7 @@ const DERIVED_LICENSED_FIELDS = ["hint"] as const;
  * Withheld rather than served as a dead link — no frontend renders it. NOT a licensing
  * matter: keep it out of LICENSED_FIELDS_PROJECTION, whose docblock states that constraint.
  */
-const RETIRED_FIELDS_PROJECTION = { luminous: 0 } as const;
+const RETIRED_FIELDS_PROJECTION: Record<RetiredField, 0> = { luminous: 0 };
 
 const KANJI_PROJECTION = {
   ...LICENSED_FIELDS_PROJECTION,
