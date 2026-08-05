@@ -107,14 +107,21 @@ if (USE_HTMX) {
 // Express's default is `Cache-Control: max-age=0`, i.e. revalidate on every page load,
 // which would cost six extra round trips per page.
 //
-// Do NOT fold this into the /static mount below. CSS and JS MUST keep revalidating or a
-// deploy would not reach anyone for a month. Fonts are safe to cache hard because they
-// only ever change by being REPLACED under a new name.
+// Do NOT fold this into the /static mount below. Fonts only ever change by being REPLACED
+// under a new name, so they are safe to cache hard; CSS and JS are edited IN PLACE, which
+// makes their lifetime the delay before a fix reaches a returning visitor.
+//
+// 1d there, not 0: the app is in maintenance, so changes are rare but urgent, and a day is
+// soon enough to be worth the revalidation traffic a 0 costs on every page load.
+//
+// These lifetimes only reach the browser because a Cloudflare Cache Rule scoped to
+// app.kanjialive.com passes them through. Without it the edge rewrites every static asset
+// to 62 days, max-age=0 included. See CLAUDE.md, Deployment.
 app.use(
   "/static/fonts",
   express.static(path.join(__dirname, "static/fonts"), { maxAge: "30d" })
 );
-app.use("/static", express.static(path.join(__dirname, "static")));
+app.use("/static", express.static(path.join(__dirname, "static"), { maxAge: "1d" }));
 app.use("/partials", express.static(path.join(__dirname, "partials")));
 
 // Must stay ABOVE app.all("/*") — without it the catch-all 302s /robots.txt to /search,
@@ -132,7 +139,8 @@ app.get("/robots.txt", (req: Request, res: Response) => {
 // Must stay ABOVE app.all("/*") for the same reason as /robots.txt: the catch-all answers a
 // missing icon with a 302 to /search, so every page load fetched an HTML page as its favicon.
 // maxAge is the point — without it each load still revalidates, and a 304 is still a request.
-// 7d, not the fonts' 30d: favicon.ico is a fixed path, so a replacement cannot be cache-busted.
+// 7d, not the fonts' 30d: favicon.ico is a fixed path, so a replacement cannot be cache-busted
+// by renaming. It reaches the browser only because the Cloudflare Cache Rule passes it through.
 const iconOptions = { root: path.join(__dirname, "static/icons"), maxAge: "7d" };
 app.get("/favicon.ico", (req: Request, res: Response) => {
   res.sendFile("favicon.ico", iconOptions);
