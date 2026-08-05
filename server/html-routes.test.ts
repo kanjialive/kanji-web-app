@@ -543,6 +543,39 @@ test("index.ts serves /robots.txt, and does so ABOVE the catch-all", () => {
 });
 
 /**
+ * Same ordering property as /robots.txt above, and the same silent failure: below the
+ * catch-all the icon routes still compile and every page load 302s to /search instead.
+ * The file check is not redundant with the route check — res.sendFile on a missing file
+ * 500s, so a build that drops static/icons breaks every page load with nothing in tsc.
+ */
+test("index.ts serves the icons from disk, ABOVE the catch-all", () => {
+  const source = fs.readFileSync(path.join(__dirname, "index.ts"), "utf8");
+
+  const catchAll = source.indexOf('app.all("/*", function');
+  assert.notEqual(catchAll, -1, "no catch-all found — has it moved? regex has rotted");
+
+  for (const route of ['app.get("/favicon.ico"', '"/apple-touch-icon.png"']) {
+    const at = source.indexOf(route);
+    assert.notEqual(at, -1, `no ${route} route in index.ts`);
+    assert.ok(at < catchAll, `${route} must be registered before the catch-all`);
+  }
+
+  // A cached icon is not requested at all; without maxAge every load still logs a 304.
+  assert.match(
+    source.slice(source.indexOf("const iconOptions"), catchAll),
+    /maxAge/,
+    "icon responses must carry a cache lifetime"
+  );
+
+  for (const file of ["favicon.ico", "apple-touch-icon.png"]) {
+    assert.ok(
+      fs.existsSync(path.join(__dirname, "..", "static", "icons", file)),
+      `static/icons/${file} is missing — the route would 500 on every page load`
+    );
+  }
+});
+
+/**
  * The two tests above guard the helper. This one guards that index.ts still USES it —
  * without this, someone re-inlining the old one-liner passes every test above while
  * reopening the hole. It reads the source that ships, like the other gates here do.

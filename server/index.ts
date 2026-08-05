@@ -128,6 +128,22 @@ app.use("/partials", express.static(path.join(__dirname, "partials")));
 app.get("/robots.txt", (req: Request, res: Response) => {
   res.type("text/plain").send("User-agent: *\nDisallow: /api/\nAllow: /api/docs\n");
 });
+
+// Must stay ABOVE app.all("/*") for the same reason as /robots.txt: the catch-all answers a
+// missing icon with a 302 to /search, so every page load fetched an HTML page as its favicon.
+// maxAge is the point — without it each load still revalidates, and a 304 is still a request.
+// 7d, not the fonts' 30d: favicon.ico is a fixed path, so a replacement cannot be cache-busted.
+const iconOptions = { root: path.join(__dirname, "static/icons"), maxAge: "7d" };
+app.get("/favicon.ico", (req: Request, res: Response) => {
+  res.sendFile("favicon.ico", iconOptions);
+});
+// iOS probes both spellings at the root; no view declares them.
+app.get(
+  ["/apple-touch-icon.png", "/apple-touch-icon-precomposed.png"],
+  (req: Request, res: Response) => {
+    res.sendFile("apple-touch-icon.png", iconOptions);
+  }
+);
 if (!USE_HTMX) {
   // AngularJS mode serves index.html at the root.
   app.get("/", (req: Request, res: Response) => {
