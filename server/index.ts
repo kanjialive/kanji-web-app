@@ -11,9 +11,6 @@ const app = express();
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
 
-// USE_HTMX=true serves the Alpine/EJS frontend; unset serves the legacy AngularJS SPA.
-const USE_HTMX = process.env.USE_HTMX === "true";
-
 const MONGODB_URI = process.env.MONGODB_URI;
 const MASHAPE_SECRET = process.env.MASHAPE_SECRET;
 
@@ -95,11 +92,9 @@ async function connectMongoDB() {
 }
 
 // Must precede the static middleware.
-if (USE_HTMX) {
-  app.get("/", (req: Request, res: Response) => {
-    res.redirect("/search");
-  });
-}
+app.get("/", (req: Request, res: Response) => {
+  res.redirect("/search");
+});
 
 // Serve only the intended directories, never the whole dist/ root.
 //
@@ -122,7 +117,6 @@ app.use(
   express.static(path.join(__dirname, "static/fonts"), { maxAge: "30d" })
 );
 app.use("/static", express.static(path.join(__dirname, "static"), { maxAge: "1d" }));
-app.use("/partials", express.static(path.join(__dirname, "partials")));
 
 // Must stay ABOVE app.all("/*") — without it the catch-all 302s /robots.txt to /search,
 // so crawlers read an HTML page as the rules and conclude nothing is disallowed.
@@ -152,13 +146,6 @@ app.get(
     res.sendFile("apple-touch-icon.png", iconOptions);
   }
 );
-if (!USE_HTMX) {
-  // AngularJS mode serves index.html at the root.
-  app.get("/", (req: Request, res: Response) => {
-    res.sendFile("index.html", { root: __dirname });
-  });
-}
-
 // There is no metrics endpoint, deliberately. Prometheus metrics could not observe the
 // failures that matter — every route returned HTTP 200 during a database outage, so they
 // reported a healthy app while it was broken. Failures are loud (5xx) instead, which any
@@ -195,69 +182,28 @@ app.get(
   public_api.getKanjiWithCharacter
 );
 
-// USE_HTMX=true: the EJS frontend serves at the SAME canonical URLs as the AngularJS app
-// (/search, /search/advanced, /search/:term, /:character), so bookmarked production links
-// keep their shape. Legacy /htmx page URLs 302 to canonical; only the XHR partial endpoint
-// stays under the prefix, and it never appears in the address bar.
-// USE_HTMX unset: the EJS frontend stays reachable at /htmx for testing.
-if (USE_HTMX) {
-  app.use("/htmx", (req: Request, res: Response, next: NextFunction) => {
-    if (req.path.startsWith("/partials/")) return next();
-    // canonicalHtmxUrl() collapses the leading slashes. Do NOT inline a bare
-    // originalUrl.replace(/^\/htmx/, "") here: that sends "/htmx//evil.example" to
-    // "//evil.example", which a browser reads as protocol-relative and follows off-site.
-    // res.redirect() does not normalise the location for us.
-    res.redirect(html_routes.canonicalHtmxUrl(req.originalUrl));
-  });
-  app.use("/htmx", html_routes.router);
-  app.use("/", html_routes.router);
-} else {
-  app.use("/htmx", html_routes.router);
-}
+// The EJS frontend serves at the canonical URLs (/search, /search/advanced, /search/:term,
+// /:character), so bookmarked production links keep their shape. Legacy /htmx page URLs 302
+// to canonical; only the XHR partial endpoint stays under the prefix, and it never appears
+// in the address bar.
+app.use("/htmx", (req: Request, res: Response, next: NextFunction) => {
+  if (req.path.startsWith("/partials/")) return next();
+  // canonicalHtmxUrl() collapses the leading slashes. Do NOT inline a bare
+  // originalUrl.replace(/^\/htmx/, "") here: that sends "/htmx//evil.example" to
+  // "//evil.example", which a browser reads as protocol-relative and follows off-site.
+  // res.redirect() does not normalise the location for us.
+  res.redirect(html_routes.canonicalHtmxUrl(req.originalUrl));
+});
+app.use("/htmx", html_routes.router);
+app.use("/", html_routes.router);
 
-// Catch-all: serves the EJS or AngularJS frontend per the feature flag.
+// Catch-all: every canonical route is mounted above, so anything reaching here is an
+// unknown URL and lands on the search page.
+//
+// This also swallows MISSING STATIC FILES — they 302 instead of 404ing, so a typo'd asset
+// path fails silently and the console stays clean. Fix when Express 5 forces this rewrite.
 app.all("/*", function (req: Request, res: Response) {
-  if (USE_HTMX) {
-    // The canonical routes are mounted above, so anything reaching here is unknown —
-    // Angular's router used redirectTo:'/search' for those.
-    return res.redirect("/search");
-  }
-
-  // Angular mode + ?htmx=true: a per-request testing escape hatch.
-  if (req.query.htmx === "true") {
-    const path = req.path;
-    if (path === "/" || path === "") {
-      return res.redirect("/htmx/search");
-    }
-    // Advanced search keeps its query string; check before /search/.
-    if (path === "/search/advanced") {
-      const qIndex = req.originalUrl.indexOf("?");
-      const qs = qIndex >= 0 ? req.originalUrl.slice(qIndex) : "";
-      return res.redirect(`/htmx/search/advanced${qs}`);
-    }
-
-    if (path.startsWith("/search/")) {
-      const query = decodeURIComponent(path.replace("/search/", ""));
-      return res.redirect(`/htmx/search?q=${encodeURIComponent(query)}`);
-    }
-    // req.path is percent-encoded, so decode before the length check:
-    // "/分" arrives as "/%E5%88%86".
-    let decodedPath = path;
-    try {
-      decodedPath = decodeURIComponent(path);
-    } catch {
-      // Malformed escape sequence — fall through to the SPA.
-    }
-    if (decodedPath.length <= 4 && !decodedPath.includes(".")) {
-      return res.redirect(`/htmx${path}`);
-    }
-  }
-
-  // Default: the AngularJS SPA.
-  const options = {
-    root: path.join(__dirname),
-  };
-  res.sendFile("index.html", options);
+  res.redirect("/search");
 });
 
 connectMongoDB();

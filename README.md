@@ -2,14 +2,23 @@
 
 This project is a Japanese kanji learning web application [https://app.kanjialive.com](https://app.kanjialive.com) built with:
 
-  - Frontend: AngularJS 1.5.8 SPA with Bootstrap UI components
+  - Frontend: server-rendered EJS views with [Alpine.js](https://alpinejs.dev) for interactivity
   - Backend: Node.js 24.x + Express 4.x serving both static files and API endpoints
   - Database: MongoDB 8.x for kanji data storage
 
   The architecture follows a client-server model with:
   1. Server API split into private (internal) and public (external) endpoints
-  2. Angular controllers for search, detail, and documentation views
+  2. EJS pages for search, detail, and documentation views, rendered on the server
   3. Custom media handling for kanji stroke animations and audio
+
+The app has three runtime dependencies — `ejs`, `express` and `mongodb`. That is a
+deliberate constraint rather than a coincidence: it is maintained by a single volunteer
+and has to keep running for years at a time, so client libraries are vendored and pinned
+under `static/js/libs/` rather than loaded from a CDN.
+
+The application was an AngularJS 1.5.8 single-page app until August 2026. That frontend
+has been removed; the last commit serving it is tagged
+[`angularjs-final`](https://github.com/kanjialive/kanji-web-app/tree/angularjs-final).
 
 ### Environment setup
 
@@ -20,7 +29,7 @@ cp .env.example .env
 ```
 
 `MONGODB_URI` and `MASHAPE_SECRET` are required — the server exits on startup if
-either is missing. `PORT` (default 5000) and `USE_HTMX` are optional.
+either is missing. `PORT` (default 5000) is optional.
 
 The project does not use `dotenv`, and nothing reads `.env` on its own. Export the
 variables into your shell before `npm run dev` or `npm start`:

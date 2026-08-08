@@ -19,7 +19,7 @@
     "test": "node --require ts-node/register --test 'server/**/*.test.ts'",
     "build": "tsc && npm run copyfiles",
     "dev": "npm run build && npm start",
-    "copyfiles": "mkdir -p dist/static dist/partials dist/views && cp index.html dist/ && cp -R static/. dist/static/ && cp -R partials/. dist/partials/ && cp -R server/views/. dist/views/",
+    "copyfiles": "mkdir -p dist/static dist/views && cp -R static/. dist/static/ && cp -R server/views/. dist/views/",
     "postinstall": "npm run build",
     "start": "node dist/index.js"
   },

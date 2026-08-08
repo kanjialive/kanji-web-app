@@ -1,6 +1,6 @@
 /**
  * The EJS frontend's routes — full pages and the results partial.
- * Active when USE_HTMX=true; see index.ts for the mounts.
+ * See index.ts for the mounts.
  */
 
 import { Router, Request, Response } from "express";
@@ -251,10 +251,9 @@ function buildResultsOrder(
 }
 
 /**
- * The search page, at the same URL shapes as the AngularJS app so production bookmarks
- * keep working: /search (welcome, ?q= or advanced), /search/advanced?…, /search/:term.
- * Also mounted under /htmx as a testing alias — redirects use req.baseUrl so they stay
- * within whichever mount handled them.
+ * The search page, at the URL shapes production bookmarks already use: /search (welcome,
+ * ?q= or advanced), /search/advanced?…, /search/:term. Also reachable under the /htmx
+ * mount — redirects use req.baseUrl so they stay within whichever mount handled them.
  */
 async function renderSearchPage(
   req: Request,
