@@ -10,17 +10,19 @@
     <a href="http://www.youtube.com/kanjialive/" target="_blank" rel="noopener" aria-label="short demonstration videos (opens in new tab)">short demonstration videos</a>. If you are having technical difficulties, please refer to our
     <a href="http://kanjialive.com/troubleshooting" target="_blank" rel="noopener" aria-label="Troubleshooting (opens in new tab)">Troubleshooting</a> page.
   </p>
-  <p lang="ja">詳細は、メーニューの「日本語」内にある使用説明とトラブルシューティングをご参照ください。</p>
+  <p lang="ja">詳細は、メニューの「日本語」内にある使用説明とトラブルシューティングをご参照ください。</p>
 
   <h3>Quick Search</h3>
   <p>
     Enter a <em>single</em> search term for kanji from one of the following four categories: 1) a kanji character, 2) an Onyomi reading in katakana, 3) a Kunyomi reading in hiragana, 4) a kanji's simplified English meaning.
   </p>
   <p>Examples:</p>
+  <%# lang="ja" on every Japanese run, same rule as the rest of the app: without it a
+      screen reader reads kana/kanji in an English voice, and macOS picks Chinese forms. %>
   <ul>
-    <li>親</li>
-    <li>シン</li>
-    <li>おや</li>
+    <li lang="ja">親</li>
+    <li lang="ja">シン</li>
+    <li lang="ja">おや</li>
     <li>parent</li>
   </ul>
   <p>
@@ -32,19 +34,20 @@
     Enter one or more search terms in Japanese or romaji from all of the available categories in <em>Kanji alive</em>. Advanced search queries <em>must</em> be entered in the form
     <kbd>key:value</kbd> where <em>key</em> refers to the search category (e.g. Onyomi reading) and <em>value</em> refers to the search term for a given key (for example,
     <kbd>on:shin</kbd> or
-    <kbd>on:シン</kbd>).
+    <kbd>on:<span lang="ja">シン</span></kbd>).
   </p>
   <p><strong>List of available Keys:</strong></p>
   <table class="help-table">
+    <caption class="visually-hidden">Advanced search keys: key, meaning, and example</caption>
     <tr>
       <th scope="row"><kbd>on:</kbd></th>
       <td>Onyomi reading, R/J (Katakana)</td>
-      <td><kbd>on:shin</kbd> or <kbd>on:シン</kbd></td>
+      <td><kbd>on:shin</kbd> or <kbd>on:<span lang="ja">シン</span></kbd></td>
     </tr>
     <tr>
       <th scope="row"><kbd>kun:</kbd></th>
       <td>Kunyomi reading, R/J (Hiragana)</td>
-      <td><kbd>kun:oya</kbd> or <kbd>kun:おや</kbd></td>
+      <td><kbd>kun:oya</kbd> or <kbd>kun:<span lang="ja">おや</span></kbd></td>
     </tr>
     <tr>
       <th scope="row"><kbd>kem:</kbd></th>
@@ -59,12 +62,12 @@
     <tr>
       <th scope="row"><kbd>kanji:</kbd></th>
       <td>Kanji character, J</td>
-      <td><kbd>kanji:親</kbd></td>
+      <td><kbd>kanji:<span lang="ja">親</span></kbd></td>
     </tr>
     <tr>
       <th scope="row"><kbd>rjn:</kbd></th>
       <td>Radical Japanese name, R/J (Hiragana)</td>
-      <td><kbd>rjn:miru</kbd> or <kbd>rjn:みる</kbd></td>
+      <td><kbd>rjn:miru</kbd> or <kbd>rjn:<span lang="ja">みる</span></kbd></td>
     </tr>
     <tr>
       <th scope="row"><kbd>rem:</kbd></th>
@@ -79,7 +82,7 @@
     <tr>
       <th scope="row"><kbd>rpos:</kbd></th>
       <td>Radical Position, R/J (Hiragana)</td>
-      <td><kbd>rpos:hen</kbd> or <kbd>rpos:へん</kbd></td>
+      <td><kbd>rpos:hen</kbd> or <kbd>rpos:<span lang="ja">へん</span></kbd></td>
     </tr>
     <tr>
       <th scope="row"><kbd>grade:</kbd></th>
@@ -104,6 +107,7 @@
 
   <p><strong>List of available Values for Textbooks:</strong></p>
   <table class="help-table">
+    <caption class="visually-hidden">Textbook values: code, textbook, and example</caption>
     <tr><th scope="row"><kbd>gen:</kbd></th><td>Genki</td><td><kbd>text:gen:c3</kbd></td></tr>
     <tr><th scope="row"><kbd>bk:</kbd></th><td>Basic Kanji Book</td><td><kbd>text:bk:c1</kbd></td></tr>
     <tr><th scope="row"><kbd>aij3:</kbd></th><td>Adventures in Japanese, 3rd edition</td><td><kbd>text:aij3:v3:c1</kbd></td></tr>
@@ -135,6 +139,7 @@
 
   <p><strong>List of available Values for Study Lists:</strong></p>
   <table class="help-table">
+    <caption class="visually-hidden">Study list values: code, study list, and example</caption>
     <tr><th scope="row"><kbd>ap:</kbd></th><td>Advanced Placement Exam</td><td><kbd>list:ap:c3</kbd></td></tr>
     <tr><th scope="row"><kbd>mac:</kbd></th><td>Macquarie University</td><td><kbd>list:mac:c12</kbd></td></tr>
   </table>
@@ -142,15 +147,18 @@
   <h3>Search Results</h3>
   <p>All kanji search results are initially shown in a single block, sorted by kanji stroke number. Two additional sort modes are available for viewing kanji, grouped together either by radical stroke number or kanji stroke number. In these two modes all kanji in a group are further sorted by the canonical order of their Japanese radicals. In the results, the radicals are shown in grey and in a smaller type size to the left of their respective kanji.</p>
 
+  <%# Arrow glyphs are aria-hidden with a visually-hidden name beside them: screen
+      readers skip ←→↑↓ at default punctuation verbosity, leaving "Use the and keys". %>
   <h3>Navigation</h3>
   <table class="help-table">
+    <caption class="visually-hidden">Search view navigation: action, and how to do it</caption>
     <tr>
       <th scope="row">Sort modes</th>
-      <td>Click on the "Sort" icon in the navigation bar or use the <kbd>&uarr;</kbd> and <kbd>&darr;</kbd> arrow keys to switch sort modes</td>
+      <td>Click on the "Sort" icon in the navigation bar or use the <kbd aria-hidden="true">&uarr;</kbd><span class="visually-hidden">Up arrow</span> and <kbd aria-hidden="true">&darr;</kbd><span class="visually-hidden">Down arrow</span> arrow keys to switch sort modes</td>
     </tr>
     <tr>
       <th scope="row">Page results</th>
-      <td>Click on the pointed brackets to the left and right of the "Sort" icon, drag the horizontal scrollbar or use the <kbd>&larr;</kbd> and <kbd>&rarr;</kbd> arrow keys to view additional pages of results</td>
+      <td>Click on the pointed brackets to the left and right of the "Sort" icon, drag the horizontal scrollbar or use the <kbd aria-hidden="true">&larr;</kbd><span class="visually-hidden">Left arrow</span> and <kbd aria-hidden="true">&rarr;</kbd><span class="visually-hidden">Right arrow</span> arrow keys to view additional pages of results</td>
     </tr>
     <tr>
       <th scope="row">View kanji details</th>

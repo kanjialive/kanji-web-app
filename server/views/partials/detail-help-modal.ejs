@@ -10,21 +10,24 @@
     <a href="http://www.youtube.com/kanjialive/" target="_blank" rel="noopener" aria-label="short demonstration videos (opens in new tab)">short demonstration videos</a>. If you are having technical difficulties, please refer to our
     <a href="http://kanjialive.com/troubleshooting" target="_blank" rel="noopener" aria-label="Troubleshooting (opens in new tab)">Troubleshooting</a> page.
   </p>
-  <p lang="ja">詳細は、メーニューの「日本語」内にある使用説明とトラブルシューティングをご参照ください。</p>
+  <p lang="ja">詳細は、メニューの「日本語」内にある使用説明とトラブルシューティングをご参照ください。</p>
 
+  <%# Arrow glyphs are aria-hidden with a visually-hidden name beside them: screen
+      readers skip ←→↑↓ at default punctuation verbosity, leaving "Use the and keys". %>
   <h3>Navigation</h3>
   <table class="help-table">
+    <caption class="visually-hidden">Detail view navigation: action, and how to do it</caption>
     <tr>
       <th scope="row">Next/Previous kanji</th>
-      <td>Use the <kbd>&larr;</kbd> and <kbd>&rarr;</kbd> keys or click on the left and right single pointed brackets in the top navigation bar</td>
+      <td>Use the <kbd aria-hidden="true">&larr;</kbd><span class="visually-hidden">Left arrow</span> and <kbd aria-hidden="true">&rarr;</kbd><span class="visually-hidden">Right arrow</span> keys or click on the left and right single pointed brackets in the top navigation bar</td>
     </tr>
     <tr>
       <th scope="row">Toggle kanji animation/typeface</th>
-      <td>Use the <kbd>&uarr;</kbd> or <kbd>&darr;</kbd> keys or click on the large image of the kanji.</td>
+      <td>Use the <kbd aria-hidden="true">&uarr;</kbd><span class="visually-hidden">Up arrow</span> or <kbd aria-hidden="true">&darr;</kbd><span class="visually-hidden">Down arrow</span> keys or click on the large image of the kanji.</td>
     </tr>
     <tr>
       <th scope="row">Next/Previous typeface</th>
-      <td>Use the <kbd>Shift</kbd> + <kbd>&larr;</kbd> and <kbd>Shift</kbd> + <kbd>&rarr;</kbd> keys or click on the left and right single pointed brackets next to the name of the typeface</td>
+      <td>Use the <kbd>Shift</kbd> + <kbd aria-hidden="true">&larr;</kbd><span class="visually-hidden">Left arrow</span> and <kbd>Shift</kbd> + <kbd aria-hidden="true">&rarr;</kbd><span class="visually-hidden">Right arrow</span> keys or click on the left and right single pointed brackets next to the name of the typeface</td>
     </tr>
     <tr>
       <th scope="row">Return to Search</th>
@@ -37,13 +40,14 @@
 
   <h3>Other Interactive Elements</h3>
   <table class="help-table">
+    <caption class="visually-hidden">Interactive elements: element, and how to use it</caption>
     <tr>
       <th scope="row">Play/Pause kanji animation</th>
       <td>Use the <kbd>spacebar</kbd> or click on the play/pause icon in the center of the kanji animation controls.</td>
     </tr>
     <tr>
       <th scope="row">Next/Previous stroke</th>
-      <td>Use the <kbd>Shift</kbd> + <kbd>&larr;</kbd> or <kbd>Shift</kbd> + <kbd>&rarr;</kbd> keys, click the previous and next stroke icons on each side of the play/pause icon or move your mouse cursor over the stroke breakdown images.</td>
+      <td>Use the <kbd>Shift</kbd> + <kbd aria-hidden="true">&larr;</kbd><span class="visually-hidden">Left arrow</span> or <kbd>Shift</kbd> + <kbd aria-hidden="true">&rarr;</kbd><span class="visually-hidden">Right arrow</span> keys, click the previous and next stroke icons on each side of the play/pause icon or move your mouse cursor over the stroke breakdown images.</td>
     </tr>
     <tr>
       <th scope="row">Radical animation</th>

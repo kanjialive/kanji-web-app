@@ -566,3 +566,70 @@ test("a radical with no animation renders an empty slot, not a fake control", as
     );
   });
 });
+
+// The two Quick Reference modals. Everything here is silent when removed: the
+// glyphs still paint, the tables still look like tables, the kanji still render.
+function helpDialog(body: string, page: string): string {
+  const match = /<dialog[\s\S]*?<\/dialog>/.exec(body);
+  assert.ok(match, `no <dialog> in the rendered ${page} page — this gate matched nothing`);
+  return match[0];
+}
+
+// Japanese that is NOT inside a lang="ja" element. Strips the tagged runs, then
+// looks for anything left in the kana/kanji ranges.
+function untaggedJapanese(region: string): string[] {
+  const stripped = region.replace(/<(\w+)[^>]*\blang="ja"[^>]*>[\s\S]*?<\/\1>/g, "");
+  return stripped.match(/[぀-ヿ一-鿿]+/g) ?? [];
+}
+
+for (const page of ["search", "detail"]) {
+  test(`the ${page} Quick Reference modal is readable by a screen reader`, async () => {
+    const url = page === "search" ? "/search" : `/${encodeURIComponent("水")}`;
+    await withServer(resultsDb([detailDoc({})]), async (base) => {
+      const res = await fetch(`${base}${url}`, boundedFetch());
+      assert.equal(res.status, 200);
+      const body = await res.text();
+      const region = helpDialog(body, page);
+
+      // showModal(), never show(): the modal form is what makes the rest of the
+      // page inert. With show() a screen reader walks straight out of the dialog.
+      assert.ok(
+        body.includes("$refs.helpDialog.showModal()"),
+        "the Quick Reference opens with show() instead of showModal() — the page " +
+          "behind it is no longer inert and focus is not trapped"
+      );
+
+      // Each table names itself and its columns; without a caption the 2nd and 3rd
+      // columns announce as bare "column 2" / "column 3".
+      const tables = region.match(/class="help-table"/g) ?? [];
+      const captions = region.match(/<caption class="visually-hidden">/g) ?? [];
+      assert.ok(tables.length > 0, "no help tables found — this gate matched nothing");
+      assert.equal(
+        captions.length,
+        tables.length,
+        `${tables.length - captions.length} help table(s) lost their hidden caption — ` +
+          "their columns announce unnamed"
+      );
+
+      // Arrow glyphs carry a spoken name beside them; VoiceOver and NVDA skip
+      // ←→↑↓ at default punctuation verbosity, leaving "Use the and keys".
+      assert.doesNotMatch(
+        region,
+        /<kbd>(?:&larr;|&rarr;|&uarr;|&darr;)/,
+        "a bare arrow <kbd> is back — it announces as nothing at all"
+      );
+      assert.match(
+        region,
+        /<kbd aria-hidden="true">&[lru]arr;<\/kbd><span class="visually-hidden">/,
+        "the arrow keys lost their visually-hidden names"
+      );
+
+      assert.deepEqual(
+        untaggedJapanese(region),
+        [],
+        "Japanese in the modal is missing lang=\"ja\" — a screen reader reads it " +
+          "in an English voice and macOS renders Chinese glyph forms"
+      );
+    });
+  });
+}
