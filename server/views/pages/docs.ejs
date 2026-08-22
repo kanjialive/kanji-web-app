@@ -20,7 +20,7 @@
     <main class="docs-columns">
       <section class="docs-col docs-col-left">
         <h2>Introduction</h2>
-        <p>Almost all of the functionality of the <em>Kanji Alive</em> <a href="http://app.kanjialive.com">web application</a> can be accessed using the <a href="https://rapidapi.com/KanjiAlive/api/learn-to-read-and-write-japanese-kanji" target="_blank">public developer API</a> hosted on <a href="https://rapidapi.com" target="_blank">Rapid API</a> under a <a href="http://creativecommons.org/licenses/by/4.0/" target="_blank">Creative Commons Attribution (CC-BY)</a> license. If you prefer, you can also download our language data and media files from our <a href="https://github.com/kanjialive/media">GitHub repository</a> for offline use under the same license.</p>
+        <p>Almost all of the functionality of the <em>Kanji Alive</em> <a href="https://app.kanjialive.com">web application</a> can be accessed using the <a href="https://rapidapi.com/KanjiAlive/api/learn-to-read-and-write-japanese-kanji" target="_blank">public developer API</a> hosted on <a href="https://rapidapi.com" target="_blank">Rapid API</a> under a <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank">Creative Commons Attribution (CC-BY)</a> license. If you prefer, you can also download our language data and media files from our <a href="https://github.com/kanjialive/kanji-data-media">GitHub repository</a> for offline use under the same license.</p>
         <p>The only exceptions are searching for kanji by textbook and viewing the mnemonic hints for individual kanji. Due to licensing restrictions these features and data are not available in the public API or offline on GitHub. Note: You will need to sign-up for a free account at <a href="https://rapidapi.com" target="_blank">Rapid API</a> to get your <em>Kanji Alive</em> API key.</p>
         <p>This page is the reference documentation for the public API; use the <a href="https://rapidapi.com/KanjiAlive/api/learn-to-read-and-write-japanese-kanji" target="_blank">Rapid API listing</a> to subscribe and obtain your key. If needed, please review the <em>Kanji alive</em> <a href="https://kanjialive.com/user-guide/" target="_blank">User Guide</a> for further details on individual fields and components.</p>
         <h2>Basic Search</h2>
@@ -108,7 +108,7 @@
             </tbody>
         </table>
         <h2>Response</h2>
-        <p>All basic and advanced searches return a JSON array containing individual objects for each kanji that matches the search. You can use the kanji <code>character</code> value that is returned for a kanji with the detail endpoint to get all of the available information regarding a specific kanji. The radical <code>order</code> value indicates the index number of the radical in the <a href="http://kanjialive.com/214-traditional-kanji-radicals/">canonical order of the 214 traditional kanji radicals</a>.</p>
+        <p>All basic and advanced searches return a JSON array containing individual objects for each kanji that matches the search. You can use the kanji <code>character</code> value that is returned for a kanji with the detail endpoint to get all of the available information regarding a specific kanji. The radical <code>order</code> value indicates the index number of the radical in the <a href="https://kanjialive.com/214-traditional-kanji-radicals/">canonical order of the 214 traditional kanji radicals</a>.</p>
         <p>Example: <code>https://kanjialive-api.p.rapidapi.com/api/public/search/坊</code></p>
         <pre>
 [
@@ -125,7 +125,7 @@
   }
 ]</pre>
         <p>If your search does not yield any results, an empty JSON Array will be returned.</p>
-        <p><strong>Note:</strong> As illustrated above some of the radical characters supported by <em>Kanji alive</em> are not defined in Unicode and had to be assigned PUA (Private Use Area) encodings in the range U+E700..U+E759. To view these characters correctly, your users will first have to install our custom <a href="https://github.com/kintopp/Kanji-alive/tree/master/radicals-font">Japanese Radicals font</a> (also available in several webfont formats).</p>
+        <p><strong>Note:</strong> As illustrated above some of the radical characters supported by <em>Kanji alive</em> are not defined in Unicode and had to be assigned PUA (Private Use Area) encodings in the range U+E700..U+E759. To view these characters correctly, your users will first have to install our custom <a href="https://github.com/kanjialive/kanji-data-media/tree/master/radicals-font">Japanese Radicals font</a> (also available in several webfont formats).</p>
       </section>
       <section class="docs-col">
         <h2>Kanji Details</h2>
