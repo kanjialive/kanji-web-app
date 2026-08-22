@@ -60,14 +60,16 @@
 
       _swapResults(target, html);
 
+      // Title BEFORE pushState: analytics logs a page view off the history event and
+      // reads document.title as it fires, so the other order files every in-page
+      // search under the previous page's name.
+      // Percent-encoded on the wire — headers cannot carry raw Japanese.
+      var title = res.headers.get('X-Title');
+      if (title) document.title = decodeURIComponent(title);
+
       // Show the full-page URL, not the partial endpoint.
       var pushUrl = res.headers.get('X-Push-Url');
       if (pushUrl) history.pushState(null, '', pushUrl);
-
-      // Keep the tab name in step with that URL. Percent-encoded on the wire —
-      // headers cannot carry raw Japanese.
-      var title = res.headers.get('X-Title');
-      if (title) document.title = decodeURIComponent(title);
 
       // Alpine's MutationObserver initialises the new subtree itself; this only tells
       // the page component to re-measure the custom scrollbar.
@@ -361,6 +363,8 @@
     });
   });
   </script>
+
+  <%- include('../partials/analytics') %>
 
   <base href="/">
 </head>

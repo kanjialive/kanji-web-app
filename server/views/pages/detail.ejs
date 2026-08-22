@@ -311,8 +311,11 @@
       var nc = doc.querySelector('.container2');
       if (!nc) throw new Error('missing container');
       document.querySelector('.container2').replaceWith(nc);
-      history.pushState(null, '', url.replace(/\?.*$/, ''));
+      // Title BEFORE pushState: analytics logs a page view off the history event and
+      // reads document.title as it fires, so the other order files every prev/next
+      // under the previous kanji's name.
       if (nc.dataset.title) document.title = nc.dataset.title;
+      history.pushState(null, '', url.replace(/\?.*$/, ''));
 
       // replaceWith destroyed the focused node: announce the new kanji and land
       // focus on its heading, or keyboard users silently restart from <body>.
@@ -344,6 +347,8 @@
     if (audio) { audio.src = src; audio.play(); }
   };
   </script>
+
+  <%- include('../partials/analytics') %>
 
   <base href="/">
 </head>

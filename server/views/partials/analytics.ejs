@@ -1,0 +1,16 @@
+<%# Google Analytics 4. Renders nothing unless GA_MEASUREMENT_ID is set, so staging and
+    a local run stay out of the production property.
+
+    This is the ONE third-party <script> the app loads, and the "never add a CDN script"
+    rule still holds for everything else: that rule guards against a library the page
+    cannot render without. Nothing here is load-bearing — if googletagmanager is
+    unreachable the app is unaffected and only the measurement is lost. %>
+<% if (gaMeasurementId) { %>
+<script async src="https://www.googletagmanager.com/gtag/js?id=<%= gaMeasurementId %>"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', <%- JSON.stringify(gaMeasurementId) %>);
+</script>
+<% } %>

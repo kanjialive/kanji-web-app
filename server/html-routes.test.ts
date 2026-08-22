@@ -595,3 +595,55 @@ test("index.ts routes its /htmx redirect through canonicalHtmxUrl", () => {
     "the /htmx redirect must go through canonicalHtmxUrl(), not a raw originalUrl"
   );
 });
+
+/**
+ * The analytics tag is invisible to tsc and paints nothing, so a template edit that
+ * drops the include, or a config var holding the numeric property id instead of the
+ * measurement id, both look exactly like a working page. Only a render catches it.
+ *
+ * Seen red: removing the include from docs.ejs, and loosening the format check.
+ */
+test("the analytics tag renders only for a well-formed GA4 measurement id", async () => {
+  const original = process.env.GA_MEASUREMENT_ID;
+  try {
+    for (const [id, expected] of [
+      ["G-ABCD123XYZ", true],
+      // The numeric GA account/property id — what Google's admin UI shows first.
+      ["35022736", false],
+      ["", false],
+    ] as [string, boolean][]) {
+      process.env.GA_MEASUREMENT_ID = id;
+      await withServer({} as Db, async (base) => {
+        const body = await (await fetch(`${base}/api/docs`)).text();
+        assert.equal(
+          body.includes("googletagmanager.com/gtag/js"),
+          expected,
+          `GA_MEASUREMENT_ID=${JSON.stringify(id)} should ${expected ? "" : "not "}emit a tag`
+        );
+        if (expected) {
+          assert.ok(
+            body.includes(`gtag('config', "${id}")`),
+            "the tag loaded but never configured the measurement id — it records nothing"
+          );
+        }
+      });
+    }
+  } finally {
+    if (original === undefined) delete process.env.GA_MEASUREMENT_ID;
+    else process.env.GA_MEASUREMENT_ID = original;
+  }
+});
+
+// Rendering one page proves the partial works; only this proves every page reaches it.
+test("every page includes the analytics partial", () => {
+  const pages = path.join(__dirname, "views", "pages");
+  const files = fs.readdirSync(pages).filter((f) => f.endsWith(".ejs"));
+  assert.ok(files.length >= 3, "found no page templates — has views/pages moved?");
+  for (const file of files) {
+    assert.match(
+      fs.readFileSync(path.join(pages, file), "utf8"),
+      /include\('\.\.\/partials\/analytics'\)/,
+      `${file} is not tracked — it lost the analytics include`
+    );
+  }
+});

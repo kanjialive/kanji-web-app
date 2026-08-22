@@ -59,14 +59,43 @@ let db: Db;
 
 export const router = Router();
 
+let gaWarned = false;
+
+/**
+ * The GA4 measurement ID, or "" when analytics is off. Read per request so a dyno's
+ * config var takes effect on restart with no rebuild.
+ *
+ * The format check exists because the ID Google shows most prominently in its admin UI
+ * is the numeric PROPERTY id, not this one — pasting that yields a tag that loads and
+ * silently records nothing. Refusing it, loudly and once, is the only signal there is.
+ */
+export const gaMeasurementId = (): string => {
+  const id = (process.env.GA_MEASUREMENT_ID ?? "").trim();
+  if (!id) return "";
+  if (!/^G-[A-Z0-9]+$/i.test(id)) {
+    if (!gaWarned) {
+      gaWarned = true;
+      console.warn(
+        `GA_MEASUREMENT_ID=${id} is not a GA4 measurement ID (expected G-XXXXXXXXXX). Analytics disabled.`
+      );
+    }
+    return "";
+  }
+  return id;
+};
+
 /**
  * numberOrBlank reaches EVERY view this router renders, never passed render-by-render.
  * The invariant is "the NaN sentinel never reaches a page", so it must be in scope on
  * pages added later too — a helper that has to be remembered at each call site will
  * eventually be forgotten at one, which is how a results heading came to print "NaN".
+ *
+ * gaMeasurementId rides along for the same reason: a page added later is tracked by
+ * default rather than by remembering.
  */
 router.use((_req: Request, res: Response, next) => {
   res.locals.numberOrBlank = numberOrBlank;
+  res.locals.gaMeasurementId = gaMeasurementId();
   next();
 });
 
