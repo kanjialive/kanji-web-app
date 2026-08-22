@@ -8,7 +8,7 @@ This project is a Japanese kanji learning web application [https://app.kanjialiv
 
 The architecture follows a client-server model with:
 
-  1. Server API split into private (internal) and public (external) endpoints
+  1. Two JSON API surfaces: one requires a free RapidAPI key, the other is open and unsupported
   2. EJS pages for search, detail, and documentation views, rendered on the server
   3. Custom media handling for kanji stroke animations and audio
 
@@ -35,6 +35,8 @@ Note: Until August 2026, this was an AngularJS 1.5.8 single-page app. That front
 ### Kanji alive data and API
 
 Our [data and media](https://github.com/kanjialive/kanji-data-media) repository includes all of the language data and media files created for _Kanji alive_. These files will primarily interest instructors and students who want to re-use them for teaching and learning. Developers may prefer instead to make use of the free [public API](https://rapidapi.com/KanjiAlive/api/learn-to-read-and-write-japanese-kanji) ([docs](https://app.kanjialive.com/api/docs/)) to the _Kanji alive_ web application. 
+
+The application serves two JSON APIs. The public API above requires a free RapidAPI key and has documented, stable response shapes; it is the one to build against. A second set of endpoints under `/api/` needs no key. Despite the `private-api` name in the source these are not internal — they are reachable by anyone. But they have no documentation and their response shapes may change without notice. They are kept because they are the project's only JSON API that does not depend on a third-party gateway. Neither API serves the licence-restricted mnemonic hints or textbook mappings.
 
 ### Development
 
