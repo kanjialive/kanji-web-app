@@ -16,12 +16,14 @@ The app has three runtime dependencies — `ejs`, `express` and `mongodb`. Clien
 
 ### Feature changes
 
+v2.1
+
 • Made various small improvements to the appearance of the user interface
 • Updated and standardised the use of web fonts 
 • Added a “shift + r” keyboard shortcut for the radical animation
 • Made web browser bookmarks of Kanji alive pages more informative
 • Improved the web application’s accessibility features (work-in-progress)
-• Added support for searching for missing values with an empty key (e.g. 'grade:'); grade:n/a no longer works."
+• Search for missing values with an empty key only; "grade:n/a" no longer works
 • Removed support for Kenkyusha’s Luminous Dictionary
 • Updated the Kanji alive API
 
@@ -34,9 +36,23 @@ Note: Until August 2026, this was an AngularJS 1.5.8 single-page app. That front
 
 Our [data and media](https://github.com/kanjialive/kanji-data-media) repository includes all of the language data and media files created for _Kanji alive_. These files will primarily interest instructors and students who want to re-use them for teaching and learning. Developers may prefer instead to make use of the free [public API](https://rapidapi.com/KanjiAlive/api/learn-to-read-and-write-japanese-kanji) ([docs](https://app.kanjialive.com/api/docs/)) to the _Kanji alive_ web application. 
 
+### Development
+
+```bash
+cp .env.example .env          # fill in the values
+set -a; source .env; set +a   # no dotenv here — nothing reads .env on its own
+npm run dev
+```
+
+Single-quote every value: the Atlas connection string contains `&`, and unquoted, `source .env` fails on it and sets nothing.
+
+`npm run dev` builds before it runs, and must — static files are served only from `dist/static`, so an unbuilt server renders every page unstyled.
+
+Gates, all three must pass: `npm run typecheck`, `npm run lint` (zero findings), `npm test`.
+
 ### Credits
 
-Application development: Arno Bosse w/Claude Code (Alpine.js/EJS), Joshua Day (Angular). Japanese language data and media: Harumi Hibino Lory and the _Kanji alive_ team. UI Design: Arno Bosse. Contributions and bug fixes: Eric Volpert, Joshua Day, Peter Thorson, Tanya Gray Jones, Mat Wilcoxson and to the many users who reported errors and suggested improvements over the years. Please see [our main website](http://kanjialive.com/credits/) for more details.
+Application development: Arno Bosse w/Claude Code (Alpine.js/EJS), Joshua Day (Angular). Japanese language data and media: Harumi Hibino Lory and the _Kanji alive_ team. UI/UX design: Arno Bosse. Contributions and bug fixes: Eric Volpert, Joshua Day, Peter Thorson, Tanya Gray Jones, Mat Wilcoxson and the many users who reported errors and suggested improvements over the years. Please see [our main website](https://kanjialive.com/credits/) for more details.
 
 ### Contact
 
