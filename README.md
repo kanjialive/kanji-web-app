@@ -18,14 +18,14 @@ The app has three runtime dependencies — `ejs`, `express` and `mongodb`. Clien
 
 v2.1
 
-• Made various small improvements to the appearance of the user interface
-• Updated and standardised the use of web fonts 
-• Added a “shift + r” keyboard shortcut for the radical animation
-• Made web browser bookmarks of Kanji alive pages more informative
-• Improved the web application’s accessibility features (work-in-progress)
-• Search for missing values with an empty key only; "grade:n/a" no longer works
-• Removed support for Kenkyusha’s Luminous Dictionary
-• Updated the Kanji alive API
+- Made various small improvements to the appearance of the user interface
+- Updated and standardised the use of web fonts 
+- Added a “shift + r” keyboard shortcut for the radical animation
+- Made web browser bookmarks of Kanji alive pages more informative
+- Improved the web application’s accessibility features (work-in-progress)
+- Search for missing values with an empty key only; "grade:n/a" no longer works
+- Removed support for Kenkyusha’s Luminous Dictionary
+- Updated the Kanji alive API
 
 ### Legacy version
 
