@@ -1,6 +1,6 @@
 # Kanji alive web application
 
-This project is a Japanese kanji learning web application [https://app.kanjialive.com](https://app.kanjialive.com) built with:
+This project is a [Japanese kanji learning web application](https://app.kanjialive.com) built with:
 
   - Frontend: server-rendered EJS views with [Alpine.js](https://alpinejs.dev) for interactivity
   - Backend: Node.js 24.x + Express 4.x serving both static files and API endpoints
@@ -23,7 +23,7 @@ v2.1
 - Added a “shift + r” keyboard shortcut for the radical animation
 - Made web browser bookmarks of Kanji alive pages more informative
 - Improved the web application’s accessibility features (work-in-progress)
-- Search for missing values with an empty key only; "grade:n/a" no longer works
+- Search for missing values with an empty key only (e.g. "grade:"); "grade:n/a" no longer works
 - Removed support for Kenkyusha’s Luminous Dictionary
 - Updated the Kanji alive API
 
