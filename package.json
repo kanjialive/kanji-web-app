@@ -6,7 +6,7 @@
   "author": "dayj",
   "dependencies": {
     "ejs": "^6.0.1",
-    "express": "4.x",
+    "express": "^5.2.1",
     "mongodb": "6.x"
   },
   "engines": {
@@ -25,7 +25,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
-    "@types/express": "^4.17.25",
+    "@types/express": "^5.0.6",
     "@types/node": "^24.13.3",
     "eslint": "^10.7.0",
     "ts-node": "^10.9.2",

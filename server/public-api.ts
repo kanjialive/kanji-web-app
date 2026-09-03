@@ -131,7 +131,7 @@ export const advancedSearch = async (
   await getSearchResultsWithQuery(query, req, res);
 };
 
-export const basicSearch = async (req: Request, res: Response) => {
+export const basicSearch = async (req: Request<{ search: string }>, res: Response) => {
   const query = search.generateBasicQuery(req.params.search);
   await getSearchResultsWithQuery(query, req, res);
 };

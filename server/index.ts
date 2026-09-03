@@ -118,7 +118,7 @@ app.use(
 );
 app.use("/static", express.static(path.join(__dirname, "static"), { maxAge: "1d" }));
 
-// Must stay ABOVE app.all("/*") — without it the catch-all 302s /robots.txt to /search,
+// Must stay ABOVE app.all("/*splat") — without it the catch-all 302s /robots.txt to /search,
 // so crawlers read an HTML page as the rules and conclude nothing is disallowed.
 // `/api/` because the unauthenticated JSON routes serve licence-restricted mn_hint;
 // `/api/docs` is carved back in — it is public reference documentation and the place
@@ -130,7 +130,7 @@ app.get("/robots.txt", (req: Request, res: Response) => {
   res.type("text/plain").send("User-agent: *\nDisallow: /api/\nAllow: /api/docs\n");
 });
 
-// Must stay ABOVE app.all("/*") for the same reason as /robots.txt: the catch-all answers a
+// Must stay ABOVE app.all("/*splat") for the same reason as /robots.txt: the catch-all answers a
 // missing icon with a 302 to /search, so every page load fetched an HTML page as its favicon.
 // maxAge is the point — without it each load still revalidates, and a 304 is still a request.
 // 7d, not the fonts' 30d: favicon.ico is a fixed path, so a replacement cannot be cache-busted
@@ -202,7 +202,7 @@ app.use("/", html_routes.router);
 //
 // This also swallows MISSING STATIC FILES — they 302 instead of 404ing, so a typo'd asset
 // path fails silently and the console stays clean. Fix when Express 5 forces this rewrite.
-app.all("/*", function (req: Request, res: Response) {
+app.all("/*splat", function (req: Request, res: Response) {
   res.redirect("/search");
 });
 

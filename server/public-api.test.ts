@@ -298,7 +298,7 @@ test("basic search is unaffected — its filter is never empty", async () => {
   const res = captureRes();
 
   await publicApi.basicSearch(
-    { params: { search: "water" } } as unknown as Request,
+    { params: { search: "water" } } as unknown as Request<{ search: string }>,
     res as unknown as Response
   );
 

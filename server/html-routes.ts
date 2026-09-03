@@ -372,7 +372,7 @@ router.get("/search/advanced", (req: Request, res: Response) =>
   renderSearchPage(req, res)
 );
 
-router.get("/search/:search", (req: Request, res: Response) =>
+router.get("/search/:search", (req: Request<{ search: string }>, res: Response) =>
   renderSearchPage(req, res, req.params.search)
 );
 
@@ -472,7 +472,7 @@ router.get("/api/docs", (_req: Request, res: Response) => {
 });
 
 /** The kanji detail page, at the canonical URL (also under the /htmx testing alias). */
-router.get("/:character", async (req: Request, res: Response, next) => {
+router.get("/:character", async (req: Request<{ character: string }>, res: Response, next) => {
   // Mounted at the app root, so this matches any single path segment: pass file-ish or
   // long paths (favicon.ico, robots.txt, …) to the fallback.
   let character: string;

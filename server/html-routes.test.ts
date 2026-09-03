@@ -517,7 +517,7 @@ test("canonicalHtmxUrl never returns a protocol-relative or off-origin location"
 });
 
 /**
- * Ordering is the whole property: below app.all("/*") the route still compiles, still
+ * Ordering is the whole property: below app.all("/*splat") the route still compiles, still
  * looks right in review, and silently 302s /robots.txt to /search — which is what
  * production did for years. tsc cannot see route order, so this reads the shipped source.
  */
@@ -527,9 +527,9 @@ test("index.ts serves /robots.txt, and does so ABOVE the catch-all", () => {
   const robots = source.indexOf('app.get("/robots.txt"');
   assert.notEqual(robots, -1, "no /robots.txt route in index.ts");
 
-  // The call signature, not the bare string: prose above mentions app.all("/*") too,
+  // The call signature, not the bare string: prose above mentions app.all("/*splat") too,
   // and matching a comment would compare the route against the wrong position.
-  const catchAll = source.indexOf('app.all("/*", function');
+  const catchAll = source.indexOf('app.all("/*splat", function');
   assert.notEqual(catchAll, -1, "no catch-all found — has it moved? regex has rotted");
   assert.ok(
     robots < catchAll,
@@ -551,7 +551,7 @@ test("index.ts serves /robots.txt, and does so ABOVE the catch-all", () => {
 test("index.ts serves the icons from disk, ABOVE the catch-all", () => {
   const source = fs.readFileSync(path.join(__dirname, "index.ts"), "utf8");
 
-  const catchAll = source.indexOf('app.all("/*", function');
+  const catchAll = source.indexOf('app.all("/*splat", function');
   assert.notEqual(catchAll, -1, "no catch-all found — has it moved? regex has rotted");
 
   for (const route of ['app.get("/favicon.ico"', '"/apple-touch-icon.png"']) {
