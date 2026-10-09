@@ -110,8 +110,8 @@ app.get("/", (req: Request, res: Response) => {
 // soon enough to be worth the revalidation traffic a 0 costs on every page load.
 //
 // These lifetimes only reach the browser because a Cloudflare Cache Rule scoped to
-// app.kanjialive.com passes them through. Without it the edge rewrites every static asset
-// to 62 days, max-age=0 included. See CLAUDE.md, Deployment.
+// app.kanjialive.com passes them through. Without it the edge raises every static asset
+// to the zone's Browser Cache TTL, max-age=0 included. See CLAUDE.md, Deployment.
 app.use(
   "/static/fonts",
   express.static(path.join(__dirname, "static/fonts"), { maxAge: "30d" })
